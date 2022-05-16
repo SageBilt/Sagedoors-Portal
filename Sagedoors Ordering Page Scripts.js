@@ -2378,7 +2378,7 @@ function DrawAngleEdgePreview(AngleInput)
 	var AngleValue = 0;
 	var LineMaterial = document.getElementById("Material"+LineNumber).value;
 	var NumberPatt = /[0-9]+/;
-	var MatThick = parseFloat(LineMaterial.match(NumberPatt)); 
+	var MatThick = GetMatThickFromName(LineMaterial); //parseFloat(LineMaterial.match(NumberPatt)); 
 	
 	var RegExp = /[\xB0mm]/g;
 	
@@ -2572,7 +2572,7 @@ function DrawPreview(canvasId,canvas2Id,LineDivID)
 	var ManualClashingStoke = "Gold";
 	}
 
-	var MaterialThick = parseFloat(itemMaterial.substr(itemMaterial.search(itemMaterial.match(/\d/)),2));
+	var MaterialThick = GetMatThickFromName(itemMaterial);
 	var LineJSON = document.getElementById("LineJSON"+LineNumber).value;
 
 	if (canvasId != 'PartEditCanvas') {if (LineJSON == '') {PartJSON = {"Operations" :[] , "Vectors" :[]}} else {PartJSON = JSON.parse(LineJSON);}}
@@ -3413,8 +3413,7 @@ function DrawPreview(canvasId,canvas2Id,LineDivID)
 
 	if (PanelType == 'Builtup Panel' && WidthNode > 0 )
 	{
-	var NumberPatt = /[0-9]+/;
-	var ThickString = itemMaterial.match(NumberPatt); 
+	var ThickString = GetMatThickFromName(itemMaterial); 
 	//PanelThick=myRound(parseFloat(itemMaterial.slice(itemMaterial.length-8,itemMaterial.length-6))*(PlanBoxWidth/WidthNode));
 	PanelThick=myRound(parseFloat(ThickString)*(PlanBoxWidth/WidthNode));
 	//alert(ThickString);

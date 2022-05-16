@@ -2052,6 +2052,24 @@ var InputStr = InputValue.toString();
 
 //var VariableList = ["X","Y","PartLength","PartWidth","PartThick","Width","Dia","Qty","Spacing","AutoSpacing","MaxSpacing(300)","MaxSpacing(400)","PartLengthCentre","PartWidthCentre"];
 
+function GetMatThickFromName(MatName)
+{
+var NewText = '';
+
+   for (var i = 0; i < MatName.length; i++) 
+   {
+	    //alert(MatName[i]);	
+	   
+	    if ( !isNaN(parseInt(MatName[i])) | MatName[i] == '.' & NewText.length > 0)
+	    {NewText = NewText+MatName[i];}
+		else
+		{
+			if (NewText.length > 1) {break;} else {NewText = '';}
+		}
+   }
+	return parseFloat(NewText);
+}
+
 function CreateEvalParams(InputValue,ItemID,ItemType) //,ParamIDs = []
 {	
 	
@@ -2059,7 +2077,7 @@ function CreateEvalParams(InputValue,ItemID,ItemType) //,ParamIDs = []
 	var LineDiv = document.getElementById(document.getElementById("selectedline").innerHTML);
 	var LineNumber = LineDiv.getAttribute("data-LineNumber");
 	var itemMaterial = document.getElementById("Material"+LineNumber).value;
-	if (itemMaterial != '') {EvalString = EvalString + "var PartThick = "+itemMaterial.substr(itemMaterial.search(itemMaterial.match(/\d/)),2)+";";}
+	if (itemMaterial != '') {EvalString = EvalString + "var PartThick = "+GetMatThickFromName(itemMaterial)+";";}
 	else {EvalString = EvalString + "var PartThick = 18;";}
 	
 	if (ItemType == 'Operations')
@@ -2729,7 +2747,7 @@ var Result = true;
 var LineDiv = document.getElementById(document.getElementById("selectedline").innerHTML);
 var LineNumber = LineDiv.getAttribute("data-LineNumber");
 var itemMaterial = document.getElementById("Material"+LineNumber).value;
-var MaterialThick = parseFloat(itemMaterial.substr(itemMaterial.search(itemMaterial.match(/\d/)),2));
+var MaterialThick = GetMatThickFromName(itemMaterial);
 var LeftedgeNode = document.getElementById("Leftedge"+LineNumber);
 var RightedgeNode = document.getElementById("Rightedge"+LineNumber);
 var TopedgeNode = document.getElementById("Topedge"+LineNumber);
@@ -2797,7 +2815,7 @@ function CheckBandAllowed(LineDiv,Edge,Type)
 var Result = true;
 var LineNumber = LineDiv.getAttribute("data-LineNumber");
 var itemMaterial = document.getElementById("Material"+LineNumber).value;
-var MaterialThick = parseFloat(itemMaterial.substr(itemMaterial.search(itemMaterial.match(/\d/)),2));
+var MaterialThick = GetMatThickFromName(itemMaterial);
 var RoutingCount = 0;
 
 if (Type != 'None')
