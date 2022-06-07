@@ -2967,30 +2967,32 @@ var RightedgeTickNode = document.getElementById("RightedgeTick"+LineNumber);
 var TopedgeTickNode = document.getElementById("TopedgeTick"+LineNumber);
 var BottomedgeTickNode = document.getElementById("BottomedgeTick"+LineNumber);	
 
+		var TickEdgeType = GetStdEdgeType(LineDivID,'SetBandTickBoxesForLibPart('+LineNumber+','+LibPartList+','+PartIndex+')');
+
 		switch (LibPartList[PartIndex].EdgeLeft)
 		{
-		case 1 : ChangeCheckBoxValue(LeftedgeTickNode.id,'Tick'); break;
+		case 1 : ChangeCheckBoxValue(LeftedgeTickNode.id,TickEdgeType); break;
 		case 2 : ChangeCheckBoxValue(LeftedgeTickNode.id,'45Profile'); break;
 		case 3 : ChangeCheckBoxValue(LeftedgeTickNode.id,'AngleEdge'); break;
 		default : ChangeCheckBoxValue(LeftedgeTickNode.id,'None'); break;
 		}
 		switch (LibPartList[PartIndex].EdgeRight)
 		{
-		case 1 : ChangeCheckBoxValue(RightedgeTickNode.id,'Tick'); break;
+		case 1 : ChangeCheckBoxValue(RightedgeTickNode.id,TickEdgeType); break;
 		case 2 : ChangeCheckBoxValue(RightedgeTickNode.id,'45Profile'); break;
 		case 3 : ChangeCheckBoxValue(RightedgeTickNode.id,'AngleEdge'); break;
 		default : ChangeCheckBoxValue(RightedgeTickNode.id,'None'); break;
 		}
 		switch (LibPartList[PartIndex].EdgeTop)
 		{
-		case 1 : ChangeCheckBoxValue(TopedgeTickNode.id,'Tick'); break;
+		case 1 : ChangeCheckBoxValue(TopedgeTickNode.id,TickEdgeType); break;
 		case 2 : ChangeCheckBoxValue(TopedgeTickNode.id,'45Profile'); break;
 		case 3 : ChangeCheckBoxValue(TopedgeTickNode.id,'AngleEdge'); break;
 		default : ChangeCheckBoxValue(TopedgeTickNode.id,'None'); break;
 		}
 		switch (LibPartList[PartIndex].EdgeBot)
 		{
-		case 1 : ChangeCheckBoxValue(BottomedgeTickNode.id,'Tick'); break;
+		case 1 : ChangeCheckBoxValue(BottomedgeTickNode.id,TickEdgeType); break;
 		case 2 : ChangeCheckBoxValue(BottomedgeTickNode.id,'45Profile'); break;
 		case 3 : ChangeCheckBoxValue(BottomedgeTickNode.id,'AngleEdge'); break;
 		default : ChangeCheckBoxValue(BottomedgeTickNode.id,'None'); break;
