@@ -290,25 +290,6 @@ function RunTimer()
 CloseWindowPopUp('hiddenDiv','DynamicElemsDiv','blanket');	
 }
 
-function GetMatThickFromName(MatName)
-{
-var NewText = '';
-
-   for (var i = 0; i < MatName.length; i++) 
-   {
-	    //alert(MatName[i]);	
-	   
-	    if ( !isNaN(parseInt(MatName[i])) | MatName[i] == '.' & NewText.length > 0)
-	    {NewText = NewText+MatName[i];}
-		else
-		{
-			if (NewText.length > 1) {break;} else {NewText = '';}
-		}
-   }
-	return parseFloat(NewText);
-}
-
-
 function SetpopupWin(popUpDiv,blanket,WinHieght,WinWidth) 
 {
 	popUpDiv.style.width=WinWidth + "px";
