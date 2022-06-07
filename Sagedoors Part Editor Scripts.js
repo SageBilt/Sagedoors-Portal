@@ -2052,6 +2052,24 @@ var InputStr = InputValue.toString();
 
 //var VariableList = ["X","Y","PartLength","PartWidth","PartThick","Width","Dia","Qty","Spacing","AutoSpacing","MaxSpacing(300)","MaxSpacing(400)","PartLengthCentre","PartWidthCentre"];
 
+function GetMatThickFromName(MatName)
+{
+var NewText = '';
+
+   for (var i = 0; i < MatName.length; i++) 
+   {
+	    //alert(MatName[i]);	
+	   
+	    if ( !isNaN(parseInt(MatName[i])) | MatName[i] == '.' & NewText.length > 0)
+	    {NewText = NewText+MatName[i];}
+		else
+		{
+			if (NewText.length > 1) {break;} else {NewText = '';}
+		}
+   }
+	return parseFloat(NewText);
+}
+
 function CreateEvalParams(InputValue,ItemID,ItemType) //,ParamIDs = []
 {	
 	
