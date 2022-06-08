@@ -2647,7 +2647,6 @@ function DrawAngleEdgePreview(AngleInput)
 	
 }
 
-
 function GetMatThickFromName(MatName)
 {
 var NewText = '';

@@ -2052,7 +2052,7 @@ var InputStr = InputValue.toString();
 
 //var VariableList = ["X","Y","PartLength","PartWidth","PartThick","Width","Dia","Qty","Spacing","AutoSpacing","MaxSpacing(300)","MaxSpacing(400)","PartLengthCentre","PartWidthCentre"];
 
-/*
+
 function GetMatThickFromName(MatName)
 {
 var NewText = '';
@@ -2069,7 +2069,7 @@ var NewText = '';
 		}
    }
 	return parseFloat(NewText);
-}*/
+}
 
 function CreateEvalParams(InputValue,ItemID,ItemType) //,ParamIDs = []
 {	
