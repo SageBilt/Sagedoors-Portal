@@ -910,7 +910,10 @@ var MatIndex = FindItem(itemMaterial,Materials,"Name");
 	{
 	var PopUpMessage = Materials[MatIndex].PopupMessage;
 	
-		if ( Materials[MatIndex].Grained == '' ) 
+	if( Materials[MatIndex].Grained == 'True') {var IsGrained = true;} else {var IsGrained = false;}
+	
+	
+		if ( !IsGrained ) 
 		{
 		RemoveExtraPar("GrainMatchGroup",LineDivID);
 		RemoveExtraPar("GrainMatchOrder",LineDivID);
@@ -4638,17 +4641,16 @@ function ExecSubMaterial()
 			RecalcAllPartObj();
 			document.getElementById("LineJSON"+r).value = JSON.stringify(PartJSON);
 			}
-			var ProfileName = GetHDFProfileName(itemMaterial);
-			var HHDItemIndex = FindItem(ProfileName,HDFDoorSpecData,'Profile');
-			
-			if (HHDItemIndex > -1) {var HDFFramedDoor = HDFDoorSpecData[HHDItemIndex].Frame}
-			else {var HDFFramedDoor = false}
-			
+	
+			var HDFFramedDoor = IsHDFFramedDoor(document.getElementById("Material"+r).value);
 
-			if ( Materials[FindItem(document.getElementById("Material"+r).value,Materials,"Name")].Grained == '' & !HDFFramedDoor) 
+			if ( Materials[FindItem(document.getElementById("Material"+r).value,Materials,"Name")].Grained == "True" ) {var IsGrained = true;} else {var IsGrained = false;}
+
+			if ( !IsGrained & !HDFFramedDoor) 
 			{
 			RemoveExtraPar("GrainMatchGroup","LineDiv"+r);
 			RemoveExtraPar("GrainMatchOrder","LineDiv"+r);
+			RemoveExtraPar("DrwFrontOption","LineDiv"+r);
 			}
 			
 			SwapOutStdEdgeType("LineDiv"+r,r,'ChangeOutHDFEdgesForMat("'+document.getElementById("Material"+r).value+'",'+r+')');
@@ -4992,6 +4994,15 @@ if (IsHDFMaterial) {document.getElementById("HDFDrwFrontOptions").style.display 
 else {document.getElementById("HDFDrwFrontOptions").style.display = "none";}
 }
 
+function IsHDFFramedDoor(LineMaterial)
+{
+	var ProfileName = GetHDFProfileName(LineMaterial);
+	var HHDItemIndex = FindItem(ProfileName,HDFDoorSpecData,'Profile');
+	
+	if (HHDItemIndex > -1) {return HDFDoorSpecData[HHDItemIndex].Frame}
+	else {return false}
+}
+
 function PopulateGrainMatchPartLists(GroupNumber,PartsListBox)
 {
 
@@ -5006,14 +5017,10 @@ function PopulateGrainMatchPartLists(GroupNumber,PartsListBox)
 			
 			if (LineMaterial.indexOf("HDF") > -1 ) {var IsHDFMaterial = true} else {var IsHDFMaterial = false}
 			
-			/*		var ProfileName = GetHDFProfileName(itemMaterial);
-			var HHDItemIndex = FindItem(ProfileName,HDFDoorSpecData,'Profile');
-			
-			if (HHDItemIndex > -1) {var HDFFramedDoor = HDFDoorSpecData[HHDItemIndex].Frame}
-			else {var HDFFramedDoor = false}*/
-	
-			
-			if ( Materials[FindItem(LineMaterial,Materials,"Name")].Grained  == "True" & CurrentGroupNumber == GroupNumber & document.getElementById("PanelType"+r).value != 'Builtup Panel' & document.getElementById("PanelType"+r).value != 'Profile Handle')
+			var HDFFramedDoor = IsHDFFramedDoor(LineMaterial);
+
+
+			if ( (Materials[FindItem(LineMaterial,Materials,"Name")].Grained  == "True" | HDFFramedDoor) & CurrentGroupNumber == GroupNumber & document.getElementById("PanelType"+r).value != 'Builtup Panel' & document.getElementById("PanelType"+r).value != 'Profile Handle')
 			{
 				if (FirstPart) {SetHDFDrwFrontOptionsVisibility(LineMaterial);}
 
@@ -5112,7 +5119,8 @@ if (HiddenDIv.childNodes.length == 0 && document.getElementById("Orderlines").ch
 	{ 
 		var LineMaterial = document.getElementById("Material"+r).value;
 		var PartWidth = parseFloat(document.getElementById("Width"+r).value);
-		if ( Materials[FindItem(LineMaterial,Materials,"Name")].Grained  == "True" & document.getElementById("PanelType"+r).value != 'Builtup Panel')
+		var HDFFramedDoor = IsHDFFramedDoor(LineMaterial);
+		if ( (Materials[FindItem(LineMaterial,Materials,"Name")].Grained  == "True" | HDFFramedDoor) & document.getElementById("PanelType"+r).value != 'Builtup Panel')
 		{ 
 			if (PartWidth > LastPartWidth) 
 			{
