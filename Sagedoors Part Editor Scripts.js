@@ -4546,6 +4546,7 @@ InsertDiv.removeAttribute("hidden");
 				DisplayName.setAttribute("class","inputleft");
 				DisplayName.setAttribute("style","width:180px;");
 				DisplayName.setAttribute("readonly","readonly");
+				DisplayName.setAttribute("onfocus","DrawParamImage(this.id);");
 				DisplayName.value = LineNodeJSON.Parameters[i].DisplayName;
 				
 				var ArrOfStrs = LineNodeJSON.Parameters[i].Value.split(",");
@@ -4624,11 +4625,13 @@ var patt1=/[0-9]+/i;
 var LineNo = patt1.exec(ParamElemID);	
 var Tempimg = new Image();
 
+ParamImg.style.display = 'none';
+
 	if (PartJSON.Parameters[LineNo-1].hasOwnProperty("Image") )
 	{
 	var LibImageID = FindItem(PartJSON.Parameters[LineNo-1].Image,LibImages,"Name");	
-		
-		if (LibImageID > -1)
+		//alert(PartJSON.Parameters[LineNo-1].Image);
+		if (LibImageID > -1 & PartJSON.Parameters[LineNo-1].Image != "")
 		{
 		ParamImg.style.display = 'initial';	
 
@@ -4646,7 +4649,7 @@ var Tempimg = new Image();
 
 		ParamImg.style.backgroundImage = "url('data:image/png;base64,"+LibImages[LibImageID].Icon+"')";
 		}
-		else {ParamImg.style.display = 'none';}
+		//else {ParamImg.style.display = 'none';}
 	}
 }
 
@@ -5250,7 +5253,7 @@ var LoggedOnToken = document.getElementById("Token").value;
 
 
   xhttp.onreadystatechange = function() 
-  {
+  {	  
     if (this.readyState == 4 && this.status == 200) 
 	{
 //alert(this.responseText);
