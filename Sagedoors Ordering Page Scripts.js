@@ -58,7 +58,7 @@ var HDFDoorSpecData = [
 {"Profile" : "PENCIL" , "ProfileMargin" : 60 , "Frame" : true, "GlassFrame" : false },
 {"Profile" : "PRESTON" , "ProfileMargin" : 60 , "Frame" : true, "GlassFrame" : false },
 {"Profile" : "RHODE ISLAND" , "ProfileMargin" : 53 , "Frame" : true, "GlassFrame" : true},
-{"Profile" : "TENNESSEE" , "ProfileMargin" : 0 , "Frame" : true, "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 85 , "MaxEdge" : 0 , "IsFixedSpacing" : false} },
+{"Profile" : "TENNESSEE" , "ProfileMargin" : 0 , "Frame" : false, "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 12 , "MaxEdge" : 0 , "IsFixedSpacing" : false, "UserSpacing" : true} },
 {"Profile" : "TEXAS" , "ProfileMargin" : 0 , "Frame" : false, "GlassFrame" : false},
 {"Profile" : "TURNBERRY" , "ProfileMargin" : 0 , "Frame" : false, "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 22 , "MaxEdge" : 0 , "IsFixedSpacing" : false , "FixedSideMargin" : 13 } },
 {"Profile" : "UTAH" , "ProfileMargin" : 60 , "Frame" : true, "GlassFrame" : false},
@@ -913,7 +913,7 @@ var PanelType = document.getElementById("PanelType"+LineNumber).value;
 			
 			for (var i=0; i<Materials.length;i++) 
 			{
-				if (Materials[i].Name.indexOf(HDFPrefix) > -1 & HDFGlassFramedAllowed(Materials[i].Name) | Materials[i].Name.indexOf(HDFPrefix) == -1)
+				if (Materials[i].Name.indexOf(HDFPrefix) > -1 & HDFGlassFramedAllowed(Materials[i].Name) & Materials[i].Name.indexOf('(POCKET BACK)') == -1  | Materials[i].Name.indexOf(HDFPrefix) == -1)
 				{ FiltMatList.push({ "Name" : ""+Materials[i].Name+"" , "colour" : ""+Materials[i].colour+"" }); }
 			}
 			return FiltMatList
@@ -2026,6 +2026,10 @@ if (IconBase64Text != "") {PanelTypeNode.className = "Inputlines LeftIcon";} els
 			if (Materials[MatIndex].NoProfileHandle == 'Yes') { itemMaterial.value = null; }
 		}
 	break;
+	case 'Glass Frame'  :
+		document.getElementById("Description"+LineNumber).value = "Glass Frame"; ChangeDesc(LineDivID);
+
+		if (itemMaterial.value.indexOf(HDFPrefix) > -1 & !HDFGlassFramedAllowed(itemMaterial.value) | itemMaterial.value.indexOf('(POCKET BACK)') > -1) {itemMaterial.value = null;} 
 
 	default:
 		
@@ -2044,7 +2048,6 @@ if (IconBase64Text != "") {PanelTypeNode.className = "Inputlines LeftIcon";} els
 	LineDesc.setAttribute("readonly","readonly");
 	LineDesc.style.backgroundColor="#F2F2F2";
 
-		//if ( PanelType == 'Glass Frame' ) { document.getElementById("Description"+LineNumber).value = "Glass Frame"; ChangeDesc(LineDivID);}
 	}
 	else
 	{
@@ -2053,8 +2056,7 @@ if (IconBase64Text != "") {PanelTypeNode.className = "Inputlines LeftIcon";} els
 	document.getElementById("DescriptionDropButton"+LineNumber).removeAttribute("disabled"); //was DescType
 	LineDesc.removeAttribute("readonly");
 	LineDesc.style.backgroundColor="rgba(255,255,255,255)";
-	}	
-
+	}
 	
 }
 
@@ -2498,14 +2500,25 @@ var RightFaciaBox = document.getElementById("RigthFacWidth");
 		if (Framed) {document.getElementById("HDFProfileQtyDiv").style.display = "inherit";}
 		else {document.getElementById("HDFProfileQtyDiv").style.display = "none";}
 		
+		document.getElementById("VGrooveSpacingDiv").style.display = "none";
+		var VGrooves = HDFDoorSpecData[HHDItemIndex].VGrooves;
+		
+		if (VGrooves != undefined)
+		{
+			if (VGrooves.UserSpacing) {document.getElementById("VGrooveSpacingDiv").style.display = "inherit";}
+			SetExtraParInputValue('VGSpacing',LineDivID,VGrooves.MaxSpacing);
+		}
+		
 		document.getElementById("HDFExtendEdgesDiv").style.display = "inherit";
 
 		var FrameMargin = parseFloat(HDFDoorSpecData[HHDItemIndex].ProfileMargin);
 		
 		var ProfileQty = SetExtraParInputValue('ProfileQty',LineDivID,"1");
 		
-		SetExtraParInputValue('RailW',LineDivID,FrameMargin+2);
+		SetExtraParInputValue('RailW',LineDivID,(FrameMargin*2)+2);
 		SetExtraParInputValue('BDH',LineDivID,720);
+		
+
 		
 		ELvalue = parseFloat(SetExtraParInputValue('TEL',LineDivID,0));
 		document.getElementById("TELCalc").innerHTML = FrameMargin+ELvalue;
@@ -2514,11 +2527,10 @@ var RightFaciaBox = document.getElementById("RigthFacWidth");
 		ELvalue = parseFloat(SetExtraParInputValue('REL',LineDivID,0));
 		document.getElementById("RELCalc").innerHTML = FrameMargin+ELvalue;
 		ELvalue = parseFloat(SetExtraParInputValue('BEL',LineDivID,0));
-		document.getElementById("BELCalc").innerHTML = FrameMargin+ELvalue;
-		
+		document.getElementById("BELCalc").innerHTML = FrameMargin+ELvalue;	
 
 		HDFProfileQtyInputsVisibility(ProfileQty);
-
+		
 		}
 	}
 
@@ -3811,13 +3823,13 @@ function DrawPreview(canvasId,canvas2Id,LineDivID)
 				{
 					if (i == 1) 
 					{
-					PocketHeight = BaseDoorHeight-FrameMargin-(RailWidth/2);
+					PocketHeight = BaseDoorHeight-(FrameMargin*2);
 					PocketYPos = StartYPos;					
 					} 
 					else
 					{
-					PocketHeight = CombPocketHeight-(BaseDoorHeight-FrameMargin)-(RailWidth/2);
-					PocketYPos = BEL+BaseDoorHeight+(RailWidth/2);					
+					PocketHeight = CombPocketHeight-(BaseDoorHeight-FrameMargin)-(RailWidth-FrameMargin);
+					PocketYPos = BEL+BaseDoorHeight+(RailWidth-FrameMargin);					
 					}
 				}
 				else
@@ -3859,15 +3871,18 @@ function DrawPreview(canvasId,canvas2Id,LineDivID)
 				MaxEdge = VGrooves.MaxEdge;
 				IsFixedSpacing = VGrooves.IsFixedSpacing;
 				var ExtendVGrooveThroughFrame = VGrooves.ExtendThroughFrame;
-				//alert(ExtendVGrooveThroughFrame);
 				if (ExtendVGrooveThroughFrame == undefined) {ExtendVGrooveThroughFrame = false;}
+				var UserSpacing = 0;
+				
+					if (VGrooves.UserSpacing) {UserSpacing = parseFloat(GetExtraParValue("VGSpacing",LineDivID));}
+					if (isNaN(UserSpacing)) {UserSpacing = 0;}
 
-						//alert(IsFixedSpacing);
+						//alert(UserSpacing);
 						
 						
 					if (IsFixedSpacing) 
-					{
-					VGrooveSpacing = MaxSpacing;
+					{	
+					VGrooveSpacing = MaxSpacing;	
 					VGrooveQty = Math.floor(2+(((PocketWidth-MaxEdge*2)/VGrooveSpacing)));
 					//VGrooveSideMargin:= ((PocketWidth - (VGrooveSpcng*(VGrooveQty-1)))/2) + (ProfMargin+LeftExtraLength);
 					}
@@ -3883,6 +3898,12 @@ function DrawPreview(canvasId,canvas2Id,LineDivID)
 						VGrooveSpacing = PocketWidth/(1+Math.floor(PocketWidth/MaxSpacing));
 						VGrooveQty = Math.floor(PocketWidth/MaxSpacing);
 						}
+					}
+					
+					if (UserSpacing > 0) 
+					{
+						VGrooveSpacing = UserSpacing;
+						VGrooveQty = Math.floor(PocketWidth/UserSpacing);
 					}
 
 					VGrooveSideMargin = ((PocketWidth - (VGrooveSpacing*(VGrooveQty-1)))/2) + PocketXPos;
