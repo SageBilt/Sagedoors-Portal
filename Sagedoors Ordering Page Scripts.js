@@ -18,7 +18,7 @@ var CustomerMachiningCharge = true;
 var PartLength = 0;
 var PartWidth = 0;
 
-var HDFPrefix = 'HDF';
+var HDFPrefix = 'OPTIDOOR';
 
 var LastSelectedLineID = "";
 
