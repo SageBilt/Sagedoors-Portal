@@ -38,9 +38,9 @@ var PanelTypes = [
 var LibImages = [];
 
 var HDFDoorSpecData = [
-{"Profile" : "ALASKA" , "ProfileMargin" : 0 , "Frame" : false , "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 30 , "MaxEdge" : 0 , "IsFixedSpacing" : false} },
+{"Profile" : "ALASKA" , "ProfileMargin" : 0 , "Frame" : false , "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 42 , "MaxEdge" : 0 , "IsFixedSpacing" : false, "UserSpacing" : true, "HalfSpacingSideMargin" : true, "Width" : 26} },
 {"Profile" : "ARIZONA" , "ProfileMargin" : 60 , "Frame" : true, "GlassFrame" : true},
-{"Profile" : "BARNSLEY" , "ProfileMargin" : 60 , "Frame" : true, "GlassFrame" : false},
+{"Profile" : "BARNSLEY" , "ProfileMargin" : 18 , "Frame" : true, "GlassFrame" : false},
 {"Profile" : "CAROLINA" , "ProfileMargin" : 18 , "Frame" : true, "GlassFrame" : false},
 {"Profile" : "COLORADO" , "ProfileMargin" : 0 , "Frame" : false, "GlassFrame" : false},
 {"Profile" : "DAKOTA" , "ProfileMargin" : 60 , "Frame" : true , "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 85 , "MaxEdge" : 0 , "IsFixedSpacing" : false , "ExtendThroughFrame" : true} },
@@ -55,7 +55,7 @@ var HDFDoorSpecData = [
 {"Profile" : "NEWPORT" , "ProfileMargin" : 0 , "Frame" : false, "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 85 , "MaxEdge" : 0 , "IsFixedSpacing" : false} },
 {"Profile" : "OKLAHOMA" , "ProfileMargin" : 60 , "Frame" : true, "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 71 , "MaxEdge" : 75 , "IsFixedSpacing" : true} },
 {"Profile" : "OREGON" , "ProfileMargin" : 60 , "Frame" : true, "GlassFrame" : true },
-{"Profile" : "PENCIL" , "ProfileMargin" : 60 , "Frame" : true, "GlassFrame" : false },
+{"Profile" : "PENCIL" , "ProfileMargin" : 18 , "Frame" : true, "GlassFrame" : false },
 {"Profile" : "PRESTON" , "ProfileMargin" : 60 , "Frame" : true, "GlassFrame" : false },
 {"Profile" : "RHODE ISLAND" , "ProfileMargin" : 53 , "Frame" : true, "GlassFrame" : true},
 {"Profile" : "TENNESSEE" , "ProfileMargin" : 0 , "Frame" : false, "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 12 , "MaxEdge" : 0 , "IsFixedSpacing" : false, "UserSpacing" : true} },
@@ -995,7 +995,7 @@ function SwapOutStdEdgeType(LineDivID,LineNumber,CallFuncWithArg)
 		if (edgeTickNode.className != "checkboxBlank" & TickEdgeType == '') {TickEdgeType = GetStdEdgeType(LineDivID,CallFuncWithArg);}
 		
 		ImageClassIndex = FindItem(edgeTickNode.className,HDFEdgeProfiles,"ImageClass");
-		if (TickEdgeType == 'Tick' & ImageClassIndex > -1 | TickEdgeType != 'Tick' & ImageClassIndex == -1 & edgeTickNode.className != "checkboxBlank") {ChangeCheckBoxValue(edgeTickNode.id,TickEdgeType);}
+		if (TickEdgeType == 'Tick' & ImageClassIndex > -1 | TickEdgeType != 'Tick' & ImageClassIndex == -1 & edgeTickNode.className == "checkboxTick") {ChangeCheckBoxValue(edgeTickNode.id,TickEdgeType);}
 	}
 	
 	//alert(TickEdgeType + " - " + ImageClassIndex);
@@ -1228,7 +1228,7 @@ var PanelType = document.getElementById("PanelType"+LineNumber).value;
 	var SheetLength = Materials[FindItem(itemMaterial,Materials,"Name")].SheetLength;
 	var SheetWidth =  Materials[FindItem(itemMaterial,Materials,"Name")].SheetWidth;
 	//alert(SheetSize);
-	if (itemMaterial.indexOf("ACRYGLOSS") > -1 | itemMaterial.indexOf("ACRYMATTE") > -1 | itemMaterial.indexOf("TIMBALOOK") > -1 | itemMaterial.indexOf("SOFT TOUCH") > -1  ) { SheetMargin = 12;} else { SheetMargin = 4.5;}
+	if (itemMaterial.indexOf("ACRYGLOSS") > -1 | itemMaterial.indexOf("ACRYMATTE") > -1 | itemMaterial.indexOf("TIMBALOOK") > -1 | itemMaterial.indexOf("SOFT TOUCH") > -1 | itemMaterial.indexOf("LOOKCRETE") > -1 | itemMaterial.indexOf("TEXTAURA") > -1  ) { SheetMargin = 12;} else { SheetMargin = 4.5;}
 	//if (SheetSize == 2.9768) { SheetMargin = 4.5}
 	if ( Materials[FindItem(itemMaterial,Materials,"Name")].Grained == "True" ) {var IsGrained = true;} else {var IsGrained = false;}	
 	
@@ -1374,8 +1374,7 @@ var LineNumber = parseFloat(LineDiv.getAttribute("data-LineNumber"));
 
 		counter--
 
-
-		Calculations(MainDiv.childNodes.item(1).id);
+		if (MainDiv.childNodes.length > 1) {Calculations(MainDiv.childNodes.item(1).id);}
 	}	
 
 } // end of RemoveLine
@@ -1542,7 +1541,7 @@ function SetBandingFromJSON(LineDiv,ArrIndex,PartListArr,LitPartListArrText)
 {
 
 	SetBandTickBoxesForCustomShape(LineDiv);
-
+	//alert(LitPartListArrText);
 	if (ArrIndex > -1)
 	{	
 	var LineNumber = LineDiv.getAttribute("data-LineNumber");
@@ -1550,12 +1549,46 @@ function SetBandingFromJSON(LineDiv,ArrIndex,PartListArr,LitPartListArrText)
 	var RightedgeTickNode = document.getElementById("RightedgeTick"+LineNumber);
 	var TopedgeTickNode = document.getElementById("TopedgeTick"+LineNumber);
 	var BottomedgeTickNode = document.getElementById("BottomedgeTick"+LineNumber);
+	var TickEdgeType = '';
+	var edgeTickNode;
+	var edgeTickValue = 0;
+
 	
-	//alert(LitPartListArrText);
 	
-	var TickEdgeType = GetStdEdgeType(LineDiv.id,'SetBandingFromJSON('+LineDiv.id+','+ArrIndex+','+LitPartListArrText+')');
 	
-		switch (PartListArr[ArrIndex].EdgeLeft)
+		for (var r = 1; r<=4; r++) 
+		{
+			switch(r)
+			{
+			case 1 : edgeTickNode = document.getElementById("LeftedgeTick"+LineNumber);
+					edgeTickValue = PartListArr[ArrIndex].EdgeLeft;
+					break;
+			case 2 : edgeTickNode = document.getElementById("RightedgeTick"+LineNumber); 
+					edgeTickValue = PartListArr[ArrIndex].EdgeRight;
+					break;
+			case 3 : edgeTickNode = document.getElementById("TopedgeTick"+LineNumber); 
+					edgeTickValue = PartListArr[ArrIndex].EdgeTop;
+					break;
+			case 4 : edgeTickNode = document.getElementById("BottomedgeTick"+LineNumber); 
+					edgeTickValue = PartListArr[ArrIndex].EdgeBot;
+					break;		
+			}
+			
+			
+			switch (edgeTickValue)
+			{
+			case 1 : 
+					if (TickEdgeType == '') {TickEdgeType = GetStdEdgeType(LineDiv.id,'SetBandingFromJSON('+LineDiv.id+','+ArrIndex+','+LitPartListArrText+')');}
+					ChangeCheckBoxValue(edgeTickNode.id,TickEdgeType); 
+					break;
+			case 2 : ChangeCheckBoxValue(edgeTickNode.id,'45Profile'); break;
+			case 3 : ChangeCheckBoxValue(edgeTickNode.id,'AngleEdge'); break;
+			default : ChangeCheckBoxValue(edgeTickNode.id,'None'); break;
+			}
+			
+		}
+	
+		/* switch (PartListArr[ArrIndex].EdgeLeft)
 		{
 		case 1 : ChangeCheckBoxValue(LeftedgeTickNode.id,TickEdgeType); break;
 		case 2 : ChangeCheckBoxValue(LeftedgeTickNode.id,'45Profile'); break;
@@ -1582,7 +1615,7 @@ function SetBandingFromJSON(LineDiv,ArrIndex,PartListArr,LitPartListArrText)
 		case 2 : ChangeCheckBoxValue(BottomedgeTickNode.id,'45Profile'); break;
 		case 3 : ChangeCheckBoxValue(BottomedgeTickNode.id,'AngleEdge'); break;
 		default : ChangeCheckBoxValue(BottomedgeTickNode.id,'None'); break;
-		}
+		} */
 	
 	}	
 }
@@ -1686,9 +1719,11 @@ LibParts[i].Name;
 		
 		if (PartIsNotShaped)
 		{
-			var TickEdgeType = GetStdEdgeType(LineDivID,'ChangeBanding('+LineDivID+')');
+			
 
-			if (PanelType == 'Glass Frame' ) {
+			if (PanelType == 'Glass Frame' ) 
+			{
+			var TickEdgeType = GetStdEdgeType(LineDivID,'ChangeBanding("'+LineDivID+'")');	
 			ChangeCheckBoxValue(LeftedgeTickNode.id,TickEdgeType);
 			ChangeCheckBoxValue(RightedgeTickNode.id,TickEdgeType);
 			ChangeCheckBoxValue(TopedgeTickNode.id,TickEdgeType);
@@ -1712,6 +1747,7 @@ LibParts[i].Name;
 		
 				if (ReturnValue =="400")
 				{
+				var TickEdgeType = GetStdEdgeType(LineDivID,'ChangeBanding("'+LineDivID+'")');	
 				ChangeCheckBoxValue(LeftedgeTickNode.id,TickEdgeType);
 				ChangeCheckBoxValue(RightedgeTickNode.id,TickEdgeType);
 				ChangeCheckBoxValue(TopedgeTickNode.id,'None');
@@ -1723,6 +1759,7 @@ LibParts[i].Name;
 
 				if (ReturnValue =="100")
 				{
+				var TickEdgeType = GetStdEdgeType(LineDivID,'ChangeBanding("'+LineDivID+'")');	
 				ChangeCheckBoxValue(LeftedgeTickNode.id,TickEdgeType);
 				ChangeCheckBoxValue(RightedgeTickNode.id,'None');
 				ChangeCheckBoxValue(TopedgeTickNode.id,'None');
@@ -1936,6 +1973,8 @@ var TypeID = FindItem(PanelType,PanelTypes,"Name");
 	
 	CheckInvalidBanding(LineNumber);
 	
+	
+	
 }
 
 function CheckInvalidBanding(LineNumber)
@@ -1963,9 +2002,29 @@ var PanelType = document.getElementById("PanelType"+LineNumber).value;
 		if (PanelType == 'Angle Edge' | document.getElementById("ToggleAngleEdgesCheck").checked) {var AngleEdgesAvail = true;} else {var AngleEdgesAvail = false;}
 
 
-		var TickEdgeType = GetStdEdgeType("LineDiv"+LineNumber,'CheckInvalidBanding('+LineNumber+')');
+		var TickEdgeType = '';
+		var edgeTickNode;
 
-		if (LeftedgeNode.value == 'AngleEdge' & AngleEdgesAvail | LeftedgeNode.value == '45Profile' & PanelType != 'Profile Handle' )
+
+		for (var r = 1; r<=4; r++) 
+		{
+			switch(r)
+			{
+			case 1 : edgeTickNode = LeftedgeTick; break;
+			case 2 : edgeTickNode = RightedgeTick; break;
+			case 3 : edgeTickNode = TopedgeTick; break;
+			case 4 : edgeTickNode = BottomedgeTick; break;		
+			}
+			
+			if (edgeTickNode.value == 'AngleEdge' & AngleEdgesAvail | edgeTickNode.value == '45Profile' & PanelType != 'Profile Handle' )
+			{
+				if (TickEdgeType == '') {TickEdgeType = GetStdEdgeType("LineDiv"+LineNumber,'CheckInvalidBanding('+LineNumber+')');}
+			ChangeCheckBoxValue(edgeTickNode.id,TickEdgeType);
+			}			
+		}
+
+
+		/* if (LeftedgeNode.value == 'AngleEdge' & AngleEdgesAvail | LeftedgeNode.value == '45Profile' & PanelType != 'Profile Handle' )
 		{
 		ChangeCheckBoxValue("LeftedgeTick"+LineNumber,TickEdgeType);
 		}
@@ -1980,7 +2039,7 @@ var PanelType = document.getElementById("PanelType"+LineNumber).value;
 		if (BotedgeNode.value == 'AngleEdge' & PanelType != 'Angle Edge' | BotedgeNode.value == '45Profile' & PanelType != 'Profile Handle' )
 		{
 		ChangeCheckBoxValue("BottomedgeTick"+LineNumber,TickEdgeType);
-		}
+		} */
 	}
 	
 }
@@ -2111,9 +2170,11 @@ var BotedgeNode = document.getElementById("Bottomedge"+LineNumber).value;
 var ExtraParamNode = document.getElementById("ExtraPar"+LineNumber);
 
 
-var Shortstring = ExtraParamNode.value.slice(ExtraParamNode.value.indexOf("Return"),ExtraParamNode.value.length);
-var CarPos = Shortstring.indexOf(";"); 
-var ReturnValue = Shortstring.slice(7,CarPos)
+//var Shortstring = ExtraParamNode.value.slice(ExtraParamNode.value.indexOf("Return"),ExtraParamNode.value.length);
+//var CarPos = Shortstring.indexOf(";"); 
+//var ReturnValue = Shortstring.slice(7,CarPos);
+var ReturnValue = GetExtraParValue("Return",LineDivID);
+if (ReturnValue == "") {ReturnValue = "Full";}
 var OversizeCalc = 0;
 var NonStockColour = [];
 var LineMaterial = '';
@@ -2501,12 +2562,14 @@ var RightFaciaBox = document.getElementById("RigthFacWidth");
 		else {document.getElementById("HDFProfileQtyDiv").style.display = "none";}
 		
 		document.getElementById("VGrooveSpacingDiv").style.display = "none";
+		document.getElementById("VGrooveSpacingCalcDiv").style.display = "none";
 		var VGrooves = HDFDoorSpecData[HHDItemIndex].VGrooves;
 		
 		if (VGrooves != undefined)
 		{
 			if (VGrooves.UserSpacing) {document.getElementById("VGrooveSpacingDiv").style.display = "inherit";}
 			SetExtraParInputValue('VGSpacing',LineDivID,VGrooves.MaxSpacing);
+			document.getElementById("VGrooveSpacingCalcDiv").style.display = "inherit";
 		}
 		
 		document.getElementById("HDFExtendEdgesDiv").style.display = "inherit";
@@ -2550,8 +2613,8 @@ function GetHDFProfileName(MatName)
 var NewText = '';
 var PrefixLength = 0;
 
-	if (MatName.substr(0,6) == HDFPrefix+' 1F') {PrefixLength = 8;}
-	else if (MatName.substr(0,3) == HDFPrefix)  {PrefixLength = 5;}
+	if (MatName.substr(0,HDFPrefix.length+3) == HDFPrefix+' 1F') {PrefixLength = HDFPrefix.length+5;}
+	else if (MatName.substr(0,HDFPrefix.length) == HDFPrefix)  {PrefixLength = HDFPrefix.length+2;}
 	
 	if (PrefixLength > 0)
 	{
@@ -3872,12 +3935,17 @@ function DrawPreview(canvasId,canvas2Id,LineDivID)
 				IsFixedSpacing = VGrooves.IsFixedSpacing;
 				var ExtendVGrooveThroughFrame = VGrooves.ExtendThroughFrame;
 				if (ExtendVGrooveThroughFrame == undefined) {ExtendVGrooveThroughFrame = false;}
-				var UserSpacing = 0;
-				
-					if (VGrooves.UserSpacing) {UserSpacing = parseFloat(GetExtraParValue("VGSpacing",LineDivID));}
-					if (isNaN(UserSpacing)) {UserSpacing = 0;}
+				//var UserSpacing = false;
+				var DrawWidth = VGrooves.Width;
+				if (DrawWidth == undefined) {DrawWidth = 0;}
 
-						//alert(UserSpacing);
+					//if (VGrooves.UserSpacing != undefined) {UserSpacing = VGrooves.UserSpacing;}	
+					if (VGrooves.UserSpacing) 
+					{
+						MaxSpacing = parseFloat(GetExtraParValue("VGSpacing",LineDivID));
+						if (isNaN(MaxSpacing)) {MaxSpacing = document.getElementById("VGSpacing").value;}
+					}
+					
 						
 						
 					if (IsFixedSpacing) 
@@ -3896,15 +3964,13 @@ function DrawPreview(canvasId,canvas2Id,LineDivID)
 						else
 						{
 						VGrooveSpacing = PocketWidth/(1+Math.floor(PocketWidth/MaxSpacing));
-						VGrooveQty = Math.floor(PocketWidth/MaxSpacing);
+							if (VGrooves.HalfSpacingSideMargin) {VGrooveQty = Math.floor(PocketWidth/MaxSpacing)+1;}
+							else {VGrooveQty = Math.floor(PocketWidth/MaxSpacing);}
 						}
+						
+						if (!isNaN(VGrooveSpacing)) document.getElementById("VGSpacingCalc").innerHTML = round(VGrooveSpacing, 1);//VGrooveSpacing.toFixed(1);
 					}
 					
-					if (UserSpacing > 0) 
-					{
-						VGrooveSpacing = UserSpacing;
-						VGrooveQty = Math.floor(PocketWidth/UserSpacing);
-					}
 
 					VGrooveSideMargin = ((PocketWidth - (VGrooveSpacing*(VGrooveQty-1)))/2) + PocketXPos;
 
@@ -3930,12 +3996,26 @@ function DrawPreview(canvasId,canvas2Id,LineDivID)
 					
 					for (var r = 0; r<VGrooveQty; r++) 
 					{
-					VGrooveXPos = (r*VGrooveSpacing)+VGrooveSideMargin;
-					VGrooveYPos = PocketYPos;		
+					VGrooveXPos = (r*VGrooveSpacing)+VGrooveSideMargin-(DrawWidth/2);
+					VGrooveYPos = PocketYPos;
+
+	
+					
 					Edge.beginPath();
 					Edge.moveTo(RecX+(VGrooveXPos*ViewRatio),RecY+RecHeight-(VGrooveYPos*ViewRatio)); 
 					Edge.lineTo(RecX+(VGrooveXPos*ViewRatio),RecY+RecHeight-((VGrooveYPos+PocketHeight)*ViewRatio));
-					Edge.stroke();	
+					Edge.stroke();
+
+					Edge.beginPath();
+					Edge.moveTo(RecX+((VGrooveXPos+DrawWidth)*ViewRatio),RecY+RecHeight-(VGrooveYPos*ViewRatio)); 
+					Edge.lineTo(RecX+((VGrooveXPos+DrawWidth)*ViewRatio),RecY+RecHeight-((VGrooveYPos+PocketHeight)*ViewRatio));
+					Edge.stroke();
+
+						if (DrawingFace == 'Front')
+						{
+						Edge.fillStyle = "#EDCB82";
+						Edge.fillRect(RecX+(VGrooveXPos*ViewRatio),RecY+RecHeight-((VGrooveYPos+PocketHeight)*ViewRatio),DrawWidth*ViewRatio,PocketHeight*ViewRatio);
+						}
 					}
 				
 					
@@ -4531,21 +4611,39 @@ function CalcFreight()
 var longestlength = 0;
 var widestwidth = 0;
 var jobweight = 0;
+/* var PartWeight = 0;
+var LargePartWeight = 0;
+var PartCubicWeight = 0;
+var LargePartCubicWeight = 0;
+var PartThick = 0;
+var TotalPanelQty = 0; */
+var AddCharge = AddFreightCharge;
 
 
 
 	for (var x = 1; x<counter; x++)
 	{
-	if ( document.getElementById("Length"+x).value > 0 && document.getElementById("Width"+x).value > 0 )
-	{ 
-	var LengthNode = parseFloat(document.getElementById("Length"+x).value);
-	var WidthNode = parseFloat(document.getElementById("Width"+x).value);
-	var QtyNode = parseFloat(document.getElementById("Qty"+x).value);
-	jobweight = jobweight + ((LengthNode*WidthNode*0.0000138)*QtyNode);
-	if (LengthNode > WidthNode) { if (LengthNode > longestlength) {longestlength = LengthNode; } } else { if (WidthNode > longestlength) {longestlength = WidthNode; } }
-	if (LengthNode < WidthNode) { if (LengthNode > widestwidth) {widestwidth = LengthNode; } } else { if (WidthNode > widestwidth) {widestwidth = WidthNode; } }
+		if ( document.getElementById("Length"+x).value > 0 && document.getElementById("Width"+x).value > 0 )
+		{ 
+		var LengthNode = parseFloat(document.getElementById("Length"+x).value);
+		var WidthNode = parseFloat(document.getElementById("Width"+x).value);
+		var QtyNode = parseFloat(document.getElementById("Qty"+x).value);
+		jobweight = jobweight + ((LengthNode*WidthNode*0.0000138)*QtyNode);
+		if (LengthNode > WidthNode) { if (LengthNode > longestlength) {longestlength = LengthNode; } } else { if (WidthNode > longestlength) {longestlength = WidthNode; } }
+		if (LengthNode < WidthNode) { if (LengthNode > widestwidth) {widestwidth = LengthNode; } } else { if (WidthNode > widestwidth) {widestwidth = WidthNode; } }
+		
+			/* PartWeight = LengthNode*WidthNode*0.0000138;
+			if (PartWeight > LargePartWeight) {LargePartWeight = PartWeight}
+	
+			PartThick = GetMatThickFromName(document.getElementById("Material"+x).value);
+	
+			PartCubicWeight = (LengthNode/1000)*(WidthNode/1000)*(PartThick/1000)*200;
+			if (PartCubicWeight > LargePartCubicWeight) {LargePartCubicWeight = PartCubicWeight}
+			
+			TotalPanelQty = TotalPanelQty + QtyNode; */
+		}
 	}
-	}
+
 
 
 	if ( document.getElementById("Suberbinput").value != "" && FindItem(document.getElementById("Suberbinput").value,Suberbdirectory,"Suberb") > -1 && longestlength > 0 && widestwidth > 0) 
@@ -4561,6 +4659,9 @@ var jobweight = 0;
 	document.getElementById("TotalWeight").value = totalweight;
 
 	//alert(document.getElementById("TotalWeight").value);
+	
+	//if (TotalPanelQty < 10 & longestlength <= 2400 & widestwidth <= 2400 & LargePartWeight < 25 & LargePartCubicWeight < 25) {AddCharge = 0;}
+	if (RowWeight <= 25) {AddCharge = 0;}
 
 	
 		if (document.getElementById("ClientCollectCheck").checked) 
@@ -4569,7 +4670,7 @@ var jobweight = 0;
 		}
 		else
 		{
-		return document.getElementById("Freight").innerHTML = ((parseFloat(FreightRates[FindItem(FreightCode,FreightRates,"Code")]["excess per kg"])*ExcessWeight)+parseFloat(FreightRates[FindItem(FreightCode,FreightRates,"Code")][RowWeight])).toFixed(2);
+		return document.getElementById("Freight").innerHTML = (AddCharge + (parseFloat(FreightRates[FindItem(FreightCode,FreightRates,"Code")]["excess per kg"])*ExcessWeight)+parseFloat(FreightRates[FindItem(FreightCode,FreightRates,"Code")][RowWeight])).toFixed(2);
 		}
 	}
 	else { return parseFloat(0); }
@@ -5077,9 +5178,8 @@ function PopulateGrainMatchPartLists(GroupNumber,PartsListBox)
 			var LineMaterial = document.getElementById("Material"+r).value;
 			
 			if (LineMaterial.indexOf(HDFPrefix) > -1 ) {var IsHDFMaterial = true} else {var IsHDFMaterial = false}
-			
+	
 			var HDFFramedDoor = IsHDFFramedDoor(LineMaterial);
-
 
 			if ( (Materials[FindItem(LineMaterial,Materials,"Name")].Grained  == "True" | HDFFramedDoor) & CurrentGroupNumber == GroupNumber & document.getElementById("PanelType"+r).value != 'Builtup Panel' & document.getElementById("PanelType"+r).value != 'Profile Handle')
 			{
