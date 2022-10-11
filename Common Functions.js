@@ -147,16 +147,21 @@ if (HiddenDIv.childNodes.length == 1 )
 	
  	if (Type == 1 | Type == 4) 
 	{
-	var OKButton = document.createElement("input");
-	OKButton.id = "OKButton";
-	OKButton.type = "button";
-	OKButton.value = "OK";
-	var classAtt = document.createAttribute("class"); classAtt.value="BigButton"; OKButton.setAttributeNode(classAtt);
-	var onclickAtt = document.createAttribute("onclick"); 
-	if (Type == 4) { OKButton.setAttribute("onclick",";CloseWindowPopUp('hiddenDiv','DynamicElemsDiv','blanket');"+YesOKFunction); } //changeContactDetails();
-	else { OKButton.setAttribute("onclick", "CloseWindowPopUp('hiddenDiv','DynamicElemsDiv','blanket');"); } 
-	var StyleAtt = document.createAttribute("style"); StyleAtt.value="position:absolute;bottom:20px;width:80px;"; OKButton.setAttributeNode(StyleAtt);
-	DynamicElemsDiv.appendChild( OKButton );
+		var OKButton = document.createElement("input");
+		OKButton.id = "OKButton";
+		OKButton.type = "button";
+		OKButton.value = "OK";
+		var classAtt = document.createAttribute("class"); classAtt.value="BigButton"; OKButton.setAttributeNode(classAtt);
+		var onclickAtt = document.createAttribute("onclick"); 
+		if (Type == 4) 
+		{ 
+		OKButton.setAttribute("onclick",";CloseWindowPopUp('hiddenDiv','DynamicElemsDiv','blanket');"+YesOKFunction);
+			if (JSONList.length > 1) {OKButton.setAttribute("disabled","disabled");}
+		//OKButton.disabled = true;		
+		} //changeContactDetails();
+		else { OKButton.setAttribute("onclick", "CloseWindowPopUp('hiddenDiv','DynamicElemsDiv','blanket');"); } 
+		var StyleAtt = document.createAttribute("style"); StyleAtt.value="position:absolute;bottom:20px;width:80px;"; OKButton.setAttributeNode(StyleAtt);
+		DynamicElemsDiv.appendChild( OKButton );
 	}
 
  		
@@ -216,20 +221,25 @@ if (HiddenDIv.childNodes.length == 1 )
 
 	if (Type == 4) 
 	{
-	var SelectBox= document.createElement("select");
-	SelectBox.id = "PopupListSelect";
-	var StyleAtt = document.createAttribute("style"); StyleAtt.value="position:absolute;bottom:80px;width:150px;"; SelectBox.setAttributeNode(StyleAtt);
+		var SelectBox= document.createElement("select");
+		SelectBox.id = "PopupListSelect";
+		var StyleAtt = document.createAttribute("style"); StyleAtt.value="position:absolute;bottom:80px;width:150px;"; SelectBox.setAttributeNode(StyleAtt);
 
-	for (var i = 0; i<JSONList.length; i++){
-	var List = document.createElement("option");
-	List.innerHTML = JSONList[i].Name;
-	List.value = JSONList[i].Name;
-	SelectBox.appendChild(List);
+		for (var i = 0; i<JSONList.length; i++){
+		var List = document.createElement("option");
+		List.innerHTML = JSONList[i].Name;
+		List.value = JSONList[i].Name;
+		SelectBox.appendChild(List);
+		}
+
+
+		DynamicElemsDiv.appendChild( SelectBox );
+		if (JSONList.length > 1) {SelectBox.selectedIndex = "-1";}
+		SelectBox.setAttribute("onchange","EnableOKButton(this)");			
 	}
+	
 
-
-	DynamicElemsDiv.appendChild( SelectBox );
-	}
+	
 	var MessageLines = Message.split("\n");	
 	
 
@@ -284,6 +294,11 @@ if (HiddenDIv.childNodes.length == 1 )
 }
 
 } //End of popup
+
+function EnableOKButton(SelElemt)
+{
+	if (SelElemt.selectedIndex > -1) { document.getElementById('OKButton').removeAttribute('disabled');}
+}
 
 function RunTimer()
 {
