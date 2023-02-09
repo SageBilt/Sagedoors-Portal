@@ -976,7 +976,7 @@ var MatIndex = FindItem(itemMaterial,Materials,"Name");
 
 	if (itemMaterial.indexOf("NON-STOCK") > -1) 
 	{
-	popup("Please note that "+NonStockLeadTime.toString()+" working days will need to be allowed for ordering in Non Stock colours",150,350,1);
+	//popup("Please note that "+NonStockLeadTime.toString()+" working days will need to be allowed for ordering in Non Stock colours",150,350,1);
 		if (PanelType == 'Profile Handle') {popup("Please note that some Non Stock colours are not available with mitre handles. Please call us to check first!",150,350,1);}
 	}
 	else if (PopUpMessage != '') { popup(PopUpMessage,150,350,1); }
