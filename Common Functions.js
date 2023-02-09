@@ -29,6 +29,14 @@ var isBlink = (isChrome || isOpera) && !!window.CSS;
 //  window.history.replaceState( null, null, window.location.href );
 //}
 
+var PromptStayOnPageWithTabClose = false;
+
+window.onbeforeunload = PopUpExit;
+function PopUpExit() {
+	//return "You want to leave this page?";
+	if (PromptStayOnPageWithTabClose) {return "You want to leave this page?";}
+}
+
 function ResetFormData()
 {
 	window.history.replaceState( null, null, window.location.href );

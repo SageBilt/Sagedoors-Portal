@@ -41,27 +41,30 @@ var HDFDoorSpecData = [
 {"Profile" : "ALASKA" , "ProfileMargin" : 0 , "Frame" : false , "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 42 , "MaxEdge" : 0 , "IsFixedSpacing" : false, "UserSpacing" : true, "HalfSpacingSideMargin" : true, "Width" : 26} },
 {"Profile" : "ARIZONA" , "ProfileMargin" : 60 , "Frame" : true, "GlassFrame" : true},
 {"Profile" : "BARNSLEY" , "ProfileMargin" : 18 , "Frame" : true, "GlassFrame" : false},
-{"Profile" : "CALIFORNIA" , "ProfileMargin" : 0 , "Frame" : false , "GlassFrame" : false , "VGrooves" : {"MaxScallopWidth" : 39 , "IsFixedSpacing" : false, "FlatWidth" : 3} },
+{"Profile" : "CALIFORNIA" , "ProfileMargin" : 0 , "Frame" : false , "GlassFrame" : false , "VGrooves" : {"MaxScallopWidth" : 39, "MaxMaxScallopWidth" : 42 , "IsFixedSpacing" : false, "FlatWidth" : 3, "MinFlatWidth" : 3} },
 {"Profile" : "CAROLINA" , "ProfileMargin" : 18 , "Frame" : true, "GlassFrame" : false},
 {"Profile" : "COLORADO" , "ProfileMargin" : 0 , "Frame" : false, "GlassFrame" : false},
 {"Profile" : "DAKOTA" , "ProfileMargin" : 60 , "Frame" : true , "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 85 , "MaxEdge" : 0 , "IsFixedSpacing" : false , "ExtendThroughFrame" : true} },
 {"Profile" : "FLORIDA" , "ProfileMargin" : 60 , "Frame" : true, "GlassFrame" : true},
+{"Profile" : "GEORGIA" , "ProfileMargin" : 10 , "Frame" : true, "GlassFrame" : false},
 {"Profile" : "HAWAII" , "ProfileMargin" : 0 , "Frame" : false, "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 22 , "MaxEdge" : 0 , "IsFixedSpacing" : false , "FixedSideMargin" : 13 } },
 {"Profile" : "ILLINOIS" , "ProfileMargin" : 0 , "Frame" : false, "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 31 ,"GrooveWidth" : 6.4 ,"GrooveDepth" : 5 , "UserSpacing" : true} },
 {"Profile" : "KANSAS" , "ProfileMargin" : 0 , "Frame" : false, "GlassFrame" : false , "VGrooves" : {"MinSpacing" : 60 , "IsFixedSpacing" : false , "FixedSideMargin" : 32 , "Width" : 60} },
+{"Profile" : "KENDAL" , "ProfileMargin" : 60 , "Frame" : true, "GlassFrame" : false},
 {"Profile" : "KENTUCKY" , "ProfileMargin" : 60 , "Frame" : true, "GlassFrame" : true, "UserPocketDepth" : 6 },
 {"Profile" : "LOUISIANA" , "ProfileMargin" : 10 , "Frame" : true, "GlassFrame" : false},
 {"Profile" : "MARYLAND" , "ProfileMargin" : 18 , "Frame" : true, "GlassFrame" : false},
 {"Profile" : "MICHIGAN" , "ProfileMargin" : 60 , "Frame" : true, "GlassFrame" : true},
 {"Profile" : "MINNESOTA" , "ProfileMargin" : 60 , "Frame" : true, "GlassFrame" : true },
 {"Profile" : "MISSISSIPPI" , "ProfileMargin" : 60 , "Frame" : true, "GlassFrame" : false},
-{"Profile" : "MISSOURI" , "ProfileMargin" : 0 , "Frame" : false, "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 20 , "MaxEdge" : 0 , "IsFixedSpacing" : false , "FixedSideMargin" : 10 } },
+{"Profile" : "MISSOURI" , "ProfileMargin" : 0 , "Frame" : false, "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 20 , "MaxEdge" : 0 , "IsFixedSpacing" : false , "FixedSideMargin" : 0.01 } },
 {"Profile" : "MONTANA" , "ProfileMargin" : 0 , "Frame" : false, "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 71 , "MaxEdge" : 75 , "IsFixedSpacing" : true} },
 {"Profile" : "NEW YORK" , "ProfileMargin" : 0 , "Frame" : false, "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 85 , "MaxEdge" : 0 , "IsFixedSpacing" : false} },
 {"Profile" : "NEWPORT" , "ProfileMargin" : 0 , "Frame" : false, "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 85 , "MaxEdge" : 0 , "IsFixedSpacing" : false} },
 {"Profile" : "OKLAHOMA" , "ProfileMargin" : 60 , "Frame" : true, "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 71 , "MaxEdge" : 75 , "IsFixedSpacing" : true} },
 {"Profile" : "OREGON" , "ProfileMargin" : 60 , "Frame" : true, "GlassFrame" : true },
 {"Profile" : "PENCIL" , "ProfileMargin" : 18 , "Frame" : true, "GlassFrame" : false },
+{"Profile" : "PENNSYLVANIA" , "ProfileMargin" : 0 , "Frame" : false, "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 11 , "MaxEdge" : 0 , "IsFixedSpacing" : false , "UserSpacing" : true, "FixedSideMargin" : -0.5 } },
 {"Profile" : "PRESTON" , "ProfileMargin" : 60 , "Frame" : true, "GlassFrame" : false },
 {"Profile" : "RHODE ISLAND" , "ProfileMargin" : 53 , "Frame" : true, "GlassFrame" : true},
 {"Profile" : "TENNESSEE" , "ProfileMargin" : 0 , "Frame" : false, "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 12 , "MaxEdge" : 0 , "IsFixedSpacing" : false, "UserSpacing" : true} },
@@ -510,8 +513,9 @@ Material.setAttribute("style","width:193px;left:195px;font-size:0.75em;user-sele
 Material.setAttribute("data-AssocInputID","Material"+counter);
 Material.setAttribute("readonly","readonly");
 Material.setAttribute("onmouseup","ShowCustomDropDown(this,BuildRelMaterialsList(this.parentNode.id));SelectLine(this.parentNode.id);");
-Material.setAttribute("onchange","CheckMaterial(this.parentNode.id);CheckSize(this.parentNode.id,this.parentNode.childNodes.item(5).id);CheckSize(this.parentNode.id,this.parentNode.childNodes.item(6).id);Calculations(this.parentNode.id);SelectLine(this.parentNode.id);");
+Material.setAttribute("onchange","CheckMaterial(this.parentNode.id);Calculations(this.parentNode.id);SelectLine(this.parentNode.id);");
 
+//CheckSize(this.parentNode.id,this.parentNode.childNodes.item(5).id);CheckSize(this.parentNode.id,this.parentNode.childNodes.item(6).id);
 var MaterialDropButton = document.createElement("input");
 MaterialDropButton.id = "PanelTypeDropButton"+counter;
 MaterialDropButton.className = "Inputlines RightDropDownButton";
@@ -977,6 +981,9 @@ var MatIndex = FindItem(itemMaterial,Materials,"Name");
 	}
 	else if (PopUpMessage != '') { popup(PopUpMessage,150,350,1); }
 	
+	CheckSize(LineDivID,"Length"+LineNumber);
+	CheckSize(LineDivID,"Width"+LineNumber);
+	
 	/*Check for banding changes on material change*/
 	SwapOutStdEdgeType(LineDivID,LineNumber,'');	
 	
@@ -1273,7 +1280,7 @@ var PanelType = document.getElementById("PanelType"+LineNumber).value;
 	}
 
 
-	//if (parseFloat(ValueNode.value) < 60 ) { popup("Panel is too small! This value must be greater than 59mm.",150,350,1); ValueNode.value = "60" }
+	if (parseFloat(ValueNode.value) <= 5 ) { popup("Panel is too small! This value must be greater than 5mm.",150,350,1); ValueNode.value = "60" }
 	
 	//alert(SheetLength);
 	
@@ -1772,7 +1779,7 @@ LibParts[i].Name;
 				ChangeCheckBoxValue(TopedgeTickNode.id,'None');
 				ChangeCheckBoxValue(BottomedgeTickNode.id,'None');
 				//DisableCustomCheckbox(LeftedgeTickNode);
-				}
+				} 
 				
 				if (parseFloat(WidthNode.value) < parseFloat(ReturnValue)+100 & parseFloat(WidthNode.value) > 0 & ReturnValue != "Full" )
 				{ WidthNode.value = parseFloat(ReturnValue)+100; popup("The Buildup size you have selected is greater than part width less 100mm. The part width will now be adjusted automatically!",200,350,1);}
@@ -2556,11 +2563,13 @@ var RightFaciaBox = document.getElementById("RigthFacWidth");
 	document.getElementById("HDFExtendEdgesDiv").style.display = "none";
 	document.getElementById("FlatWidthDiv").style.display = "none";
 	document.getElementById("VGrooveSpacingDiv").style.display = "none";
+	document.getElementById("MaxScallopWidthDiv").style.display = "none";
 	document.getElementById("VGrooveSpacingCalcDiv").style.display = "none";	
 	document.getElementById("HDFPocketDepthDiv").style.display = "none";
 	document.getElementById("HDFGrooveWidthDiv").style.display = "none";
 	document.getElementById("HDFGrooveDepthDiv").style.display = "none";
 	document.getElementById("FlatWidthCalcDiv").style.display = "none";
+	document.getElementById("ScallopDepthCalcDiv").style.display = "none";
 	
 	if (itemMaterial.indexOf(HDFPrefix) > -1) 
 	{
@@ -2591,6 +2600,11 @@ var RightFaciaBox = document.getElementById("RigthFacWidth");
 				document.getElementById("VGrooveSpacingDiv").style.display = "inherit";
 				SetExtraParInputValue('VGSpacing',LineDivID,VGrooves.MaxSpacing);
 			}
+			if (VGrooves.MaxScallopWidth) 
+			{
+				document.getElementById("MaxScallopWidthDiv").style.display = "inherit";
+				SetExtraParInputValue('MaxScallopW',LineDivID,VGrooves.MaxScallopWidth);
+			}			
 			if (VGrooves.FlatWidth > 0) 
 			{
 				document.getElementById("FlatWidthDiv").style.display = "inherit";
@@ -3741,65 +3755,100 @@ function DrawPreview(canvasId,canvas2Id,LineDivID)
 
 	if (PanelType == 'Builtup Panel' && WidthNode > 0 )
 	{
-	var ThickString = GetMatThickFromName(itemMaterial); 
-	//PanelThick=myRound(parseFloat(itemMaterial.slice(itemMaterial.length-8,itemMaterial.length-6))*(PlanBoxWidth/WidthNode));
-	PanelThick=myRound(parseFloat(ThickString)*(PlanBoxWidth/WidthNode));
-	//alert(ThickString);
-	var ReturnValue = document.getElementById("Return").value;
-	PlanBox.fillStyle="Peru";
+		var ThickString = GetMatThickFromName(itemMaterial); 
+		//PanelThick=myRound(parseFloat(itemMaterial.slice(itemMaterial.length-8,itemMaterial.length-6))*(PlanBoxWidth/WidthNode));
+		PanelThick=myRound(parseFloat(ThickString)*(PlanBoxWidth/WidthNode));
+		//alert(ThickString);
+		var ReturnValue = document.getElementById("Return").value;
+		PlanBox.fillStyle="Peru";
 
-	if (ReturnValue =="Full") {   PlanBox.fillRect(0.5,PlanBoxHeight-(17*(PlanBoxWidth/WidthNode)),PlanBoxWidth-1,(17*(PlanBoxWidth/WidthNode))); PlanBox.fillRect(0.5,PlanBoxHeight-PanelThick,PlanBoxWidth-1,(18*(PlanBoxWidth/WidthNode)));  }
-	else { PlanBox.fillRect(0.5,PlanBoxHeight-(17*(PlanBoxWidth/WidthNode)),PlanBoxWidth-1,(17*(PlanBoxWidth/WidthNode))); PlanBox.fillRect(0.5,PlanBoxHeight-PanelThick,parseFloat(ReturnValue)*(PlanBoxWidth/WidthNode)-1,(18*(PlanBoxWidth/WidthNode))); } 
+		if (ReturnValue =="Full") {   PlanBox.fillRect(0.5,PlanBoxHeight-(17*(PlanBoxWidth/WidthNode)),PlanBoxWidth-1,(17*(PlanBoxWidth/WidthNode))); PlanBox.fillRect(0.5,PlanBoxHeight-PanelThick,PlanBoxWidth-1,(18*(PlanBoxWidth/WidthNode)));  }
+		else { PlanBox.fillRect(0.5,PlanBoxHeight-(17*(PlanBoxWidth/WidthNode)),PlanBoxWidth-1,(17*(PlanBoxWidth/WidthNode))); PlanBox.fillRect(0.5,PlanBoxHeight-PanelThick,parseFloat(ReturnValue)*(PlanBoxWidth/WidthNode)-1,(18*(PlanBoxWidth/WidthNode))); } 
 
-	if (ThickString > 36) { 
-	PlanBox.fillRect(0.5,PlanBoxHeight-PanelThick+(18*(PlanBoxWidth/WidthNode)),(100*(PlanBoxWidth/WidthNode)),PanelThick-(36*(PlanBoxWidth/WidthNode)));
-	if (ReturnValue =="Full") { PlanBox.fillRect(0.5+PlanBoxWidth-(100*(PlanBoxWidth/WidthNode)),PlanBoxHeight-PanelThick+(18*(PlanBoxWidth/WidthNode)),(100*(PlanBoxWidth/WidthNode)),PanelThick-(36*(PlanBoxWidth/WidthNode)));   }
-	else {PlanBox.fillRect(0.5+(parseFloat(ReturnValue)*(PlanBoxWidth/WidthNode))-(100*(PlanBoxWidth/WidthNode)),PlanBoxHeight-PanelThick+(18*(PlanBoxWidth/WidthNode)),(100*(PlanBoxWidth/WidthNode)),PanelThick-(36*(PlanBoxWidth/WidthNode)));   }
+		if (ThickString > 36) { 
+		PlanBox.fillRect(0.5,PlanBoxHeight-PanelThick+(18*(PlanBoxWidth/WidthNode)),(100*(PlanBoxWidth/WidthNode)),PanelThick-(36*(PlanBoxWidth/WidthNode)));
+		if (ReturnValue =="Full") { PlanBox.fillRect(0.5+PlanBoxWidth-(100*(PlanBoxWidth/WidthNode)),PlanBoxHeight-PanelThick+(18*(PlanBoxWidth/WidthNode)),(100*(PlanBoxWidth/WidthNode)),PanelThick-(36*(PlanBoxWidth/WidthNode)));   }
+		else {PlanBox.fillRect(0.5+(parseFloat(ReturnValue)*(PlanBoxWidth/WidthNode))-(100*(PlanBoxWidth/WidthNode)),PlanBoxHeight-PanelThick+(18*(PlanBoxWidth/WidthNode)),(100*(PlanBoxWidth/WidthNode)),PanelThick-(36*(PlanBoxWidth/WidthNode)));   }
 
-	PlanBox.strokeStyle="black"; PlanBox.lineWidth=1;
-	PlanBox.beginPath();
-	PlanBox.moveTo(0.5,PlanBoxHeight-PanelThick+(18*(PlanBoxWidth/WidthNode))-0.5);
-	if (ReturnValue == "Full") { PlanBox.lineTo(PlanBoxWidth,PlanBoxHeight-PanelThick+(18*(PlanBoxWidth/WidthNode))-0.5); } 
-	else { PlanBox.lineTo(parseFloat(ReturnValue)*(PlanBoxWidth/WidthNode),PlanBoxHeight-PanelThick+(18*(PlanBoxWidth/WidthNode))-0.5); }
-	PlanBox.stroke();
-
-
-	}
-
-	PlanBox.strokeStyle="black"; PlanBox.lineWidth=1;
-	PlanBox.beginPath();
-	PlanBox.moveTo(0.5,PlanBoxHeight-0.5);
-	PlanBox.lineTo(PlanBoxWidth,PlanBoxHeight-0.5);
-	PlanBox.stroke();
+		PlanBox.strokeStyle="black"; PlanBox.lineWidth=1;
+		PlanBox.beginPath();
+		PlanBox.moveTo(0.5,PlanBoxHeight-PanelThick+(18*(PlanBoxWidth/WidthNode))-0.5);
+		if (ReturnValue == "Full") { PlanBox.lineTo(PlanBoxWidth,PlanBoxHeight-PanelThick+(18*(PlanBoxWidth/WidthNode))-0.5); } 
+		else { PlanBox.lineTo(parseFloat(ReturnValue)*(PlanBoxWidth/WidthNode),PlanBoxHeight-PanelThick+(18*(PlanBoxWidth/WidthNode))-0.5); }
+		PlanBox.stroke();
 
 
-	PlanBox.beginPath();
-	PlanBox.moveTo(0.5,PlanBoxHeight-PanelThick-0.5);
-	if (ReturnValue=="Full") { PlanBox.lineTo(PlanBoxWidth,PlanBoxHeight-PanelThick-0.5); } 
-	else 
-	{ 
-	PlanBox.lineTo(parseFloat(ReturnValue)*(PlanBoxWidth/WidthNode),PlanBoxHeight-PanelThick-0.5);
-	PlanBox.lineTo(parseFloat(ReturnValue)*(PlanBoxWidth/WidthNode),PlanBoxHeight-(17.5*(PlanBoxWidth/WidthNode))); 
-	}
-	PlanBox.stroke();
-	PlanBox.beginPath();
-	PlanBox.moveTo(0.5,PlanBoxHeight-(17.5*(PlanBoxWidth/WidthNode)));
-	PlanBox.lineTo(PlanBoxWidth,PlanBoxHeight-(17.5*(PlanBoxWidth/WidthNode)));
-	PlanBox.stroke();
+		}
 
-	if (LeftedgeNode == 'LaserEdge') { PlanBox.strokeStyle=ClashingStoke; PlanBox.lineWidth=4; } else { PlanBox.strokeStyle="black"; PlanBox.lineWidth=1;}
-	PlanBox.beginPath();
-	PlanBox.moveTo(0.5,PlanBoxHeight-0.5);
-	PlanBox.lineTo(0.5,PlanBoxHeight-PanelThick-0.5);
-	PlanBox.stroke();
+		PlanBox.strokeStyle="black"; PlanBox.lineWidth=1;
+		PlanBox.beginPath();
+		PlanBox.moveTo(0.5,PlanBoxHeight-0.5);
+		PlanBox.lineTo(PlanBoxWidth,PlanBoxHeight-0.5);
+		PlanBox.stroke();
 
-	if (RightedgeNode == 'LaserEdge') { PlanBox.strokeStyle=ClashingStoke; PlanBox.lineWidth=4; } else { PlanBox.strokeStyle="black"; PlanBox.lineWidth=1;}
-	PlanBox.beginPath();
-	PlanBox.moveTo(PlanBoxWidth,PlanBoxHeight-0.5);
-	if (ReturnValue =="Full") {  PlanBox.lineTo(PlanBoxWidth,PlanBoxHeight-PanelThick-0.5); } 
-	else { PlanBox.lineTo(PlanBoxWidth,PlanBoxHeight-(17.5*(PlanBoxWidth/WidthNode))); }
-	PlanBox.stroke(); 
 
+		PlanBox.beginPath();
+		PlanBox.moveTo(0.5,PlanBoxHeight-PanelThick-0.5);
+		if (ReturnValue=="Full") { PlanBox.lineTo(PlanBoxWidth,PlanBoxHeight-PanelThick-0.5); } 
+		else 
+		{ 
+		PlanBox.lineTo(parseFloat(ReturnValue)*(PlanBoxWidth/WidthNode),PlanBoxHeight-PanelThick-0.5);
+		PlanBox.lineTo(parseFloat(ReturnValue)*(PlanBoxWidth/WidthNode),PlanBoxHeight-(17.5*(PlanBoxWidth/WidthNode))); 
+		}
+		PlanBox.stroke();
+		PlanBox.beginPath();
+		PlanBox.moveTo(0.5,PlanBoxHeight-(17.5*(PlanBoxWidth/WidthNode)));
+		PlanBox.lineTo(PlanBoxWidth,PlanBoxHeight-(17.5*(PlanBoxWidth/WidthNode)));
+		PlanBox.stroke();
+
+		if (LeftedgeNode == 'LaserEdge') { PlanBox.strokeStyle=ClashingStoke; PlanBox.lineWidth=4; } else { PlanBox.strokeStyle="black"; PlanBox.lineWidth=1;}
+		PlanBox.beginPath();
+		PlanBox.moveTo(0.5,PlanBoxHeight-0.5);
+		PlanBox.lineTo(0.5,PlanBoxHeight-PanelThick-0.5);
+		PlanBox.stroke();
+
+		if (RightedgeNode == 'LaserEdge') { PlanBox.strokeStyle=ClashingStoke; PlanBox.lineWidth=4; } else { PlanBox.strokeStyle="black"; PlanBox.lineWidth=1;}
+		PlanBox.beginPath();
+		PlanBox.moveTo(PlanBoxWidth,PlanBoxHeight-0.5);
+		if (ReturnValue =="Full") {  PlanBox.lineTo(PlanBoxWidth,PlanBoxHeight-PanelThick-0.5); } 
+		else { PlanBox.lineTo(PlanBoxWidth,PlanBoxHeight-(17.5*(PlanBoxWidth/WidthNode))); }
+		PlanBox.stroke(); 
+		
+		
+		Edge.strokeStyle=DefSelRecStroke;
+		Edge.lineWidth=1;
+		Edge.setLineDash([5, 5]);
+		
+		if (ReturnValue=="Full" | parseFloat(ReturnValue) > 200) {var FirstBuildUpXPos = RecX+(100*ViewRatio);}
+		else {var FirstBuildUpXPos = parseFloat(ReturnValue)*ViewRatio;}
+		
+		Edge.beginPath();	
+		Edge.moveTo(FirstBuildUpXPos,RecY+RecHeight);
+		Edge.lineTo(FirstBuildUpXPos,RecY);
+		Edge.stroke();		
+		
+		if (ReturnValue=="Full" | parseFloat(ReturnValue) > 200) 
+		{
+			if (ReturnValue=="Full") {var SecBuildUpXPos = RecX+RecWidth-(100*ViewRatio);}
+			else {var SecBuildUpXPos = RecX+((parseFloat(ReturnValue)-100)*ViewRatio);}
+			
+			Edge.beginPath();	
+			Edge.moveTo(SecBuildUpXPos,RecY+RecHeight);
+			Edge.lineTo(SecBuildUpXPos,RecY);
+			Edge.stroke();
+		} 
+		
+		if (parseFloat(ReturnValue) > 200) 	
+		{
+			Edge.beginPath();	
+			Edge.moveTo(RecX+parseFloat(ReturnValue)*ViewRatio,RecY+RecHeight);
+			Edge.lineTo(RecX+parseFloat(ReturnValue)*ViewRatio,RecY);
+			Edge.stroke();			
+		}
+
+
+		
+		Edge.setLineDash([]);		
 	}
 
 
@@ -3889,7 +3938,7 @@ function DrawPreview(canvasId,canvas2Id,LineDivID)
 			if (DrawingFace == 'Front') {var AdjXPos = LEL;} else {var AdjXPos = REL;}
 			var PocketXPos = FrameMargin+AdjXPos;
 			var PocketYPos = 0;
-			
+
 			var MaxSpacing = 0;
 			var MinSpacing = 0;
 			var MaxEdge = 0;
@@ -3943,12 +3992,12 @@ function DrawPreview(canvasId,canvas2Id,LineDivID)
 				}	
 				//alert(PocketHeight);
 				
-				if (VGrooveFixedSideMargin > 0)
+				if (VGrooveFixedSideMargin != 0 & VGrooveFixedSideMargin != undefined)
 				{
 				PocketWidth = WidthNode-(VGrooveFixedSideMargin*2)-(FrameMargin*2)-REL-LEL;
 				PocketXPos = FrameMargin+AdjXPos+VGrooveFixedSideMargin;
 				}
-				
+
 				if (Framed) 
 				{
 					if (PanelType == 'Glass Frame' )
@@ -3981,7 +4030,6 @@ function DrawPreview(canvasId,canvas2Id,LineDivID)
 				var DrawWidth = VGrooves.Width;
 				if (DrawWidth == undefined) {DrawWidth = 0;}
 				
-				MaxScallopWidth = VGrooves.MaxScallopWidth;
 
 					//if (VGrooves.UserSpacing != undefined) {UserSpacing = VGrooves.UserSpacing;}	
 					if (VGrooves.UserSpacing) 
@@ -3989,6 +4037,11 @@ function DrawPreview(canvasId,canvas2Id,LineDivID)
 						MaxSpacing = parseFloat(GetExtraParValue("VGSpacing",LineDivID));
 						if (isNaN(MaxSpacing)) {MaxSpacing = parseFloat(document.getElementById("VGSpacing").value);}
 					}
+					if (VGrooves.MaxScallopWidth) 
+					{
+						MaxScallopWidth = parseFloat(GetExtraParValue("MaxScallopW",LineDivID));
+						if (isNaN(MaxScallopWidth)) {MaxScallopWidth = parseFloat(document.getElementById("MaxScallopW").value);}
+					}		
 					
 					if (VGrooves.FlatWidth != undefined)
 					{
@@ -4004,6 +4057,7 @@ function DrawPreview(canvasId,canvas2Id,LineDivID)
 						
 					if (MaxScallopWidth > 0 | GrooveWidth > 0)
 					{
+																		
 						if (MaxScallopWidth > 0) 
 						{
 							VGrooveQty = 1+Math.floor((PocketWidth-0.01 - FlatWidth)/(MaxScallopWidth+FlatWidth));
@@ -4017,7 +4071,16 @@ function DrawPreview(canvasId,canvas2Id,LineDivID)
 							DrawWidth = GrooveWidth;							
 						}
 
-					
+				
+						
+						if (MaxScallopWidth > 0)
+						{
+						var ScallopDepth = 35-Math.pow((Math.pow(35,2)-Math.pow(DrawWidth/2,2)),0.5)+0.5; 	
+						document.getElementById("ScallopDepthCalcDiv").style.display = "inherit";
+						document.getElementById("ScallopDepthCalc").innerHTML = round(ScallopDepth, 1);
+						}
+						
+						
 						//if (!isNaN(VGrooveSpacing)) {document.getElementById("VGSpacingCalc").innerHTML = round(VGrooveSpacing, 1);}
 					}
 					else
@@ -4030,7 +4093,7 @@ function DrawPreview(canvasId,canvas2Id,LineDivID)
 						}
 						else
 						{
-							if (VGrooveFixedSideMargin > 0)
+							if (VGrooveFixedSideMargin != 0 & VGrooveFixedSideMargin != undefined)
 							{
 								if (MinSpacing > 0)
 								{
@@ -4054,6 +4117,8 @@ function DrawPreview(canvasId,canvas2Id,LineDivID)
 						}
 					}
 					
+
+					
 					if (!isNaN(VGrooveSpacing)) 
 					{
 					document.getElementById("VGSpacingCalc").innerHTML = round(VGrooveSpacing, 1);
@@ -4069,7 +4134,7 @@ function DrawPreview(canvasId,canvas2Id,LineDivID)
 
 					VGrooveSideMargin = ((PocketWidth - (VGrooveSpacing*(VGrooveQty-1)))/2) + PocketXPos;
 
-					if (VGrooveFixedSideMargin > 0)  {VGrooveSideMargin = PocketXPos;}				
+					if (VGrooveFixedSideMargin != 0 & VGrooveFixedSideMargin != undefined)  {VGrooveSideMargin = PocketXPos;}				
 					
 					//alert(VGrooveSpacing + " " + VGrooveQty);
 					//alert((VGrooveSpacing*(VGrooveQty-1)));
@@ -4503,6 +4568,7 @@ var SizeOk = false;
 					else {BoxElem.value = 'Full';}
 					break;
 	case "VGSpacing":
+					SizeOk = true;
 					var LineDiv = document.getElementById(LineID);
 					var LineNumber = LineDiv.getAttribute("data-LineNumber");	
 					var itemMaterial = document.getElementById("Material"+LineNumber).value;	
@@ -4520,11 +4586,54 @@ var SizeOk = false;
 							var MaxSpacing = HDFDoorSpecData[HHDItemIndex].VGrooves.MaxSpacing;
 							popup("Max Spacing cannot be less than "+OpWidth+"mm!",200,400,1);
 							document.getElementById(BoxID).value = MaxSpacing;
+							SizeOk = false;
 							}
 						}
 					}
 					break;
-	/* case "ProfileQty":
+	case "FlatW":
+					SizeOk = true;
+					var LineDiv = document.getElementById(LineID);
+					var LineNumber = LineDiv.getAttribute("data-LineNumber");	
+					var itemMaterial = document.getElementById("Material"+LineNumber).value;	
+					var ProfileName = GetHDFProfileName(itemMaterial);
+					var HHDItemIndex = FindItem(ProfileName,HDFDoorSpecData,'Profile');
+					if (HHDItemIndex > -1)
+					{
+						var MinFlatWidth = HDFDoorSpecData[HHDItemIndex].VGrooves.MinFlatWidth;
+						if (MinFlatWidth != undefined)
+						{
+							if (NewValue < MinFlatWidth)
+							{
+							popup("Flat Width cannot be less than "+MinFlatWidth+"mm!",200,400,1);
+							document.getElementById(BoxID).value = MinFlatWidth;
+							SizeOk = false;
+							}
+						}
+					}
+					break;
+	case "MaxScallopW":
+					SizeOk = true;
+					var LineDiv = document.getElementById(LineID);
+					var LineNumber = LineDiv.getAttribute("data-LineNumber");	
+					var itemMaterial = document.getElementById("Material"+LineNumber).value;	
+					var ProfileName = GetHDFProfileName(itemMaterial);
+					var HHDItemIndex = FindItem(ProfileName,HDFDoorSpecData,'Profile');
+					if (HHDItemIndex > -1)
+					{
+						var MaxMaxScallopWidth = HDFDoorSpecData[HHDItemIndex].VGrooves.MaxMaxScallopWidth;
+						if (MaxMaxScallopWidth != undefined)
+						{
+							if (NewValue > MaxMaxScallopWidth)
+							{
+							popup("Max Scallop Width cannot be more than "+MaxMaxScallopWidth+"mm!",200,400,1);
+							document.getElementById(BoxID).value = MaxMaxScallopWidth;
+							SizeOk = false;
+							}
+						}
+					}
+					break;						
+	/* case "ProfileQty": 
 		SizeOk = true;
 		break;
 	case "RailWidth":
@@ -4697,6 +4806,7 @@ function submitForm(Type)
 
 	if (Type != 'PrintCompOrder')
 	{
+	PromptStayOnPageWithTabClose = false;	
 	 var MainForm = document.getElementById("Mainform"); 
 		var 	Input = document.createElement("input");
 		Input.id = "Type";
@@ -4799,7 +4909,12 @@ var AddCharge = AddFreightCharge;
 		}
 		else
 		{
-		return document.getElementById("Freight").innerHTML = (AddCharge + (parseFloat(FreightRates[FindItem(FreightCode,FreightRates,"Code")]["excess per kg"])*ExcessWeight)+parseFloat(FreightRates[FindItem(FreightCode,FreightRates,"Code")][RowWeight])).toFixed(2);
+		var FreightIndex = FindItem(FreightCode,FreightRates,"Code");
+			
+		var FreightAmount = (AddCharge + (parseFloat(FreightRates[FreightIndex]["excess per kg"])*ExcessWeight)+parseFloat(FreightRates[FreightIndex][RowWeight])).toFixed(2);
+			if (!isNaN(FreightAmount))
+			{return document.getElementById("Freight").innerHTML = FreightAmount;}
+			else {popup("Error! something is wrong with the freight calculation",150,350,1); return parseFloat(10000);}
 		}
 	}
 	else { return parseFloat(0); }
