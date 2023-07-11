@@ -1,13 +1,14 @@
 var counter = 1;
-var StdLeadTime = 4;
-var MitreHandlesLeadTime = 8;
+/*var StdLeadTime = 4;
+var MitreHandlesLeadTime = 4;
 var GlassFrameLeadTime = 6;
 var BuildupPanelLeadTime = StdLeadTime;
 var NonStockLeadTime = 12;
-var CurrentOrderLeadTime = 4;
-var GrainMatchPartSizeRatio = 0;
-var PriceIncPercent = 1.012*1.05*1.05 /*Added 5 percent 1st May 2022*/
 
+//var PriceIncPercent = 1.012*1.05*1.05 /*Added 5 percent 1st May 2022*/
+var CurrentOrderLeadTime = 4;
+
+var GrainMatchPartSizeRatio = 0;
 var ShowPartEditor = false;
 var PartJSON = { "Operations" : [] , "Vectors" : [] };
 var ViewXOrigin = 0;
@@ -25,35 +26,43 @@ var LastSelectedLineID = "";
 
 
 var PanelTypes = [
-{ "Name" : "Flat Panel" , "PartShaping" : true , "Icon" : "iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAIAAAAC64paAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAA9SURBVDhPY/z//z8DGDAyMkIYBAFCC7Lm9082QNh4gKBMAFwLE4QiD4xqJhGMaiYRjGomEVCkmYJiiIEBAOKsFR0Z4/bgAAAAAElFTkSuQmCC" },
+{ "Name" : "Standard Panel" , "PartShaping" : true , "Icon" : "iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAIAAAAC64paAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAA9SURBVDhPY/z//z8DGDAyMkIYBAFCC7Lm9082QNh4gKBMAFwLE4QiD4xqJhGMaiYRjGomEVCkmYJiiIEBAOKsFR0Z4/bgAAAAAElFTkSuQmCC" },
 { "Name" : "Glass Frame" , "PartShaping" : false , "Icon" : "iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAIAAAAC64paAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAABgSURBVDhPY/z//z8DGDAyMkIYBAFCC7LmnVXhEDYe4N62Eq6FCUKRB1igNBIAmg1loQJMd2HRDASHDx+GsmDA1tYWykICFDl7VDOJYFQziQB72saakjHBwOVnCoohBgYAvjok1vXxW9UAAAAASUVORK5CYII=" }, 
 { "Name" : "Roller Surround" , "PartShaping" : false , "Icon" : "iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAIAAAAC64paAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAB1SURBVDhPY/z//z8D2YBszUCNIJsZGRkLJu2DihEHJuQ5ATUyQXlkARYoDQZA86As3ADZjeg2Ax2DB0AVwQCKzUBw5MgRKIsIgK7ZxsYGyiICjNo8ajNBQJHN0PwM5TEwHD58GMrCBmxtbaEseGEA5ZEKGBgAVhFRDfcAtfIAAAAASUVORK5CYII=" },
 { "Name" : "Builtup Panel" , "PartShaping" : false , "Parts" : [{ "Name" : "Builtup Panel", "EdgeLeft" : 1, "EdgeRight" : 0, "EdgeTop" : 0, "EdgeBot" : 0}] , "Icon" : "iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAIAAAAC64paAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAABBSURBVDhPY/z//z8DuYAJSpMFBk4zI5TGDfAECkjzzqpwCAcTuLetxKN5iAYYRYBAgOEBwLAckQE2ArMkBZoZGAChzBIUyv2tRgAAAABJRU5ErkJggg==" },  
 { "Name" : "Profile Handle" , "PartShaping" : false , "Icon" : "iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAACESURBVDhPY/wPBAxUBCgGvpNVhbJQgdDj21AWYcAEpfECXBZhAyguZGRkhLJQwVsZFTBNjEuxuhBkBwyDgPCTO2CaGJcS9DKphhIVhqQYSpSBIECsoUQbCALEGEqSgSBAyFCSDQQBdEORAdZ0iCSEF2BTT5YL8YFRAykHg99AKlcBDAwAsVZQCkn2XVcAAAAASUVORK5CYII=" }, 
 { "Name" : "Angle Edge" , "PartShaping" : false , "Icon" : "iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsIAAA7CARUoSoAAAACJSURBVDhPrdUxDoAgDIVh6hWcHb3/hRydvYL6CJgSKLaFf8EBP2tikO63MLElrV/XtqcrXwVIRHEdQasJ1/OIqxetQDSCNkHkRUUQedAmyL8kKypO6EW7r+xBuyCyor8gsqAqEGlRNYg0qAlELZRXHF/5cOA3SeW9iO83T5iTHuoGpaaDk38BITyDt1JWRLLQ9QAAAABJRU5ErkJggg==" },  
 { "Name" : "Shapes" , "PartShaping" : true , "Parts" : [] , "Icon" : "iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsIAAA7CARUoSoAAAABqSURBVDhPYwCC/4TwWxmV/8QCRpCGw4cPAynswNbWlgFoIIPQ49tQEfyACUpTDYwaSDkYBgaC0qjwkzsM72RVoSL4AcGEDQOwBE4IEG0gCIAMJQRIMpAQAFk4mmwoB4PfQHCygTCpARgYAP6jTY4T7QMHAAAAAElFTkSuQmCC" }, 
-{ "Name" : "Handle Cut-outs" , "PartShaping" : true , "Icon" : "iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsIAAA7CARUoSoAAAAB9SURBVDhPY/wPBAxUBExQmmqA8a2MCk4XCj2+DWWhgneyqlAWdgAyECsGWYYOoA7AiRlBxOHDh4EUKrC1tWUAasZwJch1wk/uMODSQzAMQQYgY0IApwtBAGQjNoBPPV4DSQVEeZlUMGog5WAEGghO2BAmdcDgL2CpbCADAwA84E069WcNsgAAAABJRU5ErkJggg==" }   
+{ "Name" : "Handle Cut-outs" , "PartShaping" : true , "Icon" : "iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsIAAA7CARUoSoAAAAB9SURBVDhPY/wPBAxUBExQmmqA8a2MCk4XCj2+DWWhgneyqlAWdgAyECsGWYYOoA7AiRlBxOHDh4EUKrC1tWUAasZwJch1wk/uMODSQzAMQQYgY0IApwtBAGQjNoBPPV4DSQVEeZlUMGog5WAEGghO2BAmdcDgL2CpbCADAwA84E069WcNsgAAAABJRU5ErkJggg==" },
+{ "Name" : "Optidoor" , "PartShaping" : false , "Icon" : "iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAIAAAAC64paAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAABFSURBVDhP7cvLDQAwCAJQ5u1mXacL2U84iyb2JiGBy4O9IBkqDrDmCPYPPseJxpFDxWksDxWnsTxUnCrsROBIq3Eq15ht59xLx6zprEUAAAAASUVORK5CYII=" }    
 ];
 
 var LibImages = [];
 
 var HDFDoorSpecData = [
 {"Profile" : "ALASKA" , "ProfileMargin" : 0 , "Frame" : false , "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 42 , "MaxEdge" : 0 , "IsFixedSpacing" : false, "UserSpacing" : true, "HalfSpacingSideMargin" : true, "Width" : 26} },
+{"Profile" : "ANNAPOLIS" , "ProfileMargin" : 18 , "Frame" : true, "GlassFrame" : false},
 {"Profile" : "ARIZONA" , "ProfileMargin" : 60 , "Frame" : true, "GlassFrame" : true},
+{"Profile" : "ASPEN" , "ProfileMargin" : 0 , "Frame" : false , "GlassFrame" : false , "VGrooves" : {"MaxScallopWidth" : 39, "MaxMaxScallopWidth" : 42 , "IsFixedSpacing" : false, "FlatWidth" : 3, "MinFlatWidth" : 3, "ScallopToolRad" : 35} },
 {"Profile" : "BARNSLEY" , "ProfileMargin" : 18 , "Frame" : true, "GlassFrame" : false},
-{"Profile" : "CALIFORNIA" , "ProfileMargin" : 0 , "Frame" : false , "GlassFrame" : false , "VGrooves" : {"MaxScallopWidth" : 39, "MaxMaxScallopWidth" : 42 , "IsFixedSpacing" : false, "FlatWidth" : 3, "MinFlatWidth" : 3} },
+{"Profile" : "CALIFORNIA" , "ProfileMargin" : 0 , "Frame" : false , "GlassFrame" : false , "VGrooves" : {"MaxScallopWidth" : 39, "MaxMaxScallopWidth" : 42 , "IsFixedSpacing" : false, "FlatWidth" : 3, "MinFlatWidth" : 3, "ScallopToolRad" : 35} },
 {"Profile" : "CAROLINA" , "ProfileMargin" : 18 , "Frame" : true, "GlassFrame" : false},
+{"Profile" : "CHICAGO" , "ProfileMargin" : 0 , "Frame" : false, "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 13 ,"GrooveWidth" : 6.4 ,"GrooveDepth" : 1.5 , "UserSpacing" : true} },
 {"Profile" : "COLORADO" , "ProfileMargin" : 0 , "Frame" : false, "GlassFrame" : false},
 {"Profile" : "DAKOTA" , "ProfileMargin" : 60 , "Frame" : true , "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 85 , "MaxEdge" : 0 , "IsFixedSpacing" : false , "ExtendThroughFrame" : true} },
 {"Profile" : "FLORIDA" , "ProfileMargin" : 60 , "Frame" : true, "GlassFrame" : true},
 {"Profile" : "GEORGIA" , "ProfileMargin" : 10 , "Frame" : true, "GlassFrame" : false},
 {"Profile" : "HAWAII" , "ProfileMargin" : 0 , "Frame" : false, "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 22 , "MaxEdge" : 0 , "IsFixedSpacing" : false , "FixedSideMargin" : 13 } },
 {"Profile" : "ILLINOIS" , "ProfileMargin" : 0 , "Frame" : false, "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 31 ,"GrooveWidth" : 6.4 ,"GrooveDepth" : 5 , "UserSpacing" : true} },
+{"Profile" : "IOWA" , "ProfileMargin" : 0 , "Frame" : false , "GlassFrame" : false , "VGrooves" : {"MaxScallopWidth" : 8, "MaxMaxScallopWidth" : 9 , "IsFixedSpacing" : false, "FlatWidth" : 15, "MinFlatWidth" : 3, "ScallopToolRad" : 4.75, "HalfSpacingSideMargin" : true} },
 {"Profile" : "KANSAS" , "ProfileMargin" : 0 , "Frame" : false, "GlassFrame" : false , "VGrooves" : {"MinSpacing" : 60 , "IsFixedSpacing" : false , "FixedSideMargin" : 32 , "Width" : 60} },
 {"Profile" : "KENDAL" , "ProfileMargin" : 60 , "Frame" : true, "GlassFrame" : false},
 {"Profile" : "KENTUCKY" , "ProfileMargin" : 60 , "Frame" : true, "GlassFrame" : true, "UserPocketDepth" : 6 },
+{"Profile" : "LAUREL" , "ProfileMargin" : 0 , "Frame" : false , "GlassFrame" : false , "TEL" : 43 ,"VGrooves" : {"MaxSpacing" : 42 , "MaxEdge" : 0 , "IsFixedSpacing" : false, "UserSpacing" : true, "HalfSpacingSideMargin" : true, "Width" : 26} },
+{"Profile" : "LINCOLN" , "ProfileMargin" : 0 , "Frame" : false, "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 31 ,"GrooveWidth" : 6.4 ,"GrooveDepth" : 5 , "UserSpacing" : true} },
 {"Profile" : "LOUISIANA" , "ProfileMargin" : 10 , "Frame" : true, "GlassFrame" : false},
 {"Profile" : "MARYLAND" , "ProfileMargin" : 18 , "Frame" : true, "GlassFrame" : false},
+{"Profile" : "MIAMI" , "ProfileMargin" : 0 , "Frame" : false, "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 11 , "MaxEdge" : 0 , "IsFixedSpacing" : false , "UserSpacing" : true, "FixedSideMargin" : -0.5 } },
 {"Profile" : "MICHIGAN" , "ProfileMargin" : 60 , "Frame" : true, "GlassFrame" : true},
 {"Profile" : "MINNESOTA" , "ProfileMargin" : 60 , "Frame" : true, "GlassFrame" : true },
 {"Profile" : "MISSISSIPPI" , "ProfileMargin" : 60 , "Frame" : true, "GlassFrame" : false},
@@ -61,12 +70,14 @@ var HDFDoorSpecData = [
 {"Profile" : "MONTANA" , "ProfileMargin" : 0 , "Frame" : false, "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 71 , "MaxEdge" : 75 , "IsFixedSpacing" : true} },
 {"Profile" : "NEW YORK" , "ProfileMargin" : 0 , "Frame" : false, "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 85 , "MaxEdge" : 0 , "IsFixedSpacing" : false} },
 {"Profile" : "NEWPORT" , "ProfileMargin" : 0 , "Frame" : false, "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 85 , "MaxEdge" : 0 , "IsFixedSpacing" : false} },
+{"Profile" : "NORTH CAROLINA" , "ProfileMargin" : 18 , "Frame" : true, "GlassFrame" : false},
 {"Profile" : "OKLAHOMA" , "ProfileMargin" : 60 , "Frame" : true, "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 71 , "MaxEdge" : 75 , "IsFixedSpacing" : true} },
 {"Profile" : "OREGON" , "ProfileMargin" : 60 , "Frame" : true, "GlassFrame" : true },
 {"Profile" : "PENCIL" , "ProfileMargin" : 18 , "Frame" : true, "GlassFrame" : false },
 {"Profile" : "PENNSYLVANIA" , "ProfileMargin" : 0 , "Frame" : false, "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 11 , "MaxEdge" : 0 , "IsFixedSpacing" : false , "UserSpacing" : true, "FixedSideMargin" : -0.5 } },
 {"Profile" : "PRESTON" , "ProfileMargin" : 60 , "Frame" : true, "GlassFrame" : false },
 {"Profile" : "RHODE ISLAND" , "ProfileMargin" : 53 , "Frame" : true, "GlassFrame" : true},
+{"Profile" : "SAN DIEGO" , "ProfileMargin" : 0 , "Frame" : false , "GlassFrame" : false , "VGrooves" : {"MaxScallopWidth" : 55, "MaxMaxScallopWidth" : 59 , "IsFixedSpacing" : false, "FlatWidth" : 3, "MinFlatWidth" : 3, "ScallopToolRad" : 66} },
 {"Profile" : "TENNESSEE" , "ProfileMargin" : 0 , "Frame" : false, "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 12 , "MaxEdge" : 0 , "IsFixedSpacing" : false, "UserSpacing" : true} },
 {"Profile" : "TEXAS" , "ProfileMargin" : 0 , "Frame" : false, "GlassFrame" : false},
 {"Profile" : "TURNBERRY" , "ProfileMargin" : 0 , "Frame" : false, "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 22 , "MaxEdge" : 0 , "IsFixedSpacing" : false , "FixedSideMargin" : 13 } },
@@ -84,7 +95,8 @@ var HDFEdgeProfiles = [
 {"Name" : "R5 Face Only" , "Value" : "R5 Face" , "ImageClass" : "checkboxR5Face"},
 {"Name" : "R5 Both Sides" , "Value" : "R5 Both" , "ImageClass" : "checkboxR5Both"},
 {"Name" : "9.5mm Ogee" , "Value" : "9.5mm Ogee" , "ImageClass" : "checkbox95Ogee"},
-{"Name" : "6.3mm Ogee" , "Value" : "6.3mm Ogee" , "ImageClass" : "checkbox63Ogee"}
+{"Name" : "6.3mm Ogee" , "Value" : "6.3mm Ogee" , "ImageClass" : "checkbox63Ogee"},
+{"Name" : "R1.5 Face Aris Back" , "Value" : "R1.5 Face Aris Back" , "ImageClass" : "checkboxR1_5FaceArisBack"}
 ];
 
 /* var DescTypes = [
@@ -114,331 +126,6 @@ var SectionElem = document.getElementById("ShortCutIconsSection");
 
 //------------------------------------ CustomDropDown -------------------------------------
 
-function ShowCustomDropStyleSelectItem(e) 
-{
-var ExistingDropDown = document.getElementById("DropDownDiv");
-var MouseOverItem = ExistingDropDown.getAttribute("data-MouseOverItem")
-
-	if (ExistingDropDown.hasAttribute("data-MouseOverItem") & MouseOverItem != "" & MouseOverItem != null) 
-	{
-	var CurrntMouseOverItem = document.getElementById(MouseOverItem);
-	CurrntMouseOverItem.style.backgroundColor = "inherit";	
-	}
-	
-	e.target.style.backgroundColor = "rgba(43, 43, 43, 0.7)";
-	ExistingDropDown.setAttribute("data-MouseOverItem",e.target.id);
-    ExistingDropDown.setAttribute("data-SearchItemFound",e.target.id);
-
-}
-
-
-function ShowCustomDropSetItemMouseMove(Remove)
-{
-var ExistingDropDown = document.getElementById("DropDownDiv");
-	
-	for (var i = 0; i<ExistingDropDown.children.length; i++) 
-	{
-		if (Remove)
-		{ ExistingDropDown.children[i].removeAttribute("onmouseover");}
-		else	
-		{ ExistingDropDown.children[i].setAttribute("onmouseover","ShowCustomDropStyleSelectItem(event);"); }
-	}
-}
-
-
-function ShowCustomDropDown(TrigElem,List,KeepDropDownOpen) 
-{
-var ElemAssocID = TrigElem.getAttribute("data-AssocInputID");
-var AssocInputElem = document.getElementById(ElemAssocID);
-var HTMLElem = document.querySelector("html");
-var ExistingDropDown = document.getElementById("DropDownDiv");
-var ExistingDropDownAssocID = "";
-var IconText = '';
-var ItemHeight = 20;
-var Tempimg = new Image();
-var ExistingSelItem = null;	
-//alert(TrigElem.getAttribute("disabled"));
-
-
-	if (ExistingDropDown != null) 
-	{
-	ExistingDropDownAssocID = ExistingDropDown.getAttribute("data-AssocInputID");
-	HTMLElem.removeChild(ExistingDropDown);
-	HTMLElem.removeAttribute("onkeydown");	
-	}
-
-	if (TrigElem.readOnly == false)
-	{
-		if (ExistingDropDownAssocID != ElemAssocID | ExistingDropDownAssocID == "")
-		{
-		var viewportOffset = AssocInputElem.getBoundingClientRect();
-		// these are relative to the viewport, i.e. the window
-
-
-
-		var DropDownDiv = document.createElement("div");
-		DropDownDiv.id = "DropDownDiv";
-		DropDownDiv.className = "DropDownMenu";
-		DropDownDiv.setAttribute("data-AssocInputID",ElemAssocID);
-		//DropDownDiv.setAttribute("onfocusout","HideDropDown()");
-		//DropDownDiv.setAttribute("style",""); //z-index:50;
-		//ValueListWin.setAttribute("onkeyup","function CloseOnEnter(event){ if (event.key == 10 ) {ShowHideValueListEditWin("+LineNumber+");} };");
-		DropDownDiv.style.left = viewportOffset.left+"px";
-		DropDownDiv.style.top = viewportOffset.top+AssocInputElem.offsetHeight+HTMLElem.scrollTop+"px";
-		//DropDownDiv.style.height = "300px";
-		//DropDownDiv.style.width = "200px";
-		//alert(KeepOpen);
-		if (KeepDropDownOpen) {HTMLElem.removeAttribute("onClick");}	
-		else {HTMLElem.setAttribute("onClick","HideDropDown(event,'"+ElemAssocID+"')");}
-		HTMLElem.setAttribute("onkeydown","findDropDownItem(event);");
-		
-		HTMLElem.appendChild( DropDownDiv);	
-		
-		
-			for (var i = 0; i<List.length; i++) 
-			{
-				var DropDownItem = document.createElement("div");	
-				DropDownItem.className = "DropDownItem LeftIcon";
-				//DropDownItem.setAttribute("onmouseover","ShowCustomDropStyleSelectItem(event);");
-				
-					var IconBlock = document.createElement("div");
-					IconBlock.setAttribute("style","position:absolute;width:20px;height:20px;left:0px;top:1px;");
-		
-					if (List[i].hasOwnProperty("Icon"))
-					{ IconText = List[i].Icon; }
-					/* else if (List[i].hasOwnProperty("JSON"))
-					{		
-						if (List[i].JSON.hasOwnProperty("Icon")) {IconText = List[i].JSON.Icon;}
-					} */
-					
-					if (IconText != '')
-					{
-
-					Tempimg.src = "data:image/png;base64,"+IconText;
-					/* Tempimg.onload = function()
-					{
-						var ImgWidth = this.naturalWidth;
-						var ImgHeight = this.naturalHeight;
-					} */
-					var ImgWidth = Tempimg.naturalWidth;
-					var ImgHeight = Tempimg.naturalHeight;
-					
-						if (ImgWidth == 0 | ImgHeight == 0)
-						{
-						ImgHeight = "20px";
-						ImgWidth = "20px";
-						}
-					
-					
-					IconBlock.style.height = ImgHeight+"px";
-					IconBlock.style.width = ImgWidth+"px";
-					IconBlock.style.backgroundImage = "url('data:image/png;base64,"+IconText+"')";
-					//alert(Tempimg.naturalHeight + " - " +IconText);
-					ItemHeight = ImgHeight;
-					DropDownItem.style.paddingLeft = ImgWidth+"px";
-					}
-					
-					
-					
-					if (List[i].hasOwnProperty("colour"))
-					{ IconBlock.style.backgroundColor = List[i].colour;	}
-			
-					DropDownItem.appendChild(IconBlock);
-					
-				//DropDownItem.setAttribute("onclick","SelectDropDownItem(this)");
-				var DropDownText = document.createElement("div");
-				DropDownText.innerHTML = List[i].Name;
-				DropDownText.id = "ItemText"+i;
-				DropDownText.style.height = ItemHeight+"px";
-				DropDownText.setAttribute("onclick","SelectDropDownItem(this)");
-				DropDownText.setAttribute("onmouseover","ShowCustomDropStyleSelectItem(event);");
-
-				
-				DropDownItem.appendChild(DropDownText);
-				
-				DropDownDiv.appendChild(DropDownItem);
-			
-				if (AssocInputElem.value == List[i].Name) 
-				{
-				ExistingSelItem = DropDownText;
-				}
-			
-			}
-			
-		
-			var DropDownRect = DropDownDiv.getBoundingClientRect();
-			
-			//alert((DropDownRect.bottom-DropDownRect.top));
-			
-			if (DropDownRect.bottom > window.innerHeight)
-			{
-			DropDownDiv.style.maxHeight	= viewportOffset.top-10+"px"; 
-			DropDownRect = DropDownDiv.getBoundingClientRect();
-			
-			DropDownDiv.style.top = viewportOffset.top+HTMLElem.scrollTop-(DropDownRect.bottom-DropDownRect.top)-2+"px";
-			//DropDownDiv.style.paddingRight = "-20px";
-			
-			}
-			
-			DropDownDiv.style.width = DropDownDiv.offsetWidth+10+"px";
-			
-			if (ExistingSelItem != null) {ExistingSelItem.scrollIntoView(true);}
-
-		}
-	}
-			
-}
-
-function ClearAllSelectItemStyle()
-{
-var ExistingDropDown = document.getElementById("DropDownDiv");
-	for (var i = 0; i<ExistingDropDown.children.length; i++) 
-	{
-	
-	 ExistingDropDown.children[i].children[1].style.backgroundColor = "inherit";
-	}
-}
-
-function ClearDropDownSearchSelect()
-{
-var ExistingDropDown = document.getElementById("DropDownDiv");
-var ChildItem = document.getElementById(ExistingDropDown.getAttribute("data-SearchItemFound"));
-
-
-//alert(ChildItem.innerHTML);
-	if (ChildItem != null)
-	{
-	ChildItem.style.backgroundColor = "inherit";
-	ExistingDropDown.removeAttribute("data-SearchItemFound");
-	ExistingDropDown.removeAttribute("data-SearchItemText");
-	ExistingDropDown.removeAttribute("onmousemove");
-	ShowCustomDropSetItemMouseMove(false);
-	}
-
-	ClearAllSelectItemStyle();
-}
-
-function findDropDownItem(e)
-{
-var ExistingDropDown = document.getElementById("DropDownDiv");		
-//var Keychar = e.which || e.keyCode;
-
-var Keychar = e.key;
-var ExistingSearchText = ExistingDropDown.getAttribute("data-SearchItemText");
-var FoundChildItem = ExistingDropDown.getAttribute("data-SearchItemFound");
-//alert(Keychar);
-
-	//if (ExistingDropDown.hasAttribute("data-MouseOverItem")) 
-	//{
-	//var CurrntMouseOverItem = document.getElementById(ExistingDropDown.getAttribute("data-MouseOverItem"));
-	//CurrntMouseOverItem.style.backgroundColor = "inherit";	
-	//}
-
-	if ( FoundChildItem != "" & FoundChildItem != null) //ExistingSearchText != "" & ExistingSearchText != null &
-	{
-	var SelItem = document.getElementById(FoundChildItem);
-		switch(e.key)
-		{
-		case 'Enter' :  SelectDropDownItem(SelItem); break;
-		case 'ArrowUp' : 
-						if (SelItem.parentNode.previousSibling != null)
-						{
-						ClearDropDownSearchSelect();	
-						var nextItem = SelItem.parentNode.previousSibling.children[1];
-						//nextItem.focus();
-						nextItem.style.backgroundColor = "rgba(43, 43, 43, 0.7)";
-						//nextItem.scrollIntoView(true);
-						if (nextItem.parentNode.offsetTop <= ExistingDropDown.scrollTop) {nextItem.scrollIntoView(true);}
-						//alert(nextItem.parentNode.offsetTop + " - " + ExistingDropDown.scrollTop);
-						ExistingDropDown.setAttribute("data-SearchItemFound",nextItem.id);
-						}						
-						break;
-		case 'ArrowDown' : 
-						if (SelItem.parentNode.nextSibling != null)
-						{
-						ClearDropDownSearchSelect();	
-						var nextItem = SelItem.parentNode.nextSibling.children[1]; 
-						//nextItem.focus();
-						nextItem.style.backgroundColor = "rgba(43, 43, 43, 0.7)";
-						//nextItem.scrollIntoView(false);
-						if (nextItem.parentNode.offsetTop+nextItem.parentNode.offsetHeight >= ExistingDropDown.scrollTop+ExistingDropDown.offsetHeight) {nextItem.scrollIntoView(false);}
-						ExistingDropDown.setAttribute("data-SearchItemFound",nextItem.id);
-						}
-						break;
-		}
-		
-
-	}
-
-	if (Keychar.length == 1)
-	{
-
-		if (ExistingDropDown.hasAttribute("data-SearchItemText")) 
-		{
-		var SearchItemText = ExistingSearchText;
-		SearchItemText = SearchItemText+Keychar;
-		}	
-		else 
-		{var SearchItemText = Keychar;}
-
-		ExistingDropDown.setAttribute("onmousemove","ClearDropDownSearchSelect();");
-		ShowCustomDropSetItemMouseMove(true);
-
-		for (var i = 0; i<ExistingDropDown.children.length; i++) 
-		{
-		var ChildItemText = ExistingDropDown.children[i].children[1];
-		
-			if (ChildItemText.innerHTML.toUpperCase().startsWith(SearchItemText.toUpperCase()) ) 
-			{
-			ClearAllSelectItemStyle();	
-			ChildItemText.focus();
-			ChildItemText.style.backgroundColor = "rgba(43, 43, 43, 0.7)";
-			ChildItemText.scrollIntoView(true);
-			ExistingDropDown.setAttribute("data-SearchItemFound",ChildItemText.id);
-			break;		
-			}
-		
-
-		}
-
-	//alert(SearchItemText);
-	ExistingDropDown.setAttribute("data-SearchItemText",SearchItemText);
-	}
-}
-
-//scrollIntoView(alignTo)
-
-function SelectDropDownItem(SelectedItem)
-{
-var ExistingDropDown = document.getElementById("DropDownDiv");	
-var AssocDropDown = document.getElementById(ExistingDropDown.getAttribute("data-AssocInputID"));
-AssocDropDown.value = SelectedItem.innerHTML;//children[1]
-ExistingDropDown.parentNode.removeAttribute("onkeydown");
-ExistingDropDown.parentNode.removeChild(ExistingDropDown);
-
-AssocDropDown.onchange();
-//AssocDropDown.oninput();	
-}
-
-function HideDropDown(e,ElemAssocIDTarget) 
-{
-
-var ExistingDropDown = document.getElementById("DropDownDiv");
-	if (ExistingDropDown != null)
-	{
-		//alert("hide");	
-		var ElemAssocIDTag = e.target.getAttribute("data-AssocInputID");
-		//alert(ElemAssocIDTarget + " " + ElemAssocIDTag);
-		if (ElemAssocIDTarget != ElemAssocIDTag & e.target.id != "DropDownDiv" & e.target.parentNode.id != "DropDownDiv")
-		{
-		ExistingDropDown.parentNode.removeAttribute("onkeydown");
-		ExistingDropDown.parentNode.removeChild(ExistingDropDown);
-		//document.querySelector("html").removeAttribute("onkeydown");	
-		}
-	
-	}
-
-}
 
 
 //------------------------------------ CustomDropDown End -------------------------------------
@@ -475,7 +162,7 @@ var PanelType = document.createElement("input");
 PanelType.id = "PanelType"+counter;
 PanelType.name = "PanelType"+counter;
 PanelType.className = "Inputlines";
-PanelType.value = 'Flat Panel';
+PanelType.value = 'Standard Panel';
 PanelType.setAttribute("style","width:134px;left:38px;user-select: none;cursor:context-menu");
 PanelType.setAttribute("data-AssocInputID","PanelType"+counter);
 PanelType.setAttribute("data-ItemsList",PanelTypes);
@@ -493,31 +180,20 @@ PanelTypeDropButton.setAttribute("onmouseup","ShowCustomDropDown(this,PanelTypes
 PanelTypeDropButton.setAttribute("data-AssocInputID","PanelType"+counter);
 
 
-
-
-
-/* var Material = document.createElement("Select");
-Material.id = "Material"+counter ;
-Material.name = "Material"+counter ;
-var StyleAtt = document.createAttribute("style"); StyleAtt.value="width:215px;left:160px;font-size:0.75em;"; Material.setAttributeNode(StyleAtt); //font-family:Saira Extra Condensed;
-var ClassAtt = document.createAttribute("class"); ClassAtt.value="Inputlines"; Material.setAttributeNode(ClassAtt);
-var ChangeAtt = document.createAttribute("onchange"); ChangeAtt.value="SelectLine(this.parentNode.id);CheckMaterial(this.parentNode.id);CheckSize(this.parentNode.id,this.parentNode.childNodes.item(5).id);CheckSize(this.parentNode.id,this.parentNode.childNodes.item(6).id);Calculations(this.parentNode.id);"; Material.setAttributeNode(ChangeAtt);
-var onmousedownAtt = document.createAttribute("onmouseup"); onmousedownAtt.value="DrawPreview('PreviewBox','PreviewBox2',this.parentNode.id);";Material.setAttributeNode(onmousedownAtt); */
-
-
 var Material = document.createElement("input");
 Material.id = "Material"+counter ;
 Material.name = "Material"+counter ;
 Material.className = "Inputlines";
 Material.setAttribute("style","width:193px;left:195px;font-size:0.75em;user-select: none;cursor:context-menu");
 Material.setAttribute("data-AssocInputID","Material"+counter);
-Material.setAttribute("readonly","readonly");
+//Material.setAttribute("readonly","readonly");
 Material.setAttribute("onmouseup","ShowCustomDropDown(this,BuildRelMaterialsList(this.parentNode.id));SelectLine(this.parentNode.id);");
+Material.setAttribute("oninput","KeyDownShowCustomDropDown(this,BuildRelMaterialsList(this.parentNode.id));");
 Material.setAttribute("onchange","CheckMaterial(this.parentNode.id);Calculations(this.parentNode.id);SelectLine(this.parentNode.id);");
 
 //CheckSize(this.parentNode.id,this.parentNode.childNodes.item(5).id);CheckSize(this.parentNode.id,this.parentNode.childNodes.item(6).id);
 var MaterialDropButton = document.createElement("input");
-MaterialDropButton.id = "PanelTypeDropButton"+counter;
+MaterialDropButton.id = "MaterialDropButton"+counter;
 MaterialDropButton.className = "Inputlines RightDropDownButton";
 MaterialDropButton.type = "button";
 MaterialDropButton.setAttribute("style","width:23px;left:388px;");
@@ -561,30 +237,6 @@ DescriptionDropButton.setAttribute("style","width:23px;left:599px;");
 DescriptionDropButton.setAttribute("onmouseup","ShowCustomDropDown(this,BuildRelDescTypeList(this.parentNode.id));SelectLine(this.parentNode.id);");
 DescriptionDropButton.setAttribute("data-AssocInputID","Description"+counter);
 
-/* var DescSelect = document.createElement("Select");
-DescSelect.id = "DescType"+counter ;
-//DescSelect.name = "DescType"+counter;
-var ChangeAtt = document.createAttribute("onchange");
-ChangeAtt.value="document.getElementById(findinput(this.id)).value=this.options[this.selectedIndex].value;ChangeBanding(this.parentNode.id);CheckSize(this.parentNode.id,this.id);SelectLine(this.parentNode.id);Calculations(this.parentNode.id);";
-DescSelect.setAttributeNode(ChangeAtt);
-var StyleAtt = document.createAttribute("style"); StyleAtt.value="z-index: -5;width:148px;left:407px;"; DescSelect.setAttributeNode(StyleAtt);
-var ClassAtt = document.createAttribute("class"); ClassAtt.value="Inputlines"; DescSelect.setAttributeNode(ClassAtt);
-var onmousedownAtt = document.createAttribute("onmouseup"); onmousedownAtt.value="SelectLine(this.parentNode.id);";DescSelect.setAttributeNode(onmousedownAtt);
-
-
-var DescInput = document.createElement("input");
-DescInput.id = "Description"+counter ;
-DescInput.name = "Description"+counter;
-var StyleAtt = document.createAttribute("style"); StyleAtt.value="left:407px;z-index: 5;width:130px;"; DescInput.setAttributeNode(StyleAtt);
-var ClassAtt = document.createAttribute("class"); ClassAtt.value="DescInput"; DescInput.setAttributeNode(ClassAtt);
-var ChangeAtt = document.createAttribute("onchange"); ChangeAtt.value="CheckIlegalChar(this);ChangeBanding(this.parentNode.id);SelectLine(this.parentNode.id);Calculations(this.parentNode.id);CheckForGlassFrame(this);"; DescInput.setAttributeNode(ChangeAtt);
-var onmousedownAtt = document.createAttribute("onmouseup"); onmousedownAtt.value="SelectLine(this.parentNode.id);";DescInput.setAttributeNode(onmousedownAtt);
-var TitleAtt = document.createAttribute("title"); TitleAtt.value="You can select from the dropdown box or free type your part name here"; DescInput.setAttributeNode(TitleAtt);
- if (counter > 1 )
-{
-	if (document.getElementById("Description"+(counter-1)).value != "") { DescInput.value = document.getElementById("Description"+(counter-1)).value;}
-} */
-
 var ItemLength = document.createElement("input");
 ItemLength.id = "Length"+counter;
 ItemLength.name = "Length"+counter ;
@@ -627,6 +279,7 @@ ItemLeftedgeTick.setAttribute("style", "left:726px;");
 ItemLeftedgeTick.setAttribute("onclick", "CustomCheckbox(this.id,event);SelectLine(this.parentNode.id);Calculations(this.parentNode.id);");
 //ItemLeftedgeTick.setAttribute("onmouseup", "DrawPreview('PreviewBox','PreviewBox2',this.parentNode.id);");
 ItemLeftedgeTick.setAttribute("onmouseover", "ChangeCheckBoxCurser(this);");
+ItemLeftedgeTick.title = "Hold down the Ctrl key while clicking to enable special colour edging.";
 
 var ItemRightedge = document.createElement("input");
 ItemRightedge.id = "Rightedge"+counter ;
@@ -642,6 +295,7 @@ ItemRightedgeTick.setAttribute("class", "checkboxBlank");
 ItemRightedgeTick.setAttribute("style", "left:756px;");
 ItemRightedgeTick.setAttribute("onclick", "CustomCheckbox(this.id,event);SelectLine(this.parentNode.id);Calculations(this.parentNode.id);");
 ItemRightedgeTick.setAttribute("onmouseover", "ChangeCheckBoxCurser(this);");
+ItemRightedgeTick.title = "Hold down the Ctrl key while clicking to enable special colour edging.";
 
 var ItemTopedge = document.createElement("input");
 ItemTopedge.id = "Topedge"+counter ;
@@ -657,6 +311,7 @@ ItemTopedgeTick.setAttribute("class", "checkboxBlank");
 ItemTopedgeTick.setAttribute("style", "left:785px;");
 ItemTopedgeTick.setAttribute("onclick", "CustomCheckbox(this.id,event);SelectLine(this.parentNode.id);Calculations(this.parentNode.id);");
 ItemTopedgeTick.setAttribute("onmouseover", "ChangeCheckBoxCurser(this);");
+ItemTopedgeTick.title = "Hold down the Ctrl key while clicking to enable special colour edging.";
 
 var ItemBottomedge = document.createElement("input");
 ItemBottomedge.id = "Bottomedge"+counter ;
@@ -673,6 +328,7 @@ ItemBottomedgeTick.setAttribute("class", "checkboxBlank");
 ItemBottomedgeTick.setAttribute("style", "left:814px;");
 ItemBottomedgeTick.setAttribute("onclick", "CustomCheckbox(this.id,event);SelectLine(this.parentNode.id);Calculations(this.parentNode.id);");
 ItemBottomedgeTick.setAttribute("onmouseover", "ChangeCheckBoxCurser(this);");
+ItemBottomedgeTick.title = "Hold down the Ctrl key while clicking to enable special colour edging.";
 
 
 var UnitRef = document.createElement("input");
@@ -768,6 +424,13 @@ LineJSON.value = '';
 LineJSON.setAttribute("style", "display:none;");
 
 
+var PNCPartID = document.createElement("input");
+PNCPartID.id = "PNCPartID"+counter ;
+PNCPartID.name = "PNCPartID"+counter ;
+PNCPartID.type = "text" ;
+PNCPartID.value = '';
+PNCPartID.setAttribute("style", "display:none;");
+
 
 newline.appendChild( PanelType );
 newline.appendChild( PanelTypeDropButton );
@@ -795,6 +458,7 @@ newline.appendChild( ItemBottomedgeTick );
 newline.appendChild( EditLine );
 newline.appendChild( LineJSON );
 newline.appendChild( CopyLine );
+newline.appendChild( PNCPartID );
 
 document.getElementById("Orderlines").appendChild(newline);	 document.getElementById("PanelType"+counter).focus(); counter++;
 
@@ -869,6 +533,142 @@ document.getElementById("Orderlines").appendChild(newline);	 document.getElement
 //SelectLine(newline.id);	
 } //end of InsertLine
 
+function LoadExistLinesData()
+{
+	var LineNo = 0;
+	var EdgeValue = 0;
+	var EdgeIDName = '';
+	var InvalidHDFEdges = false;
+	
+	if (ExistLinesData.hasOwnProperty("Address1")) {document.getElementById("Address").value=atob(ExistLinesData.Address1);}
+	if (ExistLinesData.hasOwnProperty("City")) {document.getElementById("Cityinput").value=atob(ExistLinesData.City);}	
+	if (ExistLinesData.hasOwnProperty("Address3")) {document.getElementById("Suberbinput").value=atob(ExistLinesData.Address3);}
+	if (ExistLinesData.hasOwnProperty("PostCode")) {document.getElementById("PostCode").value=ExistLinesData.PostCode;}
+	if (ExistLinesData.hasOwnProperty("OrderNotes")) {document.getElementById("SpecInstruct").value=atob(ExistLinesData.OrderNotes);}
+	if (ExistLinesData.hasOwnProperty("OrderDesc")) {document.getElementById("JobDesc").value=atob(ExistLinesData.OrderDesc);}	
+	if (ExistLinesData.hasOwnProperty("OrderRef")) {document.getElementById("YourRef").value=atob(ExistLinesData.OrderRef);}
+	 
+	if (ExistLinesData.hasOwnProperty("CollectContact")) {document.getElementById("CollectContact").value=ExistLinesData.CollectContact;}	
+	if (ExistLinesData.hasOwnProperty("CollectNumber")) {document.getElementById("CollectContactNumber").value=ExistLinesData.CollectNumber;}
+	if (ExistLinesData.hasOwnProperty("IsCollect")) {document.getElementById("ClientCollectCheck").checked=ExistLinesData.IsCollect;}
+
+	if (ExistLinesData.hasOwnProperty("UploadedFileName")) 
+	{
+		var UpdoadFileNameElem = document.getElementById("UpdoadFileName");
+		UpdoadFileNameElem.value = ExistLinesData.UploadedFileName;
+		UpdoadFileNameElem.name = UpdoadFileNameElem.id; 
+		SetLinesReadOnly();
+	}
+	if (ExistLinesData.hasOwnProperty("ProcFileName")) 
+	{
+		var ProcFileNameElem = document.getElementById("ProcFileName");
+		ProcFileNameElem.value = ExistLinesData.ProcFileName;
+		ProcFileNameElem.name = ProcFileNameElem.id;
+	}	
+	if (ExistLinesData.hasOwnProperty("OrderNumber")) 
+	{
+		var OrderNumberElem = document.getElementById("OrderNumber").name
+		OrderNumberElem.value = ExistLinesData.OrderNumber;
+		OrderNumberElem.name = OrderNumberElem.id;
+	}
+	
+	HideShowAddressInputs();
+
+
+
+	for (var i=0; i<ExistLinesData.PanelLines.length;i++) 
+	{	
+		InvalidHDFEdges = false;	
+		LineNo++;	
+		insertline();
+		document.getElementById("selectedline").innerHTML = "LineDiv"+LineNo;
+
+		document.getElementById("PanelType"+LineNo).value=ExistLinesData.PanelLines[i].PanelType;
+		document.getElementById("Material"+LineNo).value=ExistLinesData.PanelLines[i].Material;
+		document.getElementById("Description"+LineNo).value=atob(ExistLinesData.PanelLines[i].Description);
+		document.getElementById("Qty"+LineNo).value=ExistLinesData.PanelLines[i].Qty;
+		ChangeDesc("LineDiv"+LineNo,true,true);
+		
+		document.getElementById("Length"+LineNo).value=ExistLinesData.PanelLines[i].Length;
+		document.getElementById("Width"+LineNo).value=ExistLinesData.PanelLines[i].Width;
+		document.getElementById("UnitRef"+LineNo).value=ExistLinesData.PanelLines[i].UnitNo;
+		document.getElementById("AddInfo"+LineNo).value=atob(ExistLinesData.PanelLines[i].AddInfo);
+		document.getElementById("ExtraPar"+LineNo).value=ExistLinesData.PanelLines[i].ExtraParams;
+		document.getElementById("PNCPartID"+LineNo).value=ExistLinesData.PanelLines[i].PNCPartID;
+
+		var GrainMatchGroup = GetExtraParValue("GrainMatchGroup",document.getElementById("LineDiv"+LineNo).id);
+
+		if (GrainMatchGroup > 0) {document.getElementById("AddInfo"+LineNo).placeholder = "Group " + GrainMatchGroup;}
+		
+		if (parseInt(ExistLinesData.PanelLines[i].PNCPartID) > 0) 
+		{
+		//document.getElementById("Material"+LineNo).setAttribute('disabled','disabled');
+		document.getElementById("Qty"+LineNo).setAttribute('disabled','disabled');
+		document.getElementById("Description"+LineNo).setAttribute('disabled','disabled');
+		document.getElementById("Length"+LineNo).setAttribute('disabled','disabled');
+		document.getElementById("Width"+LineNo).setAttribute('disabled','disabled');
+		document.getElementById("UnitRef"+LineNo).setAttribute('disabled','disabled');
+		document.getElementById("CopyLine"+LineNo).setAttribute('hidden','hidden');
+		
+		}
+		
+		//ExistLinesData.PanelLines[i].PopupMsg
+			
+		if (ExistLinesData.PanelLines[i].JSON != "") 
+		{
+		
+		PartJSON=PartJSON = ExistLinesData.PanelLines[i].JSON;
+		ReOrientateVectors(false);
+		document.getElementById("LineJSON"+LineNo).value=JSON.stringify(PartJSON);
+		}
+	
+		for (var j=1; j<=4;j++) 
+		{
+			switch (j)
+			{
+			case 1 : EdgeValue = ExistLinesData.PanelLines[i].EdgeLeft; EdgeIDName = 'LeftedgeTick'; break;
+			case 2 : EdgeValue = ExistLinesData.PanelLines[i].EdgeRight; EdgeIDName = 'RightedgeTick'; break;
+			case 3 : EdgeValue = ExistLinesData.PanelLines[i].EdgeTop; EdgeIDName = 'TopedgeTick'; break;
+			case 4 : EdgeValue = ExistLinesData.PanelLines[i].EdgeBot; EdgeIDName = 'BottomedgeTick'; break;
+			}
+			
+			switch (EdgeValue)
+			{
+			case 1: EdgeCheckBoxValue ='Tick'; break;
+			case 2: EdgeCheckBoxValue ='45Profile'; break;
+			case 3: EdgeCheckBoxValue ='AngleEdge'; break;
+			case 4: EdgeCheckBoxValue = 'SpecialEdge'; break;
+			case 10: EdgeCheckBoxValue ='Aris Both Sides'; break;
+			case 11: EdgeCheckBoxValue ='R1.5 Face Only'; break;
+			case 12: EdgeCheckBoxValue ='R1.5 Both Sides'; break;
+			case 13: EdgeCheckBoxValue ='R3 Face Only'; break;
+			case 14: EdgeCheckBoxValue ='R3 Both Sides'; break;
+			case 15: EdgeCheckBoxValue ='R5 Face Only'; break;
+			case 16: EdgeCheckBoxValue ='R5 Both Sides'; break;
+			case 17: EdgeCheckBoxValue ='9.5mm Ogee'; break;
+			case 18: EdgeCheckBoxValue ='6.3mm Ogee'; break;
+			default: EdgeCheckBoxValue ='None';		
+			}	
+
+			 ChangeCheckBoxValue(EdgeIDName+LineNo,EdgeCheckBoxValue);
+		 
+		 //if (LineNo == 7) {alert(EdgeIDName+" value="+EdgeCheckBoxValue);}
+			
+			if (ExistLinesData.PanelLines[i].Material.indexOf(HDFPrefix) > -1 & EdgeValue > 0 & EdgeValue < 10) {InvalidHDFEdges = true;}
+
+			if (InvalidHDFEdges) {SwapOutStdEdgeType("LineDiv"+LineNo,LineNo,'ChangeOutHDFEdgesForMat("",'+parseInt(LineNo+1)+')');}
+		}
+
+
+	 SetPanelType("LineDiv"+LineNo);
+	 Calculations("LineDiv"+LineNo);	
+	}
+	
+	
+	
+	document.getElementById("Dispdate").value =	ExistLinesData.RequiredDate;	
+}
+
 
 function CheckForGlassFrame(Elem)  
 { 
@@ -904,33 +704,66 @@ function BuildRelMaterialsList(LineDivID)
 var LineDiv = document.getElementById(LineDivID);
 var LineNumber = LineDiv.getAttribute("data-LineNumber");		
 var PanelType = document.getElementById("PanelType"+LineNumber).value;
+var PNCPartID = document.getElementById("PNCPartID"+LineNumber).value;
+var FiltMatList	= [];
 
-	if (PanelType == 'Profile Handle')
+	if (PNCPartID > 0) /*Only allow selection of same material family*/
 	{
-	var FiltMatList	= [];
-		
+
+		/*var ExistingMat = document.getElementById("Material"+LineNumber).value;
+		var FamilyName = GetMaterialNamePart(ExistingMat);
+			
 		for (var i=0; i<Materials.length;i++) 
 		{
 
-			if (Materials[i].NoProfileHandle != 'Yes' & Materials[i].Name.indexOf("36") == -1 & Materials[i].Name.indexOf("60") == -1)	
+			if (Materials[i].Name.indexOf(FamilyName) > -1)	
+			{ FiltMatList.push({ "Name" : ""+Materials[i].Name+"" , "colour" : ""+Materials[i].colour+"" }); }
+		}
+		return FiltMatList	*/
+		var ExistMatThick = GetMatThickFromName(document.getElementById("Material"+LineNumber).value);
+
+		for (var i=0; i<Materials.length;i++) 
+		{
+			var MatThick = GetMatThickFromName(Materials[i].Name);
+			if (MatThick > ExistMatThick-1 & MatThick < ExistMatThick+1)
 			{ FiltMatList.push({ "Name" : ""+Materials[i].Name+"" , "colour" : ""+Materials[i].colour+"" }); }
 		}
 		return FiltMatList
 	}
 	else
-		if (PanelType == 'Glass Frame')
+	{
+
+		switch (PanelType)
 		{
-		var FiltMatList	= [];
-			
-			for (var i=0; i<Materials.length;i++) 
-			{
-				if (Materials[i].Name.indexOf(HDFPrefix) > -1 & HDFGlassFramedAllowed(Materials[i].Name) & Materials[i].Name.indexOf('(POCKET BACK)') == -1  | Materials[i].Name.indexOf(HDFPrefix) == -1)
-				{ FiltMatList.push({ "Name" : ""+Materials[i].Name+"" , "colour" : ""+Materials[i].colour+"" }); }
-			}
-			return FiltMatList
-		}		
-	else
-	{return Materials}
+			case 'Profile Handle' : 
+				for (var i=0; i<Materials.length;i++) 
+				{
+
+					if (Materials[i].NoProfileHandle != 'Yes' & Materials[i].Name.indexOf("36") == -1 & Materials[i].Name.indexOf("60") == -1)	
+					{ FiltMatList.push({ "Name" : ""+Materials[i].Name+"" , "colour" : ""+Materials[i].colour+"" }); }
+				}
+				return FiltMatList;
+			case 'Glass Frame' : 
+				for (var i=0; i<Materials.length;i++) 
+				{
+					if (Materials[i].Name.indexOf(HDFPrefix) > -1 & HDFGlassFramedAllowed(Materials[i].Name) & Materials[i].Name.indexOf('(POCKET BACK)') == -1  | Materials[i].Name.indexOf(HDFPrefix) == -1)
+					{ FiltMatList.push({ "Name" : ""+Materials[i].Name+"" , "colour" : ""+Materials[i].colour+"" }); }
+				}
+				return FiltMatList
+			case 'Optidoor' :
+				for (var i=0; i<Materials.length;i++) 
+				{
+					if (Materials[i].Name.indexOf(HDFPrefix) > -1)
+					{ FiltMatList.push({ "Name" : ""+Materials[i].Name+"" , "colour" : ""+Materials[i].colour+"" }); }
+				}
+				return FiltMatList
+
+
+
+			default : return Materials
+		}
+
+	}
 }
 
 function CheckMaterial(LineDivID)
@@ -946,47 +779,67 @@ var MatIndex = FindItem(itemMaterial,Materials,"Name");
 			//alert(typeof Materials[FindItem(itemMaterial,Materials,"Name")].Grained);
 	if (MatIndex > -1)
 	{
-	var PopUpMessage = Materials[MatIndex].PopupMessage;
-	
-	if( Materials[MatIndex].Grained == 'True') {var IsGrained = true;} else {var IsGrained = false;}
-	
-	
-		if ( !IsGrained ) 
-		{
-		RemoveExtraPar("GrainMatchGroup",LineDivID);
-		RemoveExtraPar("GrainMatchOrder",LineDivID);
-		}
-	}
+		var PopUpMessage = Materials[MatIndex].PopupMessage;
+		
+		if( Materials[MatIndex].Grained == 'True') {var IsGrained = true;} else {var IsGrained = false;}
+		
+		if ( !IsGrained ) {RemoveGrainMatchParams(LineDivID);}
 
-	if (itemMaterial.indexOf("36") > -1 | itemMaterial.indexOf("60") > -1) //Is a builtup panel
-	{ 
-		if (PanelType != 'Builtup Panel') {document.getElementById("PanelType"+LineNumber).value = 'Builtup Panel'; document.getElementById("PanelType"+LineNumber).onchange();} 
+		if (itemMaterial.indexOf("36") > -1 | itemMaterial.indexOf("60") > -1) //Is a builtup panel
+		{ 
+			if (PanelType != 'Builtup Panel') {document.getElementById("PanelType"+LineNumber).value = 'Builtup Panel'; document.getElementById("PanelType"+LineNumber).onchange();} 
+		}
+		else
+		{
+			if (PanelType == 'Builtup Panel') 
+			{
+			document.getElementById("PanelType"+LineNumber).value = 'Standard Panel'; 
+			document.getElementById("Description"+LineNumber).value = '';
+			document.getElementById("PanelType"+LineNumber).onchange();
+			} 
+		}
+
+		if (itemMaterial.indexOf(HDFPrefix) > -1 ) 
+		{
+			if (PanelType == 'Standard Panel') {document.getElementById("PanelType"+LineNumber).value = 'Optidoor'; document.getElementById("PanelType"+LineNumber).onchange();} 
+		}
+		else
+		{
+			if (PanelType == 'Optidoor') 
+			{
+			document.getElementById("PanelType"+LineNumber).value = 'Standard Panel'; 
+			document.getElementById("PanelType"+LineNumber).onchange();
+			} 
+		}
+		
+		
+
+		if (itemMaterial.indexOf("NON-STOCK") > -1) 
+		{
+		//popup("Please note that "+NonStockLeadTime.toString()+" working days will need to be allowed for ordering in Non Stock colours",150,350,1);
+			if (PanelType == 'Profile Handle') {popup("Please note that some Non Stock colours are not available with mitre handles. Please call us to check first!",150,350,1);}
+		}
+		else if (PopUpMessage != '') { popup(PopUpMessage,150,350,1); }
+		
+		CheckSize(LineDivID,"Length"+LineNumber);
+		CheckSize(LineDivID,"Width"+LineNumber);
+		
+		/*Check for banding changes on material change*/
+		SwapOutStdEdgeType(LineDivID,LineNumber,'');	
 	}
 	else
 	{
-		if (PanelType == 'Builtup Panel') 
+		for (var i = 0; i<Materials.length; i++) 
 		{
-		document.getElementById("PanelType"+LineNumber).value = 'Flat Panel'; 
-		document.getElementById("Description"+LineNumber).value = '';
-		document.getElementById("PanelType"+LineNumber).onchange();
-		} 
+			if (Materials[i].Name.toUpperCase().startsWith(itemMaterial.toUpperCase()) ) 
+			{
+			document.getElementById("Material"+LineNumber).value = Materials[i].Name;
+			break;
+			}
+			
+			if (i == Materials.length-1) {document.getElementById("Material"+LineNumber).value = "";}
+		}
 	}
-	
-	
-
-	if (itemMaterial.indexOf("NON-STOCK") > -1) 
-	{
-	//popup("Please note that "+NonStockLeadTime.toString()+" working days will need to be allowed for ordering in Non Stock colours",150,350,1);
-		if (PanelType == 'Profile Handle') {popup("Please note that some Non Stock colours are not available with mitre handles. Please call us to check first!",150,350,1);}
-	}
-	else if (PopUpMessage != '') { popup(PopUpMessage,150,350,1); }
-	
-	CheckSize(LineDivID,"Length"+LineNumber);
-	CheckSize(LineDivID,"Width"+LineNumber);
-	
-	/*Check for banding changes on material change*/
-	SwapOutStdEdgeType(LineDivID,LineNumber,'');	
-	
 }
 
 function SwapOutStdEdgeType(LineDivID,LineNumber,CallFuncWithArg)
@@ -1009,7 +862,9 @@ function SwapOutStdEdgeType(LineDivID,LineNumber,CallFuncWithArg)
 		if (edgeTickNode.className != "checkboxBlank" & TickEdgeType == '') {TickEdgeType = GetStdEdgeType(LineDivID,CallFuncWithArg);}
 		
 		ImageClassIndex = FindItem(edgeTickNode.className,HDFEdgeProfiles,"ImageClass");
-		if (TickEdgeType == 'Tick' & ImageClassIndex > -1 | TickEdgeType != 'Tick' & ImageClassIndex == -1 & edgeTickNode.className == "checkboxTick") {ChangeCheckBoxValue(edgeTickNode.id,TickEdgeType);}
+
+		if ((TickEdgeType == 'Tick' | TickEdgeType == 'SpecialEdge' ) & ImageClassIndex > -1 
+			| TickEdgeType != 'Tick' & ImageClassIndex == -1 & (edgeTickNode.className == "checkboxTick" | edgeTickNode.className == "checkboxSpecial")) {ChangeCheckBoxValue(edgeTickNode.id,TickEdgeType);}
 	}
 	
 	//alert(TickEdgeType + " - " + ImageClassIndex);
@@ -1040,53 +895,71 @@ function CustomCheckbox(CheckBoxId,e)
 var LineDiv  = document.getElementById(CheckBoxId).parentNode;
 var LineNumber = LineDiv.getAttribute("data-LineNumber");
 var PanelType = document.getElementById("PanelType"+LineNumber).value;
-//var itemMaterial = document.getElementById("Material"+LineNumber).value;
+var itemMaterial = document.getElementById("Material"+LineNumber).value;
 var CheckBoxClass = document.getElementById(CheckBoxId).className;
+var PNCPartID = parseInt(document.getElementById("PNCPartID"+LineNumber).value);
+var WasChanged = false;
 		//alert(LineJSON);
 
 	//else {PartJSON = {"Operations" :[] , "Vectors" :[]}}
 	//alert(LineJSON);
+	if (itemMaterial.indexOf(HDFPrefix) > -1 ) {var IsHDFMaterial = true} else {var IsHDFMaterial = false}
 	
 	if (document.getElementById("ToggleAngleEdgesCheck").checked) {var ToggleAngleEdges = true;} else {var ToggleAngleEdges = false;}
 
 
 	if (document.getElementById(CheckBoxId).getAttribute("disabled") != 'disabled')
 	{	
-	SetEdgingOnVectors(LineDiv.id,CheckBoxId,CheckBoxClass);
-	
-	var LineJSON = document.getElementById("LineJSON"+LineNumber).value;
-	if (LineJSON != '') {PartJSON = JSON.parse(LineJSON);}
+		SetEdgingOnVectors(LineDiv.id,CheckBoxId,CheckBoxClass);
+		
+		var LineJSON = document.getElementById("LineJSON"+LineNumber).value;
+		if (LineJSON != '') {PartJSON = JSON.parse(LineJSON);}
 
-	var TickEdgeType = GetStdEdgeType(LineDiv.id,"");
-	
-	if (e.ctrlKey & TickEdgeType != 'Tick') {TickEdgeType = GetNextHDFEdgeProfileType(CheckBoxClass);}
-	
+
+		var TickEdgeType = GetStdEdgeType(LineDiv.id,"");
+
+		
+		if (e.ctrlKey) 
+		{
+			if (IsHDFMaterial & TickEdgeType != 'Tick') {TickEdgeType = GetNextHDFEdgeProfileType(CheckBoxClass);}
+			if (!IsHDFMaterial & CheckBoxClass != 'checkboxSpecial') {TickEdgeType = 'SpecialEdge';}
+		}
+		
 		switch(CheckBoxClass)
 		{
-			case "checkboxBlank": ChangeCheckBoxValue(CheckBoxId,TickEdgeType);
-			break;
+			case "checkboxBlank": WasChanged = ChangeCheckBoxValue(CheckBoxId,TickEdgeType);
+				break;
 			case "checkboxTick":
-				
-				if(PanelType == 'Angle Edge' | ToggleAngleEdges) {ChangeCheckBoxValue(CheckBoxId,'AngleEdge');}
-				else if (PanelType == 'Profile Handle') {ChangeCheckBoxValue(CheckBoxId,'45Profile');}
-				else {ChangeCheckBoxValue(CheckBoxId,'None');}	
-			break;
-			case "checkbox45Profile": ChangeCheckBoxValue(CheckBoxId,'None');	
-
-					break;
+				if (e.ctrlKey) {WasChanged = ChangeCheckBoxValue(CheckBoxId,TickEdgeType);}
+				else if(PanelType == 'Angle Edge' | ToggleAngleEdges) {WasChanged = ChangeCheckBoxValue(CheckBoxId,'AngleEdge');}
+				else if (PanelType == 'Profile Handle') {WasChanged = ChangeCheckBoxValue(CheckBoxId,'45Profile');}
+				else {WasChanged = ChangeCheckBoxValue(CheckBoxId,'None');}	
+				break;
+			case "checkboxSpecial": 
+				if (e.ctrlKey) {WasChanged = ChangeCheckBoxValue(CheckBoxId,TickEdgeType);}
+				else {WasChanged = ChangeCheckBoxValue(CheckBoxId,'None');}
+				break;
+			case "checkbox45Profile": WasChanged = ChangeCheckBoxValue(CheckBoxId,'None');	
+				break;
 			case "checkboxAngleEdge": 
 					//if (ToggleAngleEdges) {ChangeCheckBoxValue(CheckBoxId,'AngleEdge');}
-					if (PanelType == 'Profile Handle') {ChangeCheckBoxValue(CheckBoxId,'45Profile');}
-					else {ChangeCheckBoxValue(CheckBoxId,'None');}	
+					if (PanelType == 'Profile Handle') {WasChanged = ChangeCheckBoxValue(CheckBoxId,'45Profile');}
+					else {WasChanged = ChangeCheckBoxValue(CheckBoxId,'None');}	
 					break;
 			default : 	
-				if(PanelType == 'Angle Edge' | ToggleAngleEdges) {ChangeCheckBoxValue(CheckBoxId,'AngleEdge');}
-				else if (PanelType == 'Profile Handle') {ChangeCheckBoxValue(CheckBoxId,'45Profile');}
-				else if (e.ctrlKey) {ChangeCheckBoxValue(CheckBoxId,TickEdgeType);}
-				else {ChangeCheckBoxValue(CheckBoxId,'None');}		
+				if(PanelType == 'Angle Edge' | ToggleAngleEdges) {WasChanged = ChangeCheckBoxValue(CheckBoxId,'AngleEdge');}
+				else if (PanelType == 'Profile Handle') {WasChanged = ChangeCheckBoxValue(CheckBoxId,'45Profile');}
+				else if (e.ctrlKey) {WasChanged = ChangeCheckBoxValue(CheckBoxId,TickEdgeType);}
+				else {WasChanged = ChangeCheckBoxValue(CheckBoxId,'None');}		
 		}
 		
 		if (PanelType == 'Angle Edge' | ToggleAngleEdges) {SetSpecialTypeInputs(LineDiv.id);};
+
+		if (PNCPartID > 0 & PartJSON.hasOwnProperty("Vectors") & WasChanged) 
+		{
+			
+			if (PartJSON.Vectors.length > 0) {delete PartJSON.PNCVectors; document.getElementById("LineJSON"+LineNumber).value = JSON.stringify(PartJSON);}
+		}		
 	}
 		
 }
@@ -1111,6 +984,8 @@ var RightedgeTickNode = document.getElementById("RightedgeTick"+LineNumber);
 var TopedgeTickNode = document.getElementById("TopedgeTick"+LineNumber);
 var BottomedgeTickNode = document.getElementById("BottomedgeTick"+LineNumber);
 
+var PNCPartID = parseInt(document.getElementById("PNCPartID"+LineNumber).value);
+
 	if ( ItemID.match('Left') != null ) { var WhichEdge = 'Left'}
 	if ( ItemID.match('Right') != null ) { var WhichEdge = 'Right'}
 	if ( ItemID.match('Top') != null ) { var WhichEdge = 'Top'}
@@ -1124,14 +999,14 @@ var BottomedgeTickNode = document.getElementById("BottomedgeTick"+LineNumber);
 	
 	var LineJSON = document.getElementById("LineJSON"+LineNumber).value;
 	
-	if (LineJSON != '') 
+	if (LineJSON != '' & PNCPartID == 0) 
 	{
 	if (CheckBandAllowed(LineDiv,WhichEdge,CheckType) == false) {BandChangeOK = false; popup("Invalid edge! Operations too close to Edgebanding!",120,350,1);}
 	}
 
 if (BandChangeOK == true)
 {
-	document.getElementById(ItemID).title = "";
+	document.getElementById(ItemID).title = "Hold down the Ctrl key while clicking to enable special colour edging.";	
 
 	switch(CheckType)
 	{
@@ -1140,8 +1015,23 @@ if (BandChangeOK == true)
 		//{
 		document.getElementById(ItemID).className = "checkboxTick";	
 		SetEdgeType = 'LaserEdge';
+
+		if ( TopedgeNode.value == 'SpecialEdge') { TopedgeNode.value = SetEdgeType; TopedgeTickNode.className = "checkboxTick";}
+		if ( BotedgeNode.value == 'SpecialEdge') { BotedgeNode.value = SetEdgeType; BottomedgeTickNode.className = "checkboxTick";}
+		if ( LeftedgeNode.value == 'SpecialEdge') { LeftedgeNode.value = SetEdgeType; LeftedgeTickNode.className = "checkboxTick";}
+		if ( RightedgeNode.value == 'SpecialEdge') { RightedgeNode.value = SetEdgeType; RightedgeTickNode.className = "checkboxTick";}		
 		//}
 		break;
+	case 'SpecialEdge':
+			document.getElementById(ItemID).className = "checkboxSpecial";	
+			SetEdgeType = 'SpecialEdge';
+
+			if ( TopedgeNode.value == 'LaserEdge') { TopedgeNode.value = SetEdgeType; TopedgeTickNode.className = "checkboxSpecial";}
+			if ( BotedgeNode.value == 'LaserEdge') { BotedgeNode.value = SetEdgeType; BottomedgeTickNode.className = "checkboxSpecial";}
+			if ( LeftedgeNode.value == 'LaserEdge') { LeftedgeNode.value = SetEdgeType; LeftedgeTickNode.className = "checkboxSpecial";}
+			if ( RightedgeNode.value == 'LaserEdge') { RightedgeNode.value = SetEdgeType; RightedgeTickNode.className = "checkboxSpecial";}
+
+			break;
 	case 'None':
 		document.getElementById(ItemID).className = "checkboxBlank";
 		SetEdgeType = 'None';
@@ -1198,6 +1088,8 @@ if (BandChangeOK == true)
 	case 'Top': TopedgeNode.value = SetEdgeType; break;
 	case 'Bottom': BotedgeNode.value = SetEdgeType; break;	
 	}
+
+	return true;
 }
 
 }
@@ -1232,6 +1124,7 @@ var LineDiv = document.getElementById(LineDivID);
 var LineNumber = LineDiv.getAttribute("data-LineNumber");
 var itemMaterial = document.getElementById("Material"+LineNumber).value;
 var PanelType = document.getElementById("PanelType"+LineNumber).value;
+var PNCPartID = document.getElementById("PNCPartID"+LineNumber).value;
 
  if (itemMaterial != 0 )
  {
@@ -1290,16 +1183,16 @@ var PanelType = document.getElementById("PanelType"+LineNumber).value;
 	{
 	MaxSize = MaxSheetLength;		
 	popup("Panel is too large for sheet! This value must be less than "+parseFloat(MaxSize)+"mm.",150,350,1);
-	ValueNode.value = MaxSize;
+	if (PNCPartID == 0) {ValueNode.value = MaxSize;}
 	}
 	
 	if (ValueNode.id.indexOf("Length") > -1 & IsGrained == false & WidthNode > MaxSheetWidth & InputValue > MaxSheetWidth | 
 		ValueNode.id.indexOf("Width") > -1 & IsGrained == false & LengthNode > MaxSheetWidth & InputValue > MaxSheetWidth | 
 		ValueNode.id.indexOf("Width") > -1 & IsGrained == true & InputValue > MaxSheetWidth) 
 	{
-	MaxSize = MaxSheetWidth;	
-	popup("Panel is too large for sheet! This value must be less than "+parseFloat(MaxSize)+"mm.",150,350,1);
-	ValueNode.value = MaxSize;	
+		MaxSize = MaxSheetWidth;	
+		popup("Panel is too large for sheet! This value must be less than "+parseFloat(MaxSize)+"mm.",150,350,1);
+		if (PNCPartID == 0) {ValueNode.value = MaxSize;}
 	}
 
 
@@ -1446,8 +1339,8 @@ var LineDiv = document.getElementById(LineDivID);
 		//RenameChildNodes(NewLineDive,i);
 		
 		SetPanelType('LineDiv'+(counter-1))
-		RemoveExtraPar("GrainMatchGroup",LineDivID);
-		RemoveExtraPar("GrainMatchOrder",LineDivID);
+		SelectLine('LineDiv'+(counter-1))
+		RemoveGrainMatchParams(LineDivID)
 
 		
 	//Calculations(MainDiv.childNodes.item(1).id);
@@ -1834,6 +1727,13 @@ var LineMaterial = document.getElementById("Material"+LineNumber).value;
 	return '';
 }
 
+function ApplyHDFMaterialSelection(LineNumber)
+{
+var HDFMaterialName = document.getElementById('hiddenDiv').getAttribute("data-SelectListValue");
+document.getElementById("Material"+LineNumber).value = HDFMaterialName;
+document.getElementById("Material"+LineNumber).onchange();
+}
+
 function ApplyHDFEdgeProfileSelection(LineNumber)
 {
 //var HDFEdgeName = document.getElementById('PopupListSelect').value;
@@ -1851,7 +1751,7 @@ var edgeTickNode;
 		case 4 : edgeTickNode = document.getElementById("BottomedgeTick"+LineNumber); break;		
 		}
 		
-		if (edgeTickNode.className == "checkboxTick") {ChangeCheckBoxValue(edgeTickNode.id,HDFEdgeName);}	
+		if (edgeTickNode.className == "checkboxTick" | edgeTickNode.className == "checkboxSpecial") {ChangeCheckBoxValue(edgeTickNode.id,HDFEdgeName);}	
 	}
 }
 
@@ -1899,6 +1799,7 @@ var itemMaterial = document.getElementById("Material"+LineNumber).value;
 var DescNode = document.getElementById("Description"+LineNumber);
 var ShapingOK = PanelTypes[FindItem(PanelType,PanelTypes,"Name")].PartShaping;
 var TypeID = FindItem(PanelType,PanelTypes,"Name");
+var PNCPartID = document.getElementById("PNCPartID"+LineNumber).value;
 
 
 
@@ -1917,12 +1818,14 @@ var TypeID = FindItem(PanelType,PanelTypes,"Name");
 			if (FindItem(DescNode.value,PanelTypes[i].Parts,"Name") > -1 & i != TypeID) {InOtherType = true;} /* i != TypeID = Exclude this type from the check*/
 		}			
 	}
-
 	
 	if (InOtherType | PanelType != 'Glass Frame' & DescNode.value == "Glass Frame" | PanelType != 'Builtup Panel' & DescNode.value == "Builtup Panel") 
 	{
-	DescNode.value = '';
-	ChangeDesc(LineDivID);
+		if (PNCPartID == "")
+		{
+		DescNode.value = '';
+		ChangeDesc(LineDivID);
+		}
 	}
 	
 	
@@ -1948,7 +1851,7 @@ var TypeID = FindItem(PanelType,PanelTypes,"Name");
 	
 
 
-	if (TypeID > -1)
+	if (TypeID > -1 & PNCPartID == "")
 	{
 		if (PanelTypes[TypeID].hasOwnProperty("Parts") )
 		{
@@ -1980,6 +1883,12 @@ var TypeID = FindItem(PanelType,PanelTypes,"Name");
 		DescNode.value = 'Door';ChangeDesc(LineDivID);
 		//var TopedgeTickNode = document.getElementById("TopedgeTick"+LineNumber);
 		//ChangeCheckBoxValue(TopedgeTickNode.id,'AngleEdge');
+	}
+
+	if (PanelType == 'Optidoor' & itemMaterial != "")
+	{
+		if (itemMaterial.indexOf(HDFPrefix) == -1)
+		{popup('Please select an Optidoor material!',200,300,4,'ApplyHDFMaterialSelection('+LineNumber+');',BuildRelMaterialsList(LineDivID));}
 	}
 	
 	
@@ -2058,6 +1967,46 @@ var PanelType = document.getElementById("PanelType"+LineNumber).value;
 	
 }
 
+function GetMaterialNamePart(MaterialName)
+{
+	const regex = /\d+/;
+	var NumCharPos = MaterialName.search(regex);
+
+	return MaterialName.substr(0,NumCharPos-1);
+}
+
+function MatchMaterialFamily(ExistingMat,FindBuildup)
+{
+	var NewMaterial = null;
+	var FamilyName = GetMaterialNamePart(ExistingMat);
+	var IsBuildupMat = false;
+
+	for (var r = 0; r<Materials.length; r++) 
+	{
+		IsBuildupMat = false;
+
+		if (Materials[r].Name.indexOf("36") > -1 | Materials[r].Name.indexOf("60") > -1) {IsBuildupMat = true;}
+
+
+		if (Materials[r].Name.indexOf(FamilyName) > -1 && IsBuildupMat & FindBuildup | !IsBuildupMat & !FindBuildup) 
+		{ 
+			NewMaterial = Materials[r].Name;
+			break;
+		} 
+	} 
+
+	return NewMaterial;
+}
+
+function RemoveGrainMatchParams(LineDivID)
+{
+	RemoveExtraPar("GrainMatchGroup",LineDivID);
+	RemoveExtraPar("GrainMatchOrder",LineDivID);
+	RemoveExtraPar("GrainMatchXPos",LineDivID);
+	RemoveExtraPar("GrainMatchYPos",LineDivID);
+	RemoveExtraPar("DrwFrontOption",LineDivID);
+}
+
 function SetPanelType(LineDivID)
 {
 var LineDiv = document.getElementById(LineDivID);
@@ -2069,6 +2018,7 @@ if(ShowPartEditor == true) {PartEditButton.removeAttribute("hidden");}
 var PanelTypeNode = document.getElementById("PanelType"+LineNumber);
 var LineDesc = document.getElementById("Description"+LineNumber);
 var AddInfo = document.getElementById("AddInfo"+LineNumber);
+var PNCPartID = document.getElementById("PNCPartID"+LineNumber).value;
 //alert(PanelTypes[FindItem(PanelTypeNode.value,PanelTypes,"Name")].Icon);
 
 var IconBase64Text = PanelTypes[FindItem(PanelTypeNode.value,PanelTypes,"Name")].Icon;
@@ -2079,18 +2029,20 @@ if (IconBase64Text != "") {PanelTypeNode.className = "Inputlines LeftIcon";} els
 	switch(PanelType)
 	{
 	case 'Builtup Panel': 
-		RemoveExtraPar("GrainMatchGroup",LineDivID);
-		RemoveExtraPar("GrainMatchOrder",LineDivID);
+		RemoveGrainMatchParams(LineDivID)
+		AddInfo.removeAttribute("placeholder");
 
-		if (itemMaterial.value.indexOf("36") == -1 & itemMaterial.value.indexOf("60") == -1)  { itemMaterial.value = null;  }
+		if (itemMaterial.value.indexOf("36") == -1 & itemMaterial.value.indexOf("60") == -1)  { itemMaterial.value = MatchMaterialFamily(itemMaterial.value,true);  }
+		
+		itemMaterial.removeAttribute("disabled");		
 		 
 		PartEditButton.setAttribute("hidden","hidden");
 		document.getElementById("LineJSON"+LineNumber).value = '';
 		PartJSON = [];
 	break;
 	case 'Profile Handle':
-		RemoveExtraPar("GrainMatchGroup",LineDivID);
-		RemoveExtraPar("GrainMatchOrder",LineDivID);
+		//RemoveGrainMatchParams(LineDivID)
+		AddInfo.removeAttribute("placeholder");	
 
 
 		var MatIndex = FindItem(itemMaterial.value,Materials,"Name");
@@ -2100,37 +2052,56 @@ if (IconBase64Text != "") {PanelTypeNode.className = "Inputlines LeftIcon";} els
 		}
 	break;
 	case 'Glass Frame'  :
-		document.getElementById("Description"+LineNumber).value = "Glass Frame"; ChangeDesc(LineDivID);
+		if (PNCPartID == "")
+		{
+		document.getElementById("Description"+LineNumber).value = "Glass Frame"; 
+		ChangeDesc(LineDivID);
+		}
 
 		if (itemMaterial.value.indexOf(HDFPrefix) > -1 & !HDFGlassFramedAllowed(itemMaterial.value) | itemMaterial.value.indexOf('(POCKET BACK)') > -1) {itemMaterial.value = null;} 
-
+	break;	
+	/*case 'Optidoor'  :
+		if (itemMaterial.value.indexOf(HDFPrefix) == -1) 
+		{popup('Please select an Optidoor material!',200,300,4,'ApplyHDFMaterialSelection('+LineNumber+');',BuildRelMaterialsList(LineDivID));}
+	break;*/
 	default:
 		
 	}
 	
 	if (itemMaterial.value.indexOf("36") > -1 | itemMaterial.value.indexOf("60") > -1)
 	{
-		if (PanelType != 'Builtup Panel') {itemMaterial.value = null; }	
+		if (PanelType != 'Builtup Panel') {itemMaterial.value = MatchMaterialFamily(itemMaterial.value,false); }	
 	}
 	
 	
-	
-	if (PanelType == 'Roller Surround') // | PanelType == 'Glass Frame' 
+	if (PNCPartID == "")
 	{
-	document.getElementById("DescriptionDropButton"+LineNumber).setAttribute("disabled","disabled");
-	LineDesc.setAttribute("readonly","readonly");
-	LineDesc.style.backgroundColor="#F2F2F2";
+		if (PanelType == 'Roller Surround') // | PanelType == 'Glass Frame' 
+		{
+		document.getElementById("DescriptionDropButton"+LineNumber).setAttribute("disabled","disabled");
+		LineDesc.setAttribute("readonly","readonly");
+		LineDesc.style.backgroundColor="#F2F2F2";
 
-	}
-	else
-	{
-	if ( LineDesc.value == "Roller Door Surround" | PanelType != 'Glass Frame' & LineDesc.value == 'Glass Frame' ) { LineDesc.value = ""; }
-	//if ( PanelType != 'Glass Frame' & AddInfo.value == 'Glass Frame' ) { AddInfo.value = ""; }
-	document.getElementById("DescriptionDropButton"+LineNumber).removeAttribute("disabled"); //was DescType
-	LineDesc.removeAttribute("readonly");
-	LineDesc.style.backgroundColor="rgba(255,255,255,255)";
+		}
+		else
+		{
+		if ( LineDesc.value == "Roller Door Surround" | PanelType != 'Glass Frame' & LineDesc.value == 'Glass Frame' ) { LineDesc.value = ""; }
+		//if ( PanelType != 'Glass Frame' & AddInfo.value == 'Glass Frame' ) { AddInfo.value = ""; }
+		document.getElementById("DescriptionDropButton"+LineNumber).removeAttribute("disabled"); //was DescType
+		LineDesc.removeAttribute("readonly");
+		LineDesc.style.backgroundColor="rgba(255,255,255,255)";
+		}
 	}
 	
+}
+
+function Is1FaceMaterial(MaterialName)
+{
+	var Result = false;
+	if (MaterialName.indexOf(' 1F') > -1 ) {Result = true;}
+	if (MaterialName.indexOf(' 2F') == -1 & MaterialName.indexOf('ACRYGLOSS') > -1 ) {Result = true;}
+
+	return Result;
 }
 
 
@@ -2174,14 +2145,14 @@ var LineNumber = LineDiv.getAttribute("data-LineNumber");
 var PanelType = document.getElementById("PanelType"+LineNumber).value
 var itemMaterial = document.getElementById("Material"+LineNumber).value;
 var itemQty = parseFloat(document.getElementById("Qty"+LineNumber).value);
-var itemDesc = document.getElementById("Description"+LineNumber).value;
+//var itemDesc = document.getElementById("Description"+LineNumber).value;
 var LengthNode = parseFloat(document.getElementById("Length"+LineNumber).value);
 var WidthNode = parseFloat(document.getElementById("Width"+LineNumber).value);
 var LeftedgeNode = document.getElementById("Leftedge"+LineNumber).value;
 var RightedgeNode = document.getElementById("Rightedge"+LineNumber).value;
 var TopedgeNode = document.getElementById("Topedge"+LineNumber).value;
 var BotedgeNode = document.getElementById("Bottomedge"+LineNumber).value;
-var ExtraParamNode = document.getElementById("ExtraPar"+LineNumber);
+//var ExtraParamNode = document.getElementById("ExtraPar"+LineNumber);
 
 
 //var Shortstring = ExtraParamNode.value.slice(ExtraParamNode.value.indexOf("Return"),ExtraParamNode.value.length);
@@ -2199,6 +2170,11 @@ var RoutingCharge = 0;
 var SecondPrgCharge = 0;
 var HasManualClashing = false;
 var ManualClashingCharge = 0;
+var GMGroupsArr = [];
+var GrianMatchCharge = 0;
+var FaceOpsCount = 0;
+var BackOpsCount = 0;
+var SecPrgCount = 0;
 
 //alert(LeftedgeNode);
 
@@ -2220,224 +2196,266 @@ if (BotedgeNode == 'AngleEdge') {AngleEdgeCost = AngleEdgeCost + 50;}
 
 
 
-if (LengthNode > 0 && WidthNode > 0 && itemMaterial != '')
+if (LengthNode > 0 && WidthNode > 0 && itemMaterial != "")
 {
+	var MatIndex = FindItem(itemMaterial,Materials,"Name");
+	if (MatIndex > -1)
+	{
 	
-	if (itemMaterial.indexOf("LPM WHITE") > -1 && LPMDiscount < 1 ){ DiscountRate = LPMDiscount; }
+		if (itemMaterial.indexOf("LPM WHITE") > -1 && LPMDiscount < 1 ){ DiscountRate = LPMDiscount; }
 
-SheetMargin = Materials[FindItem(itemMaterial,Materials,"Name")].SheetMargin;
-EdgetapeCostPerM = Materials[FindItem(itemMaterial,Materials,"Name")].EdgetapeCostPerM;
-ProcessCost = Materials[FindItem(itemMaterial,Materials,"Name")].ProcessCost;
+	SheetMargin = Materials[MatIndex].SheetMargin;
+	EdgetapeCostPerM = Materials[MatIndex].EdgetapeCostPerM;
+	ProcessCost = Materials[MatIndex].ProcessCost;
 
-if (Materials[FindItem(itemMaterial,Materials,"Name")].NoLongSheetSurcharge == "No" 
-& (Materials[FindItem(itemMaterial,Materials,"Name")].SheetLength > 2800 | Materials[FindItem(itemMaterial,Materials,"Name")].SheetWidth > 1250)
-& (LengthNode > 2430 | WidthNode > 2430) ) 
-{LongSHSurcharge = 60; } //alert('Long Sheet Surcharge $'+LongSHSurcharge);
+	if (Materials[MatIndex].NoLongSheetSurcharge == "No" 
+	& (Materials[MatIndex].SheetLength > 2800 | Materials[MatIndex].SheetWidth > 1250)
+	& (LengthNode > 2430 | WidthNode > 2430) ) 
+	{LongSHSurcharge = 60; } //alert('Long Sheet Surcharge $'+LongSHSurcharge);
 
 
-	if ( PanelType == "Builtup Panel" && ReturnValue=="Full" ) 
-	{ 
-			//if (itemMaterial == "ACRYGLOSS WHITE 36 2F" ) 
-			//{  
-			//SheetCost = 240;
-			//CuttingCostPerM = 5;
-			//}
-			//if (itemMaterial == "ACRYGLOSS WHITE 60 2F" ) 
-			//{ 
-			//SheetCost = 240;
-			//CuttingCostPerM = 6;
-			//}
-	SheetCost = Materials[FindItem(itemMaterial,Materials,"Name")].AltSheetCost;
-	CuttingCostPerM = Materials[FindItem(itemMaterial,Materials,"Name")].AltCuttingCostPerM;
+		if ( PanelType == "Builtup Panel" && ReturnValue=="Full" ) 
+		{ 
+				//if (itemMaterial == "ACRYGLOSS WHITE 36 2F" ) 
+				//{  
+				//SheetCost = 240;
+				//CuttingCostPerM = 5;
+				//}
+				//if (itemMaterial == "ACRYGLOSS WHITE 60 2F" ) 
+				//{ 
+				//SheetCost = 240;
+				//CuttingCostPerM = 6;
+				//}
+		SheetCost = Materials[MatIndex].AltSheetCost;
+		CuttingCostPerM = Materials[MatIndex].AltCuttingCostPerM;
+		}
+		else
+		{
+		SheetCost = Materials[MatIndex].SheetCost;
+		CuttingCostPerM = Materials[MatIndex].CuttingCostPerM;
+		}
+
+	
+	if ( itemMaterial.indexOf("36") > -1 || itemMaterial.indexOf("60") > -1  ) { EdgetapeCostPerPiece = 10; } else { EdgetapeCostPerPiece = 1;}
+	SheetArea = Materials[MatIndex].SheetArea;
+	LengthIndex = (Math.ceil((LengthNode+49)/50))-2;
+	WidthIndex = (Math.ceil((WidthNode+49)/50))-2;
+	if (LengthIndex < 0) {LengthIndex = 0;}
+	if (WidthIndex < 0) {WidthIndex = 0;}
+	Lenghtrounded = roundedsizes[LengthIndex].ReCalcValue;
+	Widthrounded = roundedsizes[WidthIndex].ReCalcValue;
+	EdgeTapeLength = adjustededgetape[LengthIndex].ReCalcValue;
+	EdgeTapeWidth = adjustededgetape[WidthIndex].ReCalcValue;
+	CuttingCostLength = adjustedcuttingcost[LengthIndex].ReCalcValue;
+	CuttingCostWidth = adjustedcuttingcost[WidthIndex].ReCalcValue;
+	if (Materials[MatIndex].Name.search("24MDF") > -1 || Materials[MatIndex].Name.search("25MDF") > -1 || Materials[MatIndex].Name.search("30MDF") > -1 || Materials[MatIndex].Name.search("32MDF") > -1
+	|| Materials[MatIndex].Name.search("32MRC2") > -1)
+	{
+	AdjustedPartArea = ((adjustedsizes24mm[LengthIndex].ReCalcValue)/1000)*((adjustedsizes24mm[WidthIndex].ReCalcValue)/1000);
 	}
 	else
 	{
-	SheetCost = Materials[FindItem(itemMaterial,Materials,"Name")].SheetCost;
-	CuttingCostPerM = Materials[FindItem(itemMaterial,Materials,"Name")].CuttingCostPerM;
+	AdjustedPartArea = ((adjustedsizes[LengthIndex].ReCalcValue)/1000)*((adjustedsizes[WidthIndex].ReCalcValue)/1000);
 	}
 
- 
-if ( itemMaterial.indexOf("36") > -1 || itemMaterial.indexOf("60") > -1  ) { EdgetapeCostPerPiece = 10; } else { EdgetapeCostPerPiece = 1;}
-SheetArea = Materials[FindItem(itemMaterial,Materials,"Name")].SheetArea;
-LengthIndex = (Math.ceil((LengthNode+49)/50))-2;
-WidthIndex = (Math.ceil((WidthNode+49)/50))-2;
-if (LengthIndex < 0) {LengthIndex = 0;}
-if (WidthIndex < 0) {WidthIndex = 0;}
-Lenghtrounded = roundedsizes[LengthIndex].ReCalcValue;
-Widthrounded = roundedsizes[WidthIndex].ReCalcValue;
-EdgeTapeLength = adjustededgetape[LengthIndex].ReCalcValue;
-EdgeTapeWidth = adjustededgetape[WidthIndex].ReCalcValue;
-CuttingCostLength = adjustedcuttingcost[LengthIndex].ReCalcValue;
-CuttingCostWidth = adjustedcuttingcost[WidthIndex].ReCalcValue;
-if (Materials[FindItem(itemMaterial,Materials,"Name")].Name.search("24MDF") > -1 || Materials[FindItem(itemMaterial,Materials,"Name")].Name.search("25MDF") > -1 || Materials[FindItem(itemMaterial,Materials,"Name")].Name.search("30MDF") > -1 || Materials[FindItem(itemMaterial,Materials,"Name")].Name.search("32MDF") > -1
-|| Materials[FindItem(itemMaterial,Materials,"Name")].Name.search("32MRC2") > -1)
-{
-AdjustedPartArea = ((adjustedsizes24mm[LengthIndex].ReCalcValue)/1000)*((adjustedsizes24mm[WidthIndex].ReCalcValue)/1000);
-}
-else
-{
-AdjustedPartArea = ((adjustedsizes[LengthIndex].ReCalcValue)/1000)*((adjustedsizes[WidthIndex].ReCalcValue)/1000);
-}
-
-PartPrice = itemQty*(ProfileHandleCost+AngleEdgeCost+LongSHSurcharge+parseFloat(((SheetCost/SheetArea*(AdjustedPartArea)*SheetMargin+(ProcessCost+(Lenghtrounded+Widthrounded)*0.001*CuttingCostPerM*2*CuttingCostLength*CuttingCostWidth)+(((LeftEdge*Lenghtrounded+RightEdge*Lenghtrounded+TopEdge*Widthrounded+BottomEdge*Widthrounded)*0.001*EdgetapeCostPerM)+(LeftEdge*EdgeTapeLength+RightEdge*EdgeTapeLength+TopEdge*EdgeTapeWidth+BottomEdge*EdgeTapeWidth)+(LeftEdge+RightEdge+TopEdge+BottomEdge)*EdgetapeCostPerPiece))*1.25).toFixed(2)));
-if (PanelType == 'Glass Frame' ) { PartPrice = PartPrice + (itemQty*80) ; } 
-if (PanelType == 'Roller Surround' ) { PartPrice = PartPrice + (itemQty*40); }
+	PartPrice = itemQty*(ProfileHandleCost+AngleEdgeCost+LongSHSurcharge+parseFloat(((SheetCost/SheetArea*(AdjustedPartArea)*SheetMargin+(ProcessCost+(Lenghtrounded+Widthrounded)*0.001*CuttingCostPerM*2*CuttingCostLength*CuttingCostWidth)+(((LeftEdge*Lenghtrounded+RightEdge*Lenghtrounded+TopEdge*Widthrounded+BottomEdge*Widthrounded)*0.001*EdgetapeCostPerM)+(LeftEdge*EdgeTapeLength+RightEdge*EdgeTapeLength+TopEdge*EdgeTapeWidth+BottomEdge*EdgeTapeWidth)+(LeftEdge+RightEdge+TopEdge+BottomEdge)*EdgetapeCostPerPiece))*1.25).toFixed(2)));
+	if (PanelType == 'Glass Frame' ) { PartPrice = PartPrice + (itemQty*80) ; } 
+	if (PanelType == 'Roller Surround' ) { PartPrice = PartPrice + (itemQty*40); }
 
 
-	var LineJSON = document.getElementById("LineJSON"+LineNumber).value;
-	if (LineJSON != '') 
-	{
-		var PartJSONObj = JSON.parse(LineJSON);
-
-		for (var i = 0; i<PartJSONObj.Vectors.length; i++)
+		var LineJSON = document.getElementById("LineJSON"+LineNumber).value;
+		if (LineJSON != '') 
 		{
-			if (PartJSONObj.Vectors[i].Edge == "M") {HasManualClashing = true;break;}		
+			var PartJSONObj = JSON.parse(LineJSON);
+
+			for (var i = 0; i<PartJSONObj.Vectors.length; i++)
+			{
+				if (PartJSONObj.Vectors[i].Edge == "M") {HasManualClashing = true;break;}		
+			}
+			
+		if (HasManualClashing == true) {ManualClashingCharge = 40*itemQty;PartPrice = PartPrice+ManualClashingCharge}	
 		}
-		
-	if (HasManualClashing == true) {ManualClashingCharge = 40*itemQty;PartPrice = PartPrice+ManualClashingCharge}	
-	}
-PartPrice = (PartPrice*PriceIncPercent)*DiscountRate;
+	PartPrice = (PartPrice*PriceIncPercent)*DiscountRate;
 
-document.getElementById("LinePrice"+LineNumber).value = PartPrice.toFixed(2); 
+	document.getElementById("LinePrice"+LineNumber).value = PartPrice.toFixed(2); 
 
+	if (LineMaterial.indexOf(HDFPrefix) > -1 ) {var IsHDFMaterial = true} else {var IsHDFMaterial = false}
 
-
-for (var r = 1; r<counter; r++) 
-{
-	var LineItemQty = parseFloat(document.getElementById("Qty"+r).value);
-	if ( document.getElementById("Length"+r).value > 0 && document.getElementById("Width"+r).value > 0 ) 
+	for (var r = 1; r<counter; r++) 
 	{
+		var LineItemQty = parseFloat(document.getElementById("Qty"+r).value);
 		LineMaterial = document.getElementById("Material"+r).value;
-		if (LineMaterial.indexOf("NON-STOCK") > -1 ) 
+		var MatThick = GetMatThickFromName(LineMaterial);
+
+		if ( document.getElementById("Length"+r).value > 0 && document.getElementById("Width"+r).value > 0 ) 
 		{
-		if (NonStockColour.length == 0 ) { NonStockColour.push( {"MatName" : LineMaterial , "SheetCost" : Materials[FindItem(LineMaterial,Materials,"Name")].SheetCost , "SmallParts" : 0 , "BigParts" : 0 , "BigPartsCost" : 0 } ); NonStockCharge = 125; }				
-		//if (NonStockColour.length == 0 ) { NonStockColour.push( { "MatName" : LineMaterial } ) }				
-		if ( FindItem(LineMaterial,NonStockColour,"MatName") == -1 )
-		{ NonStockColour.push( {"MatName" : LineMaterial , "SheetCost" : Materials[FindItem(LineMaterial,Materials,"Name")].SheetCost , "SmallParts" : 0 , "BigParts" : 0 , "BigPartsCost" : 0 } ); NonStockCharge = NonStockCharge + 100; }
+			
+			if (LineMaterial.indexOf("NON-STOCK") > -1 ) 
+			{
+				if (NonStockColour.length == 0 ) { NonStockColour.push( {"MatName" : LineMaterial , "SheetCost" : Materials[FindItem(LineMaterial,Materials,"Name")].SheetCost , "SmallParts" : 0 , "BigParts" : 0 , "BigPartsCost" : 0 } ); NonStockCharge = 125; }				
+				//if (NonStockColour.length == 0 ) { NonStockColour.push( { "MatName" : LineMaterial } ) }				
+				if ( FindItem(LineMaterial,NonStockColour,"MatName") == -1 )
+				{ NonStockColour.push( {"MatName" : LineMaterial , "SheetCost" : Materials[FindItem(LineMaterial,Materials,"Name")].SheetCost , "SmallParts" : 0 , "BigParts" : 0 , "BigPartsCost" : 0 } ); NonStockCharge = NonStockCharge + 100; }
+				
+				//NonStockColour = true;
+				SheetCost = Materials[FindItem(LineMaterial,Materials,"Name")].SheetCost;
+				LengthIndex = (Math.ceil((parseFloat(document.getElementById("Length"+r).value )+49)/50))-2;
+				WidthIndex = (Math.ceil((parseFloat(document.getElementById("Width"+r).value)+49)/50))-2;
+				NonStockPartLength = ExtraForBadPartSizes[LengthIndex].ReCalcValue;
+				NonStockPartWidth = ExtraForBadPartSizes[WidthIndex].ReCalcValue;
+				OversizeCalc = (SheetCost*0.025*((NonStockPartLength+NonStockPartWidth-100+Math.abs(NonStockPartLength+NonStockPartWidth-100))*(Math.abs(((NonStockPartLength+NonStockPartWidth-128+Math.abs(NonStockPartLength+NonStockPartWidth-100))-Math.abs((NonStockPartLength+NonStockPartWidth-128+Math.abs(NonStockPartLength+NonStockPartWidth-100))))*((NonStockPartLength+NonStockPartWidth-100+Math.abs(NonStockPartLength+NonStockPartWidth-100)))))/((Math.abs(((NonStockPartLength+NonStockPartWidth-128+Math.abs(NonStockPartLength+NonStockPartWidth-100))-Math.abs((NonStockPartLength+NonStockPartWidth-128+Math.abs(NonStockPartLength+NonStockPartWidth-100))))*((NonStockPartLength+NonStockPartWidth-100+Math.abs(NonStockPartLength+NonStockPartWidth-100)))))+0.1))).toFixed(2);
+				//alert(OversizeCalc);
+				if (OversizeCalc == 0) {NonStockColour[FindItem(LineMaterial,NonStockColour,"MatName")].SmallParts = NonStockColour[FindItem(LineMaterial,NonStockColour,"MatName")].SmallParts + LineItemQty; }
+				if (OversizeCalc > 0) {NonStockColour[FindItem(LineMaterial,NonStockColour,"MatName")].BigParts = NonStockColour[FindItem(LineMaterial,NonStockColour,"MatName")].BigParts + (LineItemQty*2); }
+				NonStockColour[FindItem(LineMaterial,NonStockColour,"MatName")].BigPartsCost = NonStockColour[FindItem(LineMaterial,NonStockColour,"MatName")].BigPartsCost + (parseFloat(OversizeCalc)*LineItemQty);
+				//document.getElementById("AddInfo"+r).value = OversizeCalc * parseFloat(document.getElementById("Qty"+r).value);
+			}
+
+		TotalPrice = TotalPrice + parseFloat(document.getElementById("LinePrice"+r).value);
+		TotalPanelCount = TotalPanelCount+LineItemQty;	
+		}
 		
-		//NonStockColour = true;
-		SheetCost = Materials[FindItem(LineMaterial,Materials,"Name")].SheetCost;
-		LengthIndex = (Math.ceil((parseFloat(document.getElementById("Length"+r).value )+49)/50))-2;
-		WidthIndex = (Math.ceil((parseFloat(document.getElementById("Width"+r).value)+49)/50))-2;
-		NonStockPartLength = ExtraForBadPartSizes[LengthIndex].ReCalcValue;
-		NonStockPartWidth = ExtraForBadPartSizes[WidthIndex].ReCalcValue;
-		OversizeCalc = (SheetCost*0.025*((NonStockPartLength+NonStockPartWidth-100+Math.abs(NonStockPartLength+NonStockPartWidth-100))*(Math.abs(((NonStockPartLength+NonStockPartWidth-128+Math.abs(NonStockPartLength+NonStockPartWidth-100))-Math.abs((NonStockPartLength+NonStockPartWidth-128+Math.abs(NonStockPartLength+NonStockPartWidth-100))))*((NonStockPartLength+NonStockPartWidth-100+Math.abs(NonStockPartLength+NonStockPartWidth-100)))))/((Math.abs(((NonStockPartLength+NonStockPartWidth-128+Math.abs(NonStockPartLength+NonStockPartWidth-100))-Math.abs((NonStockPartLength+NonStockPartWidth-128+Math.abs(NonStockPartLength+NonStockPartWidth-100))))*((NonStockPartLength+NonStockPartWidth-100+Math.abs(NonStockPartLength+NonStockPartWidth-100)))))+0.1))).toFixed(2);
-		//alert(OversizeCalc);
-		if (OversizeCalc == 0) {NonStockColour[FindItem(LineMaterial,NonStockColour,"MatName")].SmallParts = NonStockColour[FindItem(LineMaterial,NonStockColour,"MatName")].SmallParts + LineItemQty; }
-		if (OversizeCalc > 0) {NonStockColour[FindItem(LineMaterial,NonStockColour,"MatName")].BigParts = NonStockColour[FindItem(LineMaterial,NonStockColour,"MatName")].BigParts + (LineItemQty*2); }
-		NonStockColour[FindItem(LineMaterial,NonStockColour,"MatName")].BigPartsCost = NonStockColour[FindItem(LineMaterial,NonStockColour,"MatName")].BigPartsCost + (parseFloat(OversizeCalc)*LineItemQty);
-		//document.getElementById("AddInfo"+r).value = OversizeCalc * parseFloat(document.getElementById("Qty"+r).value);
+		var LineJSON = document.getElementById("LineJSON"+r).value;
+		if (LineJSON != '') 
+		{
+			var PartJSONObj = JSON.parse(LineJSON);
+			var OponFace = false;
+			var OponBack = false;
+			var HasDrilling = false;
+			var HasRouting = false;
+			var HasManualClashing = false;
+			
+			for (var i = 0; i<PartJSONObj.Operations.length; i++)
+			{
+				var OpDepth = CalcOutputValue(PartJSONObj.Operations[i].Depth);
+
+				if (PartJSONObj.Operations[i].Face == 'Front' & OpDepth < MatThick) {OponFace = true;}
+				if (PartJSONObj.Operations[i].Face == 'Back' & OpDepth < MatThick) {OponBack = true;}
+				if (PartJSONObj.Operations[i].Type == "Hole" | PartJSONObj.Operations[i].Type == "LineBore") {HasDrilling = true;}
+				if (PartJSONObj.Operations[i].Type == "Rebate" | PartJSONObj.Operations[i].Type == "Route") {HasRouting = true;}
+			}
+			
+			for (var i = 0; i<PartJSONObj.Vectors.length; i++)
+			{
+				if (PartJSONObj.Vectors[i].Edge == "M") {HasManualClashing = true;break;}		
+			}
+			
+			if (HasManualClashing == true) {ManualClashingCharge = ManualClashingCharge+(40*LineItemQty);}	
+			if (HasDrilling == true) {MachiningCharge = MachiningCharge+(2*LineItemQty);}
+			if (HasRouting == true) {RoutingCharge = RoutingCharge+(5*LineItemQty);}
+
+			if (Is1FaceMaterial(LineMaterial))
+			{
+				if (OponFace) {FaceOpsCount += 1;}
+				if (OponBack) {BackOpsCount += 1;}	
+			}
+			else if (OponFace & OponBack) {SecPrgCount += LineItemQty;}	
 		}
 
-	TotalPrice = TotalPrice + parseFloat(document.getElementById("LinePrice"+r).value);
-	TotalPanelCount = TotalPanelCount+LineItemQty;	
+		var GrainMatchGroup = GetExtraParValue("GrainMatchGroup","LineDiv"+r);
+		if (GrainMatchGroup > 0 & !IsHDFMaterial)
+		{
+			if (GMGroupsArr.indexOf(GrainMatchGroup) == -1) {GMGroupsArr.push(GrainMatchGroup);}
+		}
+		
 	}
-	
-	var LineJSON = document.getElementById("LineJSON"+r).value;
-	if (LineJSON != '') 
+
+	if (FaceOpsCount < BackOpsCount & FaceOpsCount != 0) {SecPrgCount += FaceOpsCount;} //Add the number of parts with face ops
+	if (BackOpsCount <= FaceOpsCount & BackOpsCount != 0) {SecPrgCount += BackOpsCount;} //Add the number of parts with back ops
+
+	SecondPrgCharge += (10*SecPrgCount);
+
+
+
+	if (TotalPanelCount > 0) {document.getElementById('TotalPanelQty').innerHTML="Total panel Quantity "+TotalPanelCount;} 
+	if (GMGroupsArr.length > 0) {GrianMatchCharge = GMGroupsArr.length*30;}
+
+
+	for (var xx = 0; xx<NonStockColour.length; xx++)
 	{
-		var PartJSONObj = JSON.parse(LineJSON);
-		var OponFace = false;
-		var OponBack = false;
-		var HasDrilling = false;
-		var HasRouting = false;
-		var HasManualClashing = false;
-		
-		for (var i = 0; i<PartJSONObj.Operations.length; i++)
-		{
-			if (PartJSONObj.Operations[i].Face == 'Front') {OponFace = true;}
-			if (PartJSONObj.Operations[i].Face == 'Back') {OponBack = true;}
-			if (PartJSONObj.Operations[i].Type == "Hole" | PartJSONObj.Operations[i].Type == "LineBore") {HasDrilling = true;}
-			if (PartJSONObj.Operations[i].Type == "Rebate" | PartJSONObj.Operations[i].Type == "Route") {HasRouting = true;}
-		}
-		
-		for (var i = 0; i<PartJSONObj.Vectors.length; i++)
-		{
-			if (PartJSONObj.Vectors[i].Edge == "M") {HasManualClashing = true;break;}		
-		}
-		
-	if (HasManualClashing == true) {ManualClashingCharge = ManualClashingCharge+(40*LineItemQty);}	
-	if (HasDrilling == true) {MachiningCharge = MachiningCharge+(2*LineItemQty);}
-	if (HasRouting == true) {RoutingCharge = RoutingCharge+(5*LineItemQty);}
-	if (OponFace && OponBack) {SecondPrgCharge = SecondPrgCharge+(10*LineItemQty);}
+
+		if ( NonStockColour[xx].BigParts > NonStockColour[xx].SmallParts )
+		{NonStockColour[xx].BigPartsTotalCost = NonStockColour[xx].BigPartsCost*((NonStockColour[xx].BigParts-NonStockColour[xx].SmallParts)/NonStockColour[xx].BigParts); }
+		else 
+		{NonStockColour[xx].BigPartsTotalCost = 0;}
+
+		NonStockBigPartsTotal = NonStockBigPartsTotal + NonStockColour[xx].BigPartsTotalCost;
+	}
+
+	if (CustomerMachiningCharge) {TotalMachiningPrice = MachiningCharge+RoutingCharge+SecondPrgCharge;}
+
+	TotalPrice = TotalPrice+TotalMachiningPrice+NonStockBigPartsTotal+NonStockCharge+GrianMatchCharge;
+
+	//alert(GBigPartsTotalCost + " \ " + BigPartsTotalCost);
+	//if ( NonStockColour.length > 0 ) { var PricewithFeight = TotalPrice+NonStockBigPartsTotal+NonStockCharge+parseFloat(CalcFreight());}
+	//else {var PricewithFeight = TotalPrice+parseFloat(CalcFreight()); }
+	var PricewithFeight = TotalPrice+parseFloat(CalcFreight());
+
+	if ( NonStockColour.length > 0  ) 
+	{ 
+	document.getElementById("OverSizePanel").innerHTML=(NonStockBigPartsTotal).toFixed(2);
+	document.getElementById("OverSizePanelHidden").value=(NonStockBigPartsTotal).toFixed(2);
+	document.getElementById("NonStockCharge").innerHTML=(NonStockCharge).toFixed(2);
+	document.getElementById("NonStockChargeHidden").value=(NonStockCharge).toFixed(2); 
+	document.getElementById('OverSizePanelSpan').style.visibility = "visible"; 
+	document.getElementById('NonStockChargeSpan').style.visibility = "visible"; 
+	} 
+	else 
+	{ 
+	document.getElementById("OverSizePanel").innerHTML=0;
+	document.getElementById("OverSizePanelHidden").value="0.00";
+	document.getElementById("NonStockCharge").innerHTML=0;
+	document.getElementById("NonStockChargeHidden").value="0.00";
+	document.getElementById('OverSizePanelSpan').style.visibility = "hidden"; 
+	document.getElementById('NonStockChargeSpan').style.visibility = "hidden";  
+	}
+
+	if (GrianMatchCharge > 0)
+	{
+		document.getElementById("GrainMatchCharge").innerHTML=(GrianMatchCharge).toFixed(2);
+		document.getElementById("GrainMatchChargeHidden").value=(GrianMatchCharge).toFixed(2);
+		document.getElementById('GrainMatchChargeSpan').style.visibility = "visible";		
+	}
+	else
+	{
+		document.getElementById("GrainMatchChargeHidden").value="0.00";
+		document.getElementById('GrainMatchChargeSpan').style.visibility = "hidden";
+	}
+
+
+	if (CustomerMachiningCharge)
+	{
+		if ( MachiningCharge > 0  ) 
+		{ 
+		document.getElementById("MachiningCharge").innerHTML=(MachiningCharge).toFixed(2);
+		document.getElementById("MachiningChargeHidden").value=(MachiningCharge).toFixed(2); 
+		document.getElementById('MachiningChargeSpan').style.visibility = "visible"; 
+		} else { document.getElementById("MachiningCharge").innerHTML=0; document.getElementById("RouteChargeHidden").value=(0).toFixed(2); document.getElementById('MachiningChargeSpan').style.visibility = "hidden";}
+		if ( RoutingCharge > 0  ) 
+		{ 
+		document.getElementById("RouteCharge").innerHTML=(RoutingCharge).toFixed(2);
+		document.getElementById("RouteChargeHidden").value=(RoutingCharge).toFixed(2);
+		document.getElementById('RouteChargeSpan').style.visibility = "visible";  
+		} else { document.getElementById("RouteCharge").innerHTML=0; document.getElementById("RouteChargeHidden").value=(0).toFixed(2); document.getElementById('RouteChargeSpan').style.visibility = "hidden";}
+		if ( SecondPrgCharge > 0  ) 
+		{ 
+		document.getElementById("SecondPrgCharge").innerHTML=(SecondPrgCharge).toFixed(2);
+		document.getElementById("SecondPrgChargeHidden").value=(SecondPrgCharge).toFixed(2);
+		document.getElementById('SecondPrgChargeSpan').style.visibility = "visible";  
+		} else { document.getElementById("SecondPrgCharge").innerHTML=0; document.getElementById("SecondPrgChargeHidden").value=(0).toFixed(2); document.getElementById('SecondPrgChargeSpan').style.visibility = "hidden";}
 	}
 	
-}
-if (TotalPanelCount > 0) {document.getElementById('TotalPanelQty').innerHTML="Total panel Quantity "+TotalPanelCount;} 
+	document.getElementById("Total").innerHTML=(PricewithFeight).toFixed(2);
+	document.getElementById("GST").innerHTML=(PricewithFeight*0.15).toFixed(2);
+	document.getElementById("TotalGST").innerHTML=((PricewithFeight*0.15)+PricewithFeight).toFixed(2);
 
-for (var xx = 0; xx<NonStockColour.length; xx++)
-{
-
-if ( NonStockColour[xx].BigParts > NonStockColour[xx].SmallParts )
-{NonStockColour[xx].BigPartsTotalCost = NonStockColour[xx].BigPartsCost*((NonStockColour[xx].BigParts-NonStockColour[xx].SmallParts)/NonStockColour[xx].BigParts); }
-else 
-{NonStockColour[xx].BigPartsTotalCost = 0;}
-
-NonStockBigPartsTotal = NonStockBigPartsTotal + NonStockColour[xx].BigPartsTotalCost;
-}
-if (CustomerMachiningCharge) {TotalMachiningPrice = MachiningCharge+RoutingCharge+SecondPrgCharge;}
-
-TotalPrice = TotalPrice+TotalMachiningPrice+NonStockBigPartsTotal+NonStockCharge;
-
-//alert(GBigPartsTotalCost + " \ " + BigPartsTotalCost);
-//if ( NonStockColour.length > 0 ) { var PricewithFeight = TotalPrice+NonStockBigPartsTotal+NonStockCharge+parseFloat(CalcFreight());}
-//else {var PricewithFeight = TotalPrice+parseFloat(CalcFreight()); }
-var PricewithFeight = TotalPrice+parseFloat(CalcFreight());
-
-if ( NonStockColour.length > 0  ) 
-{ 
-document.getElementById("OverSizePanel").innerHTML=(NonStockBigPartsTotal).toFixed(2);
-document.getElementById("OverSizePanelHidden").value=(NonStockBigPartsTotal).toFixed(2);  
-} 
-else 
-{ 
-document.getElementById("OverSizePanel").innerHTML=0;
-document.getElementById("OverSizePanelHidden").value="0.00";
-}
-if ( NonStockColour.length > 0  ) 
-{ 
-document.getElementById("NonStockCharge").innerHTML=(NonStockCharge).toFixed(2);
-document.getElementById("NonStockChargeHidden").value=(NonStockCharge).toFixed(2);  
-} 
-else 
-{ 
-document.getElementById("NonStockCharge").innerHTML=0;
-document.getElementById("NonStockChargeHidden").value="0.00"; 
-}
-
-if (CustomerMachiningCharge)
-{
-	if ( MachiningCharge > 0  ) 
-	{ 
-	document.getElementById("MachiningCharge").innerHTML=(MachiningCharge).toFixed(2);
-	document.getElementById("MachiningChargeHidden").value=(MachiningCharge).toFixed(2); 
-	document.getElementById('MachiningChargeSpan').style.visibility = "visible"; 
-	} else { document.getElementById("MachiningCharge").innerHTML=0; document.getElementById("RouteChargeHidden").value=(0).toFixed(2); document.getElementById('MachiningChargeSpan').style.visibility = "hidden";}
-	if ( RoutingCharge > 0  ) 
-	{ 
-	document.getElementById("RouteCharge").innerHTML=(RoutingCharge).toFixed(2);
-	document.getElementById("RouteChargeHidden").value=(RoutingCharge).toFixed(2);
-	document.getElementById('RouteChargeSpan').style.visibility = "visible";  
-	} else { document.getElementById("RouteCharge").innerHTML=0; document.getElementById("RouteChargeHidden").value=(0).toFixed(2); document.getElementById('RouteChargeSpan').style.visibility = "hidden";}
-	if ( SecondPrgCharge > 0  ) 
-	{ 
-	document.getElementById("SecondPrgCharge").innerHTML=(SecondPrgCharge).toFixed(2);
-	document.getElementById("SecondPrgChargeHidden").value=(SecondPrgCharge).toFixed(2);
-	document.getElementById('SecondPrgChargeSpan').style.visibility = "visible";  
-	} else { document.getElementById("SecondPrgCharge").innerHTML=0; document.getElementById("SecondPrgChargeHidden").value=(0).toFixed(2); document.getElementById('SecondPrgChargeSpan').style.visibility = "hidden";}
-}
-	
-document.getElementById("Total").innerHTML=(PricewithFeight).toFixed(2);
-document.getElementById("GST").innerHTML=(PricewithFeight*0.15).toFixed(2);
-document.getElementById("TotalGST").innerHTML=((PricewithFeight*0.15)+PricewithFeight).toFixed(2);
-
-if ( NonStockColour.length > 0  ) {document.getElementById('OverSizePanelSpan').style.visibility = "visible"; document.getElementById('NonStockChargeSpan').style.visibility = "visible"; } 
-else {document.getElementById('OverSizePanelSpan').style.visibility = "hidden"; document.getElementById('NonStockChargeSpan').style.visibility = "hidden"; } 
-
+	}
+	else {popup("Material '"+itemMaterial+"' is nolonger available!",150,350,1);}
 } //end
 
 
-SetLeadTime();
+//SetLeadTime();
+ExcDate();
 Checkdate(document.getElementById('Dispdate').value,false);
 //ExcDate();
 
@@ -2462,6 +2480,7 @@ var itemMaterial = document.getElementById("Material"+LineNumber).value;
 var TopFaciaBox = document.getElementById("TopFacWidth");
 var LeftFaciaBox = document.getElementById("LeftFacWidth");
 var RightFaciaBox = document.getElementById("RigthFacWidth");
+var PNCPartID = document.getElementById("PNCPartID"+LineNumber).value;
 	
 	if (PanelType == 'Roller Surround' | PanelType == 'Glass Frame' | PanelType == 'Profile Handle')
 	{document.getElementById("AdditEdgeAngleDiv").style.display = "inherit";}
@@ -2490,11 +2509,15 @@ var RightFaciaBox = document.getElementById("RigthFacWidth");
 	document.getElementById("LeftFacWidthL").style.display = "None";
 	document.getElementById("RigthFacWidthL").style.display = "None";
 
-	if (PanelType == 'Roller Surround' | PanelType == 'Glass Frame' ) 
+	if (PanelType == 'Roller Surround') 
 	{
 		if (PanelType == 'Roller Surround' )
 		{
-		document.getElementById("Description"+LineNumber).value = "Roller Door Surround"; ChangeDesc(LineDivID);
+			if (PNCPartID = "")
+			{
+			document.getElementById("Description"+LineNumber).value = "Roller Door Surround"; 
+			ChangeDesc(LineDivID);
+			}
 		document.getElementById("TopFacWidthL").style.display = "inherit";
 		document.getElementById("LeftFacWidthL").style.display = "inherit";
 		document.getElementById("RigthFacWidthL").style.display = "inherit";
@@ -2503,6 +2526,21 @@ var RightFaciaBox = document.getElementById("RigthFacWidth");
 		RightFaciaBox.value = SetExtraParInputValue('RigthFacWidth',LineDivID,46); //GetExtraParValue('RigthFacWidth',LineDivID);
 		}
 		//if ( PanelType == 'Glass Frame' ) { document.getElementById("Description"+LineNumber).value = "Glass Frame";}
+	}
+
+	document.getElementById("GlassFrameMarginsDiv").style.display = "none";	
+
+	if (PanelType == 'Glass Frame' & itemMaterial.indexOf(HDFPrefix) == -1)
+	{
+		var MatThick = GetMatThickFromName(itemMaterial);
+		document.getElementById("GlassFrameMarginsDiv").style.display = "inherit";	
+		
+		SetExtraParInputValue('GFMTop',LineDivID,60);
+		SetExtraParInputValue('GFMLeft',LineDivID,60);
+		SetExtraParInputValue('GFMRight',LineDivID,60);
+		SetExtraParInputValue('GFMBot',LineDivID,60);
+		SetExtraParInputValue('GFRD',LineDivID,MatThick-9);
+		SetExtraParInputValue('GFRW',LineDivID,10);
 	}
 
 
@@ -2633,9 +2671,10 @@ var RightFaciaBox = document.getElementById("RigthFacWidth");
 		SetExtraParInputValue('RailW',LineDivID,(FrameMargin*2)+2);
 		SetExtraParInputValue('BDH',LineDivID,720);
 		
-
+		var TEL = 0;
+		if (HDFDoorSpecData[HHDItemIndex].hasOwnProperty("TEL")) {TEL = HDFDoorSpecData[HHDItemIndex].TEL;}
 		
-		ELvalue = parseFloat(SetExtraParInputValue('TEL',LineDivID,0));
+		ELvalue = parseFloat(SetExtraParInputValue('TEL',LineDivID,TEL));
 		document.getElementById("TELCalc").innerHTML = FrameMargin+ELvalue;
 		ELvalue = parseFloat(SetExtraParInputValue('LEL',LineDivID,0));
 		document.getElementById("LELCalc").innerHTML = FrameMargin+ELvalue;
@@ -2820,1416 +2859,1550 @@ var NewText = '';
 	return parseFloat(NewText);
 }
 
+function ChangePrevFaceView()
+{
+	DrawPreview('PreviewBox','PreviewBox2',document.getElementById("selectedline").innerHTML);
+}
+
+function DrawDimension(Cnv,DimText,FontH,StartX,StartY,EndX,EndY)
+{
+	const DimOffset = 5;
+	const HalfStrL = 10;
+	Cnv.setLineDash([]);	
+	
+	var TextW = Cnv.measureText(DimText).width;
+	var DimAngle = Math.atan2( (StartY-EndY),(StartX-EndX) );
+	var DimLength = Math.sqrt( ( (StartX-EndX)*(StartX-EndX) )+( (StartY-EndY)*(StartY-EndY) ) );	
+	
+	var StartXDimCnt = StartX+Math.sin(DimAngle)*(DimOffset+HalfStrL);
+	var StartYDimCnt = StartY-Math.cos(DimAngle)*(DimOffset+HalfStrL);
+	var EndXDimCnt = EndX+Math.sin(DimAngle)*(DimOffset+HalfStrL);
+	var EndYDimCnt = EndY-Math.cos(DimAngle)*(DimOffset+HalfStrL);	
+
+	var VirtTextSpace = FontH+5;
+	var HozTextSpace = TextW+5;
+
+	var AngleDegs = Math.abs(DimAngle*Rad % 360);
+
+	if (AngleDegs > 45 & AngleDegs < 135 | AngleDegs > 225 & AngleDegs < 315)
+	{var SpcForDimText = FontH+5;} else {var SpcForDimText = TextW+5;}
+
+
+	var DimLineLength = (DimLength-SpcForDimText)/2;
+	
+	//alert("DimAngle="+ DimAngle + " DimLength=" + DimLength);
+	
+	Cnv.beginPath();
+	Cnv.moveTo(StartXDimCnt-Math.sin(DimAngle)*HalfStrL,StartYDimCnt+Math.cos(DimAngle)*HalfStrL); 
+	Cnv.lineTo(StartXDimCnt+Math.sin(DimAngle)*HalfStrL,StartYDimCnt-Math.cos(DimAngle)*HalfStrL);
+	Cnv.stroke();
+	
+	Cnv.beginPath();
+	Cnv.moveTo(EndXDimCnt-Math.sin(DimAngle)*HalfStrL,EndYDimCnt+Math.cos(DimAngle)*HalfStrL); 
+	Cnv.lineTo(EndXDimCnt+Math.sin(DimAngle)*HalfStrL,EndYDimCnt-Math.cos(DimAngle)*HalfStrL);
+	Cnv.stroke();
+	
+	Cnv.font=FontH+"px Arial";
+	Cnv.fillStyle = 'black';
+	Cnv.textBaseline = "ideographic";
+
+	
+	//alert("DimLength="+ DimLength + " TextH=" + TextH);
+
+	var XDimCnt = StartXDimCnt-Math.cos(DimAngle)*(DimLength/2);
+	var YDimCnt = StartYDimCnt-Math.sin(DimAngle)*(DimLength/2);
+
+
+	if (DimLength > SpcForDimText)
+	{Cnv.fillText(DimText,XDimCnt-(TextW/2),YDimCnt+(FontH/2));}
+	else
+	{
+		var SmallClear = HalfStrL*2;
+		DimLineLength = DimLength/2;
+		Cnv.fillText(DimText,XDimCnt+Math.sin(DimAngle)*SmallClear-(TextW/2),YDimCnt-Math.cos(DimAngle)*SmallClear+(FontH/2));
+	}
+
+	Cnv.beginPath();
+	Cnv.moveTo(StartXDimCnt,StartYDimCnt); 
+	Cnv.lineTo(StartXDimCnt-Math.cos(DimAngle)*DimLineLength,StartYDimCnt-Math.sin(DimAngle)*DimLineLength);
+	Cnv.stroke();
+
+	Cnv.beginPath();
+	Cnv.moveTo(EndXDimCnt,EndYDimCnt); 
+	Cnv.lineTo(EndXDimCnt+Math.cos(DimAngle)*DimLineLength,EndYDimCnt+Math.sin(DimAngle)*DimLineLength);
+	Cnv.stroke();		
+}
+
+
 function DrawPreview(canvasId,canvas2Id,LineDivID)
 {	
 //alert(typeof(LineNumber));
 	if (LineDivID != "")
 	{
 	var LineDiv = document.getElementById(LineDivID);
-	var LineNumber = LineDiv.getAttribute("data-LineNumber");	
-		
-	var PanelType = document.getElementById("PanelType"+LineNumber).value;
-	var itemMaterial = document.getElementById("Material"+LineNumber).value;
-	var itemQty = parseFloat(document.getElementById("Qty"+LineNumber).value);
-
-	var LengthNode = parseFloat(document.getElementById("Length"+LineNumber).value);
-	var WidthNode = parseFloat(document.getElementById("Width"+LineNumber).value);
-	var LeftedgeNode = document.getElementById("Leftedge"+LineNumber).value;
-	var RightedgeNode = document.getElementById("Rightedge"+LineNumber).value;
-	var TopedgeNode = document.getElementById("Topedge"+LineNumber).value;
-	var BotedgeNode = document.getElementById("Bottomedge"+LineNumber).value;
-	var ExtraParamNode = document.getElementById("ExtraPar"+LineNumber);
-	var TopFaciaBox = document.getElementById("TopFacWidth");
-	var LeftFaciaBox = document.getElementById("LeftFacWidth");
-	var RightFaciaBox = document.getElementById("RigthFacWidth");
-	var canvas = document.getElementById(canvasId);
-	var canvas2 = document.getElementById(canvas2Id);
-	var RecHeight=0;
-	var RecWidth=0;
-	var framewidth=0;
-	var RollerRight=0;
-	var RollerLeft=0;
-	var RollerTOp=0;
-	var LinewidthCalc=0;
-	var Shortstring;
-	var CarPos = 0;
-	var ViewBoxHeight=parseFloat(canvas.height)-1;
-	var ViewBoxWidth=parseFloat(canvas.width)-1;
-	var ViewBoxX=0;
-	var PanelThick=0;
-	var IsPartShapeEditor = false;
-
-	var PartDesc = document.getElementById("Description"+LineNumber).value;
-	var PartUnitRef = document.getElementById("UnitRef"+LineNumber).value;
-	if (PartUnitRef != '' ) {PartUnitRef = "Unit "+PartUnitRef;}
-
-					
-					
-			
-	var DrawingFace = ViewFace;
-	if (canvasId == 'PreviewBox' | canvasId.indexOf("PartCanvas") > -1) {DrawingFace = 'Front';}
-
-
-
-	/* if ( WidthNode < 350 ) { 
-	canvas2.width = 250;
-	if ( WidthNode < 270 ) { canvas2.width = 150; }
-	if ( WidthNode < 150 ) { canvas2.width = 100; }
-	}else { canvas2.width = 331;} */
-
-
-	var PlanBoxHeight=parseFloat(canvas2.height)-1;
-	var PlanBoxWidth=parseFloat(canvas2.width)-1;
-
-
-		/* if (document.getElementById(LineNumber).childNodes.item(0).value == 'Builtup Panel' )
+	var LineNumber = LineDiv.getAttribute("data-LineNumber");			
+	var itemMaterial = document.getElementById("Material"+LineNumber).value;	
+	var MatIndex = FindItem(itemMaterial,Materials,"Name");	
+	
+		if (MatIndex > -1)
 		{
-		ViewBoxHeight=parseFloat(canvas.height)-61;
-		ViewBoxWidth=parseFloat(canvas.width)-61;
-		ViewBoxX=25;
-		} */
 
-	var Edge = canvas.getContext("2d");
-	var PlanBox = canvas2.getContext("2d");
-	//Edge.translate(-0.5, -0.5)
-
-
-	Edge.save();
-	// Use the identity matrix while clearing the canvas
-	Edge.setTransform(1, 0, 0, 1, 0, 0);
-	Edge.clearRect(0, 0, canvas.width, canvas.height);
-	// Restore the transform
-	Edge.restore();
-
-	PlanBox.save();
-	// Use the identity matrix while clearing the canvas
-	PlanBox.setTransform(1, 0, 0, 1, 0, 0);
-	PlanBox.clearRect(0, 0, canvas2.width, canvas2.height);
-	// Restore the transform
-	PlanBox.restore();
-
-
-	if (canvasId == 'PreviewBox' | canvasId.indexOf("PartCanvas") > -1)
-	{
-		PartLength = LengthNode;
-		PartWidth = WidthNode;
-		ViewXOrigin=canvas.width/2;
-		ViewYOrigin=canvas.height/2;
-	  if (WidthNode > LengthNode) { ViewRatio=ViewBoxWidth/WidthNode; } else { ViewRatio=ViewBoxHeight/LengthNode;}	
-	}
-
-
-	var RecY=0;
-	var RecX=0;
-
-
-	RecHeight=myRound(LengthNode*ViewRatio);
-	RecWidth=myRound(WidthNode*ViewRatio);
-	RecX=ViewXOrigin-(RecWidth/2);
-	RecY=ViewYOrigin-(RecHeight/2)+0.5;
-	LinewidthCalc=ViewRatio;
-	RollerRight=myRound(parseFloat(RightFaciaBox.value)*ViewRatio);
-	RollerLeft=myRound(parseFloat(LeftFaciaBox.value)*ViewRatio);
-	RollerTop=myRound(parseFloat(TopFaciaBox.value)*ViewRatio);
-	Edge.setLineDash([]);
-
-	var ClashingStoke = "Red";
-	if (itemMaterial != '' ) 
-	{
-	var PanelColour = Materials[FindItem(itemMaterial,Materials,"Name")].colour;
-	if (PanelColour == '' ) {Edge.fillStyle = "#FFFFFF";} else {Edge.fillStyle = PanelColour;} //if (PanelColour == '' ) {PanelColour = "rgb(255,255,255)";} 
-	}
-
-	switch(PanelColour) {
-		case 'rgb(120,23,31)': ClashingStoke = "#00FF00"; break;
-		case 'rgb(255,78,0)': ClashingStoke = "#00FF00"; break;     
-	}
-	
-	if (RGBIsDark(PanelColour) == true ) 
-	{
-	var DefOpStroke="Gainsboro";
-	var DefSelRecStroke="rgb(164,239,67)";
-	var HiddenOpStroke="#caed9d";
-	var ManualClashingStoke = "Cyan";
-	} 
-	else 
-	{
-	var DefOpStroke="black";
-	var DefSelRecStroke="#464646";
-	var HiddenOpStroke="#969696";
-	var ManualClashingStoke = "Gold";
-	}
-
-	var MaterialThick = GetMatThickFromName(itemMaterial);
-	var LineJSON = document.getElementById("LineJSON"+LineNumber).value;
-
-	if (canvasId != 'PartEditCanvas') {if (LineJSON == '') {PartJSON = {"Operations" :[] , "Vectors" :[]}} else {PartJSON = JSON.parse(LineJSON);}}
-	
-	
-
-	if (ModeSelection != 'PartShape' & canvasId == 'PartEditCanvas' & PartJSON.Vectors.length == 0 | canvasId == 'PreviewBox' & PartJSON.Vectors.length == 0 | canvasId.indexOf("PartCanvas") > -1 & PartJSON.Vectors.length == 0)
-	{
-
-		Edge.fillRect(RecX,RecY,RecWidth,RecHeight);
-		
-		Edge.strokeStyle="black"; Edge.lineWidth=1;
-		if (LeftedgeNode != 'None') { Edge.strokeStyle=ClashingStoke; Edge.lineWidth=3; } 
-		if (LeftedgeNode == '45Profile') { Edge.strokeStyle=ClashingStoke; Edge.lineWidth=10; }
-
-		Edge.beginPath();
-		if (DrawingFace == 'Front') {Edge.moveTo(RecX,RecHeight+RecY); Edge.lineTo(RecX,RecY);}
-		else {Edge.moveTo(RecX+RecWidth,RecY); Edge.lineTo(RecX+RecWidth,RecHeight+RecY);}
-		Edge.stroke();
-
-		Edge.strokeStyle="black"; Edge.lineWidth=1;
-		if (TopedgeNode != 'None') { Edge.strokeStyle=ClashingStoke; Edge.lineWidth=3; }
-		if (TopedgeNode == '45Profile') { Edge.strokeStyle=ClashingStoke; Edge.lineWidth=10; }
-
-		Edge.beginPath();
-		Edge.moveTo(RecX,RecY);
-		Edge.lineTo(RecX+RecWidth,RecY);
-		Edge.stroke();
-
-		Edge.strokeStyle="black"; Edge.lineWidth=1;
-		if (RightedgeNode != 'None') { Edge.strokeStyle=ClashingStoke; Edge.lineWidth=3; } 
-		if (RightedgeNode == '45Profile') { Edge.strokeStyle=ClashingStoke; Edge.lineWidth=10; } 
-
-		Edge.beginPath();
-		if (DrawingFace == 'Front') {Edge.moveTo(RecX+RecWidth,RecY); Edge.lineTo(RecX+RecWidth,RecHeight+RecY);}
-		else {Edge.moveTo(RecX,RecHeight+RecY); Edge.lineTo(RecX,RecY);}
-		Edge.stroke();
-
-		Edge.strokeStyle="black"; Edge.lineWidth=1;
-		if (BotedgeNode != 'None') { Edge.strokeStyle=ClashingStoke; Edge.lineWidth=3; }
-		if (BotedgeNode == '45Profile') { Edge.strokeStyle=ClashingStoke; Edge.lineWidth=10; }
-
-		Edge.beginPath();
-		if (DrawingFace == 'Front') {Edge.moveTo(RecX+RecWidth,RecHeight+RecY);} else {Edge.moveTo(RecX,RecHeight+RecY);}
-		if (PanelType == 'Roller Surround' ) 
-		{
-			if (DrawingFace == 'Front') {Edge.lineTo(RecX+RecWidth-RollerRight,RecHeight+RecY);}
-			else {Edge.lineTo(RecX+RollerRight,RecHeight+RecY);}	
-		} 
-		else { if (DrawingFace == 'Front') {Edge.lineTo(RecX,RecHeight+RecY);} else {Edge.lineTo(RecX+RecWidth,RecHeight+RecY);} }
-		Edge.stroke();
-		
 			
-	
-	}
-	
-	if (PanelType == 'Angle Edge' | document.getElementById("ToggleAngleEdgesCheck").checked)
-	{
-		if (WidthNode > LengthNode) {var AngleSideMargin = 0;var AngleBotTopMargin = (ViewBoxHeight-(LengthNode*ViewRatio))/2;}
-		else {var AngleSideMargin = (ViewBoxWidth-(WidthNode*ViewRatio))/2;var AngleBotTopMargin = 0;}
+		var PanelType = document.getElementById("PanelType"+LineNumber).value;
+		var itemQty = parseFloat(document.getElementById("Qty"+LineNumber).value);
 
-		var LeftAngle = GetExtraParValue('LeftEdgeAngle',LineDivID);
-		var RightAngle = GetExtraParValue('RightEdgeAngle',LineDivID);
-		var TopAngle = GetExtraParValue('TopEdgeAngle',LineDivID);
-		var BotAngle = GetExtraParValue('BotEdgeAngle',LineDivID);
-		
-		var TextHeight = 7;
-		Edge.font=(TextHeight*2)+"px Arial";
-		Edge.fillStyle = DefSelRecStroke;
-		
-		var LeftSideAdj = 0;
-		if (AngleSideMargin > Edge.measureText(LeftAngle).width+10) {LeftSideAdj = Edge.measureText(LeftAngle).width+10;}
-		var RightSideAdj = 0;
-		if (AngleSideMargin > Edge.measureText(RightAngle).width+10) {RightSideAdj = Edge.measureText(RightAngle).width+10;}
-		
-		var TopSideAdj = 0;
-		if (AngleBotTopMargin > TextHeight*2+10) {TopSideAdj = TextHeight*2+10;}
-		var BotSideAdj = 0;
-		if (AngleBotTopMargin > TextHeight*2+10) {BotSideAdj = TextHeight*2+10;}
-		
-		if (DrawingFace == 'Front')
-		{
-			if (LeftedgeNode == 'AngleEdge') {Edge.fillText(LeftAngle,RecX+5-LeftSideAdj,RecY+TextHeight+RecHeight/2);}
-			if (RightedgeNode == 'AngleEdge') {Edge.fillText(RightAngle,RecX+RecWidth-5+RightSideAdj-Edge.measureText(RightAngle).width,RecY+TextHeight+RecHeight/2);}
-		}
-		else
-		{
-			if (LeftedgeNode == 'AngleEdge') {Edge.fillText(LeftAngle,RecX+RecWidth-5+LeftSideAdj-Edge.measureText(LeftAngle).width,RecY+TextHeight+RecHeight/2);}
-			if (RightedgeNode == 'AngleEdge') {Edge.fillText(RightAngle,RecX+5-RightSideAdj,RecY+TextHeight+RecHeight/2);}	
-		}
-		if (TopedgeNode == 'AngleEdge') {Edge.fillText(TopAngle,RecX-Edge.measureText(TopAngle).width/2+RecWidth/2,RecY+TextHeight+10-TopSideAdj);}
-		if (BotedgeNode == 'AngleEdge') {Edge.fillText(BotAngle,RecX-Edge.measureText(BotAngle).width/2+RecWidth/2,RecY+RecHeight-10+BotSideAdj);}
-		Edge.fillStyle = "#FFFFFF";
-		
-	}
+		var LengthNode = parseFloat(document.getElementById("Length"+LineNumber).value);
+		var WidthNode = parseFloat(document.getElementById("Width"+LineNumber).value);
+		var LeftedgeNode = document.getElementById("Leftedge"+LineNumber).value;
+		var RightedgeNode = document.getElementById("Rightedge"+LineNumber).value;
+		var TopedgeNode = document.getElementById("Topedge"+LineNumber).value;
+		var BotedgeNode = document.getElementById("Bottomedge"+LineNumber).value;
+		var ExtraParamNode = document.getElementById("ExtraPar"+LineNumber);
+		var TopFaciaBox = document.getElementById("TopFacWidth");
+		var LeftFaciaBox = document.getElementById("LeftFacWidth");
+		var RightFaciaBox = document.getElementById("RigthFacWidth");
+		var canvas = document.getElementById(canvasId);
+		var canvas2 = document.getElementById(canvas2Id);
+		var RecHeight=0;
+		var RecWidth=0;
+		var framewidth=0;
+		var RollerRight=0;
+		var RollerLeft=0;
+		var RollerTOp=0;
+		var LinewidthCalc=0;
+		var Shortstring;
+		var CarPos = 0;
+		var ViewBoxHeight=parseFloat(canvas.height)-1;
+		var ViewBoxWidth=parseFloat(canvas.width)-1;
+		var ViewBoxX=0;
+		var PanelThick=0;
+		var IsPartShapeEditor = false;
 
-	if (ModeSelection == 'PartShape' & canvasId == 'PartEditCanvas')
-	{
-		Edge.setLineDash([5, 5]);
-		Edge.strokeStyle="black"
-		Edge.strokeRect(RecX,RecY,RecWidth,RecHeight);	
-		Edge.setLineDash([]);
-		IsPartShapeEditor = true;	
-	}
-		
-	//alert(RGBIsDark(PanelColour));
+		var PartDesc = document.getElementById("Description"+LineNumber).value;
+		var PartUnitRef = document.getElementById("UnitRef"+LineNumber).value;
+		if (PartUnitRef != '' ) {PartUnitRef = "Unit "+PartUnitRef;}
 
-
-	Edge.lineWidth=1;
-
-			var MoveOffsetX = 0;
-			var MoveOffsetY = 0;
-			
-			if (PartJSON.Vectors.length > 0)
-			{
-			var ClashingEdges = [];
-				//if (canvasId == 'PartEditCanvas' & ModeSelection == 'PartShape' ) {var PartShapingMode = true;} else {var PartShapingMode = false;}
-			
-
-				if (PanelColour == '' ) {Edge.fillStyle = "#FFFFFF";} else {Edge.fillStyle = PanelColour;}	
-
-				if (IsPartShapeEditor == false) {Edge.beginPath();}
-
-				for (var i = 0; i<PartJSON.Vectors.length; i++)
-				{ 
-			
-				if (canvasId == 'PartEditCanvas') {Edge.lineWidth=2;}
-				if (IsPartShapeEditor) {Edge.lineWidth=3;}
-				Edge.strokeStyle="Black";
+						
+						
 				
-				if (MoveObject.InMove == true & IsItemInList(i,SelectedObjects.Items) & ModeSelection == 'PartShape') 
+		var DrawingFace = ViewFace;
+		if (canvasId.indexOf("PartCanvas") > -1) {DrawingFace = 'Front';}
+		if (canvasId == 'PreviewBox' ) 
+		{
+			if (document.getElementById("PrevFaceRadio").checked) {DrawingFace = 'Front';}
+			else {DrawingFace = 'Back';}
+		}	
+
+
+		/* if ( WidthNode < 350 ) { 
+		canvas2.width = 250;
+		if ( WidthNode < 270 ) { canvas2.width = 150; }
+		if ( WidthNode < 150 ) { canvas2.width = 100; }
+		}else { canvas2.width = 331;} */
+
+
+		var PlanBoxHeight=parseFloat(canvas2.height)-1;
+		var PlanBoxWidth=parseFloat(canvas2.width)-1;
+
+
+			/* if (document.getElementById(LineNumber).childNodes.item(0).value == 'Builtup Panel' )
+			{
+			ViewBoxHeight=parseFloat(canvas.height)-61;
+			ViewBoxWidth=parseFloat(canvas.width)-61;
+			ViewBoxX=25;
+			} */
+
+		var Edge = canvas.getContext("2d");
+		var PlanBox = canvas2.getContext("2d");
+		//Edge.translate(-0.5, -0.5)
+
+
+		Edge.save();
+		// Use the identity matrix while clearing the canvas
+		Edge.setTransform(1, 0, 0, 1, 0, 0);
+		Edge.clearRect(0, 0, canvas.width, canvas.height);
+		// Restore the transform
+		Edge.restore();
+
+		PlanBox.save();
+		// Use the identity matrix while clearing the canvas
+		PlanBox.setTransform(1, 0, 0, 1, 0, 0);
+		PlanBox.clearRect(0, 0, canvas2.width, canvas2.height);
+		// Restore the transform
+		PlanBox.restore();
+
+
+		if (canvasId == 'PreviewBox' | canvasId.indexOf("PartCanvas") > -1)
+		{
+			PartLength = LengthNode;
+			PartWidth = WidthNode;
+			ViewXOrigin=canvas.width/2;
+			ViewYOrigin=canvas.height/2;
+		  if (WidthNode > LengthNode) { ViewRatio=ViewBoxWidth/WidthNode; } else { ViewRatio=ViewBoxHeight/LengthNode;}	
+		}
+
+
+		var RecY=0;
+		var RecX=0;
+
+
+		RecHeight=myRound(LengthNode*ViewRatio);
+		RecWidth=myRound(WidthNode*ViewRatio);
+		RecX=ViewXOrigin-(RecWidth/2);
+		RecY=ViewYOrigin-(RecHeight/2)+0.5;
+		LinewidthCalc=ViewRatio;
+		RollerRight=myRound(parseFloat(RightFaciaBox.value)*ViewRatio);
+		RollerLeft=myRound(parseFloat(LeftFaciaBox.value)*ViewRatio);
+		RollerTop=myRound(parseFloat(TopFaciaBox.value)*ViewRatio);
+		Edge.setLineDash([]);
+
+		var ClashingStoke = "Red";
+		if (itemMaterial != '' ) 
+		{
+		var PanelColour = Materials[FindItem(itemMaterial,Materials,"Name")].colour;
+		if (PanelColour == '' ) {Edge.fillStyle = "#FFFFFF";} else {Edge.fillStyle = PanelColour;} //if (PanelColour == '' ) {PanelColour = "rgb(255,255,255)";} 
+		}
+
+		switch(PanelColour) {
+			case 'rgb(120,23,31)': ClashingStoke = "#00FF00"; break;
+			case 'rgb(255,78,0)': ClashingStoke = "#00FF00"; break;     
+		}
+		
+		if (RGBIsDark(PanelColour) == true ) 
+		{
+		var DefOpStroke="Gainsboro";
+		var DefSelRecStroke="rgb(164,239,67)";
+		var HiddenOpStroke="#caed9d";
+		var ManualClashingStoke = "Cyan";
+		} 
+		else 
+		{
+		var DefOpStroke="black";
+		var DefSelRecStroke="#464646";
+		var HiddenOpStroke="#969696";
+		var ManualClashingStoke = "Gold";
+		}
+
+		var MaterialThick = GetMatThickFromName(itemMaterial);
+		var LineJSON = document.getElementById("LineJSON"+LineNumber).value;
+
+		if (canvasId != 'PartEditCanvas') {if (LineJSON == '') {PartJSON = {"Operations" :[] , "Vectors" :[]}} else {PartJSON = JSON.parse(LineJSON);}}
+		
+		
+
+		if (ModeSelection != 'PartShape' & canvasId == 'PartEditCanvas' & PartJSON.Vectors.length == 0 | canvasId == 'PreviewBox' & PartJSON.Vectors.length == 0 | canvasId.indexOf("PartCanvas") > -1 & PartJSON.Vectors.length == 0)
+		{
+
+			Edge.fillRect(RecX,RecY,RecWidth,RecHeight);
+			
+			Edge.strokeStyle="black"; Edge.lineWidth=1;
+			if (LeftedgeNode != 'None') { Edge.strokeStyle=ClashingStoke; Edge.lineWidth=3; } 
+			if (LeftedgeNode == '45Profile') { Edge.strokeStyle=ClashingStoke; Edge.lineWidth=10; }
+
+			Edge.beginPath();
+			if (DrawingFace == 'Front') {Edge.moveTo(RecX,RecHeight+RecY); Edge.lineTo(RecX,RecY);}
+			else {Edge.moveTo(RecX+RecWidth,RecY); Edge.lineTo(RecX+RecWidth,RecHeight+RecY);}
+			Edge.stroke();
+
+			Edge.strokeStyle="black"; Edge.lineWidth=1;
+			if (TopedgeNode != 'None') { Edge.strokeStyle=ClashingStoke; Edge.lineWidth=3; }
+			if (TopedgeNode == '45Profile') { Edge.strokeStyle=ClashingStoke; Edge.lineWidth=10; }
+
+			Edge.beginPath();
+			Edge.moveTo(RecX,RecY);
+			Edge.lineTo(RecX+RecWidth,RecY);
+			Edge.stroke();
+
+			Edge.strokeStyle="black"; Edge.lineWidth=1;
+			if (RightedgeNode != 'None') { Edge.strokeStyle=ClashingStoke; Edge.lineWidth=3; } 
+			if (RightedgeNode == '45Profile') { Edge.strokeStyle=ClashingStoke; Edge.lineWidth=10; } 
+
+			Edge.beginPath();
+			if (DrawingFace == 'Front') {Edge.moveTo(RecX+RecWidth,RecY); Edge.lineTo(RecX+RecWidth,RecHeight+RecY);}
+			else {Edge.moveTo(RecX,RecHeight+RecY); Edge.lineTo(RecX,RecY);}
+			Edge.stroke();
+
+			Edge.strokeStyle="black"; Edge.lineWidth=1;
+			if (BotedgeNode != 'None') { Edge.strokeStyle=ClashingStoke; Edge.lineWidth=3; }
+			if (BotedgeNode == '45Profile') { Edge.strokeStyle=ClashingStoke; Edge.lineWidth=10; }
+
+			Edge.beginPath();
+			if (DrawingFace == 'Front') {Edge.moveTo(RecX+RecWidth,RecHeight+RecY);} else {Edge.moveTo(RecX,RecHeight+RecY);}
+			if (PanelType == 'Roller Surround' ) 
+			{
+				if (DrawingFace == 'Front') {Edge.lineTo(RecX+RecWidth-RollerRight,RecHeight+RecY);}
+				else {Edge.lineTo(RecX+RollerRight,RecHeight+RecY);}	
+			} 
+			else { if (DrawingFace == 'Front') {Edge.lineTo(RecX,RecHeight+RecY);} else {Edge.lineTo(RecX+RecWidth,RecHeight+RecY);} }
+			Edge.stroke();
+			
+				
+		
+		}
+		
+		if (PanelType == 'Angle Edge' | document.getElementById("ToggleAngleEdgesCheck").checked)
+		{
+			if (WidthNode > LengthNode) {var AngleSideMargin = 0;var AngleBotTopMargin = (ViewBoxHeight-(LengthNode*ViewRatio))/2;}
+			else {var AngleSideMargin = (ViewBoxWidth-(WidthNode*ViewRatio))/2;var AngleBotTopMargin = 0;}
+
+			var LeftAngle = GetExtraParValue('LeftEdgeAngle',LineDivID);
+			var RightAngle = GetExtraParValue('RightEdgeAngle',LineDivID);
+			var TopAngle = GetExtraParValue('TopEdgeAngle',LineDivID);
+			var BotAngle = GetExtraParValue('BotEdgeAngle',LineDivID);
+			
+			var TextHeight = 7;
+			Edge.font=(TextHeight*2)+"px Arial";
+			Edge.fillStyle = DefSelRecStroke;
+			
+			var LeftSideAdj = 0;
+			if (AngleSideMargin > Edge.measureText(LeftAngle).width+10) {LeftSideAdj = Edge.measureText(LeftAngle).width+10;}
+			var RightSideAdj = 0;
+			if (AngleSideMargin > Edge.measureText(RightAngle).width+10) {RightSideAdj = Edge.measureText(RightAngle).width+10;}
+			
+			var TopSideAdj = 0;
+			if (AngleBotTopMargin > TextHeight*2+10) {TopSideAdj = TextHeight*2+10;}
+			var BotSideAdj = 0;
+			if (AngleBotTopMargin > TextHeight*2+10) {BotSideAdj = TextHeight*2+10;}
+			
+			if (DrawingFace == 'Front')
+			{
+				if (LeftedgeNode == 'AngleEdge') {Edge.fillText(LeftAngle,RecX+5-LeftSideAdj,RecY+TextHeight+RecHeight/2);}
+				if (RightedgeNode == 'AngleEdge') {Edge.fillText(RightAngle,RecX+RecWidth-5+RightSideAdj-Edge.measureText(RightAngle).width,RecY+TextHeight+RecHeight/2);}
+			}
+			else
+			{
+				if (LeftedgeNode == 'AngleEdge') {Edge.fillText(LeftAngle,RecX+RecWidth-5+LeftSideAdj-Edge.measureText(LeftAngle).width,RecY+TextHeight+RecHeight/2);}
+				if (RightedgeNode == 'AngleEdge') {Edge.fillText(RightAngle,RecX+5-RightSideAdj,RecY+TextHeight+RecHeight/2);}	
+			}
+			if (TopedgeNode == 'AngleEdge') {Edge.fillText(TopAngle,RecX-Edge.measureText(TopAngle).width/2+RecWidth/2,RecY+TextHeight+10-TopSideAdj);}
+			if (BotedgeNode == 'AngleEdge') {Edge.fillText(BotAngle,RecX-Edge.measureText(BotAngle).width/2+RecWidth/2,RecY+RecHeight-10+BotSideAdj);}
+			Edge.fillStyle = "#FFFFFF";
+			
+		}
+
+		if (ModeSelection == 'PartShape' & canvasId == 'PartEditCanvas')
+		{
+			Edge.setLineDash([5, 5]);
+			Edge.strokeStyle="black"
+			Edge.strokeRect(RecX,RecY,RecWidth,RecHeight);	
+			Edge.setLineDash([]);
+			IsPartShapeEditor = true;	
+		}
+			
+		//alert(RGBIsDark(PanelColour));
+
+
+		Edge.lineWidth=1;
+
+				var MoveOffsetX = 0;
+				var MoveOffsetY = 0;
+				
+				if (PartJSON.Vectors.length > 0)
+				{
+				var ClashingEdges = [];
+					//if (canvasId == 'PartEditCanvas' & ModeSelection == 'PartShape' ) {var PartShapingMode = true;} else {var PartShapingMode = false;}
+				
+
+					if (PanelColour == '' ) {Edge.fillStyle = "#FFFFFF";} else {Edge.fillStyle = PanelColour;}	
+
+					if (IsPartShapeEditor == false) {Edge.beginPath();}
+
+					for (var i = 0; i<PartJSON.Vectors.length; i++)
+					{ 
+				
+					if (canvasId == 'PartEditCanvas') {Edge.lineWidth=2;}
+					if (IsPartShapeEditor) {Edge.lineWidth=3;}
+					Edge.strokeStyle="Black";
+					
+					if (MoveObject.InMove == true & IsItemInList(i,SelectedObjects.Items) & ModeSelection == 'PartShape') 
+					{
+					MoveOffsetX = (MoveObject.X-ActiveMouseX)*ViewRatio;	
+					MoveOffsetY = (MoveObject.Y-ActiveMouseY)*ViewRatio;	
+					}
+					else {MoveOffsetX = 0;MoveOffsetY = 0;}
+					
+					var OrigVectSX = CalcOutputValue(PartJSON.Vectors[i].SX);
+					var OrigVectSY = CalcOutputValue(PartJSON.Vectors[i].SY);
+					var OrigVectEX = CalcOutputValue(PartJSON.Vectors[i].EX);
+					var OrigVectEY = CalcOutputValue(PartJSON.Vectors[i].EY);
+					
+					if (DrawingFace!= 'Front') {var VectSX = RecX - MoveOffsetX + RecWidth - Math.round((OrigVectSX)*ViewRatio);}
+					else {var VectSX = RecX - MoveOffsetX + Math.round((OrigVectSX)*ViewRatio);}
+					var  VectSY = RecY + MoveOffsetY + RecHeight - Math.round((OrigVectSY)*ViewRatio);
+					
+					if (DrawingFace!= 'Front') {var VectEX = RecX - MoveOffsetX + RecWidth - Math.round((OrigVectEX)*ViewRatio);}
+					else {var VectEX = RecX - MoveOffsetX + Math.round((OrigVectEX)*ViewRatio);}
+					var  VectEY = RecY + MoveOffsetY + RecHeight - Math.round((OrigVectEY)*ViewRatio);
+					
+					//Edge.font="30px Arial";
+					//Edge.fillStyle = 'black';
+					//Edge.fillText(i,VectSX,VectSY); 
+					
+					if (PanelColour == '' ) {Edge.fillStyle = "#FFFFFF";} else {Edge.fillStyle = PanelColour;}	
+						
+						switch (PartJSON.Vectors[i].Type)
+						{
+						case 'Line':
+								if (IsPartShapeEditor) {Edge.beginPath();}	
+								if (i==0 | IsPartShapeEditor) {Edge.moveTo(VectSX,VectSY);}										
+								Edge.lineTo(VectEX,VectEY);
+								if (IsPartShapeEditor) {Edge.stroke();}
+								
+									if (PartJSON.Vectors[i].Edge != 'N') 
+									{
+									ClashingEdges.push({"Type":"Line","SX":VectSX,"SY":VectSY,"EX":VectEX,"EY":VectEY,"Edge":PartJSON.Vectors[i].Edge});
+									}
+								
+								break;
+						case 'Arc':
+								var OrigVectCX = CalcOutputValue(PartJSON.Vectors[i].CX);
+								var OrigVectCY = CalcOutputValue(PartJSON.Vectors[i].CY);
+								
+								
+								if (DrawingFace!= 'Front') {var VectCX = RecX - MoveOffsetX + RecWidth - Math.round((OrigVectCX)*ViewRatio);}
+								else {var VectCX = RecX - MoveOffsetX + Math.round((OrigVectCX)*ViewRatio);}
+								var  VectCY = RecY + MoveOffsetY + RecHeight - Math.round((OrigVectCY)*ViewRatio);
+								
+		
+								var StartAngle = Math.atan2( (VectSY-VectCY),(VectSX-VectCX) );
+								var EndAngle = Math.atan2( (VectEY-VectCY),(VectEX-VectCX) );
+		
+								//document.getElementById("TestP").innerHTML = " StartAngle=" + (StartAngle*Rad).toString() + " EndAngle=" + (EndAngle*Rad).toString();
+								
+								if (!PartJSON.Vectors[i].hasOwnProperty("CCW") | !PartJSON.Vectors[i].hasOwnProperty("Radius"))
+								{
+									if ( (StartAngle-EndAngle)*Rad < -180  | (StartAngle-EndAngle)*Rad > 0 & (StartAngle-EndAngle)*Rad <= 180) {ArcIsCC = true;} else {ArcIsCC = false;}
+									PartJSON.Vectors[i].CCW = ArcIsCC;
+									
+									var ArcRadius = Math.sqrt( ( (OrigVectSX-OrigVectCX)*(OrigVectSX-OrigVectCX) )+( (OrigVectSY-OrigVectCY)*(OrigVectSY-OrigVectCY) ) );
+									PartJSON.Vectors[i].Radius = ArcRadius;
+									
+									document.getElementById("LineJSON"+LineNumber).value = JSON.stringify(PartJSON);
+								}								
+								else 
+								{
+								var ArcIsCC = PartJSON.Vectors[i].CCW;
+								var ArcRadius = CalcOutputValue(PartJSON.Vectors[i].Radius);
+								}
+								
+								if (DrawingFace!= 'Front' ) //| canvasId != 'PartEditCanvas'
+								{
+									if (ArcIsCC) {ArcIsCC = false;} else {ArcIsCC = true;}
+								}
+
+
+								Edge.font="12px Arial";
+								Edge.fillStyle = 'black';
+								if (IsPartShapeEditor == true) {Edge.fillText("R" + round(ArcRadius,1),VectCX,VectCY); } //Edge.fillText("CCW " + ArcIsCC,VectCX+15,VectCY+15);
+								if (PanelColour == '' ) {Edge.fillStyle = "#FFFFFF";} else {Edge.fillStyle = PanelColour;}	
+								
+								//
+								if (IsPartShapeEditor) {Edge.beginPath();}							
+								Edge.arc(VectCX, VectCY, ArcRadius*ViewRatio, StartAngle, EndAngle, ArcIsCC);
+								if (IsPartShapeEditor) {Edge.stroke();}
+
+									if (PartJSON.Vectors[i].Edge != 'N') 
+									{
+									ClashingEdges.push({"Type":"Arc","CX":VectCX,"CY":VectCY,"Radius":ArcRadius*ViewRatio,"BA":StartAngle,"EA":EndAngle,"Dir":ArcIsCC,"Edge":PartJSON.Vectors[i].Edge});								
+									}
+									
+									/* if (PartJSON.Vectors[i].hasOwnProperty("IntAngle"))
+									{
+									Edge.strokeStyle="Red";
+									Edge.lineWidth=1;
+									Edge.beginPath();
+									var DrawX = RecX - MoveOffsetX + Math.round((PartJSON.Vectors[i].GovPointX)*ViewRatio);
+									var DrawY = RecY + MoveOffsetY + RecHeight - Math.round((PartJSON.Vectors[i].GovPointY)*ViewRatio);
+									Edge.moveTo(DrawX,DrawY);
+									var SecGovPointX = PartJSON.Vectors[i].GovPointX + Math.cos(PartJSON.Vectors[i].IntAngle)*PartJSON.Vectors[i].PointToIntLength;
+									var SecGovPointY =PartJSON.Vectors[i].GovPointY + Math.sin(PartJSON.Vectors[i].IntAngle)*PartJSON.Vectors[i].PointToIntLength;
+									var DrawX = RecX - MoveOffsetX + Math.round((SecGovPointX)*ViewRatio);
+									var DrawY = RecY + MoveOffsetY + RecHeight - Math.round((SecGovPointY)*ViewRatio);								
+									Edge.lineTo(DrawX,DrawY);
+									Edge.stroke();
+													
+									}
+									
+									if (PartJSON.Vectors[i].hasOwnProperty("IntPointX2"))
+									{
+									Edge.strokeStyle="Red";
+									Edge.lineWidth=1;
+									Edge.beginPath();
+									var DrawX = RecX - MoveOffsetX + Math.round((PartJSON.Vectors[i].IntPointX2)*ViewRatio);
+									var DrawY = RecY + MoveOffsetY + RecHeight - Math.round((PartJSON.Vectors[i].IntPointY2)*ViewRatio);
+									Edge.moveTo(DrawX-5,DrawY);
+									Edge.lineTo(DrawX+5,DrawY);
+									Edge.moveTo(DrawX,DrawY-5);
+									Edge.lineTo(DrawX,DrawY+5);
+									Edge.stroke();					
+													
+									} */
+									
+
+								break;
+						}
+					}
+					//Edge.closePath();
+					if (IsPartShapeEditor == false) 
+					{
+					Edge.fill();
+					Edge.stroke();
+					}
+					
+					
+					Edge.lineWidth=4;
+					//document.getElementById("TestP").innerHTML = "JSON="+ JSON.stringify(ClashingEdges);
+					if (ModeSelection != 'PartShape' & canvasId == 'PartEditCanvas' | canvasId != 'PartEditCanvas')
+					{
+						for (var i = 0; i<ClashingEdges.length; i++)
+						{ 
+							switch (ClashingEdges[i].Edge)
+							{
+							case "N" : var VectorEdgeing = "Black"; break;
+							case "E" : var VectorEdgeing = ClashingStoke; break;
+							case "M" : var VectorEdgeing = ManualClashingStoke; break;
+							}
+							
+						
+								switch (ClashingEdges[i].Type)
+								{
+								case 'Line':
+											Edge.strokeStyle=VectorEdgeing;
+											Edge.beginPath();		
+											Edge.moveTo(ClashingEdges[i].SX,ClashingEdges[i].SY);
+											Edge.lineTo(ClashingEdges[i].EX,ClashingEdges[i].EY);
+											Edge.stroke();
+											break;
+								case 'Arc':
+											Edge.strokeStyle=VectorEdgeing;
+											Edge.beginPath();								
+											Edge.arc(ClashingEdges[i].CX, ClashingEdges[i].CY,ClashingEdges[i].Radius, ClashingEdges[i].BA, ClashingEdges[i].EA,ClashingEdges[i].Dir); // ClashingEdges[i].Dir
+											Edge.stroke();
+											break;
+								}
+						}
+					}
+					Edge.lineWidth=1;
+					
+				}
+
+				for (var i = 0; i<PartJSON.Operations.length; i++)
+				{
+					
+				if (MoveObject.InMove == true & IsItemInList(i,SelectedObjects.Items) & ModeSelection == 'Operations') 
 				{
 				MoveOffsetX = (MoveObject.X-ActiveMouseX)*ViewRatio;	
 				MoveOffsetY = (MoveObject.Y-ActiveMouseY)*ViewRatio;	
 				}
 				else {MoveOffsetX = 0;MoveOffsetY = 0;}
-				
-				var OrigVectSX = CalcOutputValue(PartJSON.Vectors[i].SX);
-				var OrigVectSY = CalcOutputValue(PartJSON.Vectors[i].SY);
-				var OrigVectEX = CalcOutputValue(PartJSON.Vectors[i].EX);
-				var OrigVectEY = CalcOutputValue(PartJSON.Vectors[i].EY);
-				
-				if (DrawingFace!= 'Front') {var VectSX = RecX - MoveOffsetX + RecWidth - Math.round((OrigVectSX)*ViewRatio);}
-				else {var VectSX = RecX - MoveOffsetX + Math.round((OrigVectSX)*ViewRatio);}
-				var  VectSY = RecY + MoveOffsetY + RecHeight - Math.round((OrigVectSY)*ViewRatio);
-				
-				if (DrawingFace!= 'Front') {var VectEX = RecX - MoveOffsetX + RecWidth - Math.round((OrigVectEX)*ViewRatio);}
-				else {var VectEX = RecX - MoveOffsetX + Math.round((OrigVectEX)*ViewRatio);}
-				var  VectEY = RecY + MoveOffsetY + RecHeight - Math.round((OrigVectEY)*ViewRatio);
-				
-				// Edge.font="30px Arial";
-				//Edge.fillStyle = 'black';
-				//Edge.fillText(i,VectSX,VectSY); 
-				
-				if (PanelColour == '' ) {Edge.fillStyle = "#FFFFFF";} else {Edge.fillStyle = PanelColour;}	
 					
-					switch (PartJSON.Vectors[i].Type)
-					{
-					case 'Line':
-							if (IsPartShapeEditor) {Edge.beginPath();}	
-							if (i==0 | IsPartShapeEditor) {Edge.moveTo(VectSX,VectSY);}										
-							Edge.lineTo(VectEX,VectEY);
-							if (IsPartShapeEditor) {Edge.stroke();}
-							
-								if (PartJSON.Vectors[i].Edge != 'N') 
-								{
-								ClashingEdges.push({"Type":"Line","SX":VectSX,"SY":VectSY,"EX":VectEX,"EY":VectEY,"Edge":PartJSON.Vectors[i].Edge});
-								}
-							
-							break;
-					case 'Arc':
-							var OrigVectCX = CalcOutputValue(PartJSON.Vectors[i].CX);
-							var OrigVectCY = CalcOutputValue(PartJSON.Vectors[i].CY);
-							
-							
-							if (DrawingFace!= 'Front') {var VectCX = RecX - MoveOffsetX + RecWidth - Math.round((OrigVectCX)*ViewRatio);}
-							else {var VectCX = RecX - MoveOffsetX + Math.round((OrigVectCX)*ViewRatio);}
-							var  VectCY = RecY + MoveOffsetY + RecHeight - Math.round((OrigVectCY)*ViewRatio);
-							
-	
-							var StartAngle = Math.atan2( (VectSY-VectCY),(VectSX-VectCX) );
-							var EndAngle = Math.atan2( (VectEY-VectCY),(VectEX-VectCX) );
-	
-							//document.getElementById("TestP").innerHTML = " StartAngle=" + (StartAngle*Rad).toString() + " EndAngle=" + (EndAngle*Rad).toString();
-							
-							if (!PartJSON.Vectors[i].hasOwnProperty("CCW") | !PartJSON.Vectors[i].hasOwnProperty("Radius"))
-							{
-								if ( (StartAngle-EndAngle)*Rad < -180  | (StartAngle-EndAngle)*Rad > 0 & (StartAngle-EndAngle)*Rad <= 180) {ArcIsCC = true;} else {ArcIsCC = false;}
-								PartJSON.Vectors[i].CCW = ArcIsCC;
-								
-								var ArcRadius = Math.sqrt( ( (OrigVectSX-OrigVectCX)*(OrigVectSX-OrigVectCX) )+( (OrigVectSY-OrigVectCY)*(OrigVectSY-OrigVectCY) ) );
-								PartJSON.Vectors[i].Radius = ArcRadius;
-								
-								document.getElementById("LineJSON"+LineNumber).value = JSON.stringify(PartJSON);
-							}								
-							else 
-							{
-							var ArcIsCC = PartJSON.Vectors[i].CCW;
-							var ArcRadius = CalcOutputValue(PartJSON.Vectors[i].Radius);
-							}
-							
-							if (DrawingFace!= 'Front' ) //| canvasId != 'PartEditCanvas'
-							{
-								if (ArcIsCC) {ArcIsCC = false;} else {ArcIsCC = true;}
-							}
-
-
-							Edge.font="12px Arial";
-							Edge.fillStyle = 'black';
-							if (IsPartShapeEditor == true) {Edge.fillText("R" + round(ArcRadius,1),VectCX,VectCY); } //Edge.fillText("CCW " + ArcIsCC,VectCX+15,VectCY+15);
-							if (PanelColour == '' ) {Edge.fillStyle = "#FFFFFF";} else {Edge.fillStyle = PanelColour;}	
-							
-							//
-							if (IsPartShapeEditor) {Edge.beginPath();}							
-							Edge.arc(VectCX, VectCY, ArcRadius*ViewRatio, StartAngle, EndAngle, ArcIsCC);
-							if (IsPartShapeEditor) {Edge.stroke();}
-
-								if (PartJSON.Vectors[i].Edge != 'N') 
-								{
-								ClashingEdges.push({"Type":"Arc","CX":VectCX,"CY":VectCY,"Radius":ArcRadius*ViewRatio,"BA":StartAngle,"EA":EndAngle,"Dir":ArcIsCC,"Edge":PartJSON.Vectors[i].Edge});								
-								}
-								
-								/* if (PartJSON.Vectors[i].hasOwnProperty("IntAngle"))
-								{
-								Edge.strokeStyle="Red";
-								Edge.lineWidth=1;
-								Edge.beginPath();
-								var DrawX = RecX - MoveOffsetX + Math.round((PartJSON.Vectors[i].GovPointX)*ViewRatio);
-								var DrawY = RecY + MoveOffsetY + RecHeight - Math.round((PartJSON.Vectors[i].GovPointY)*ViewRatio);
-								Edge.moveTo(DrawX,DrawY);
-								var SecGovPointX = PartJSON.Vectors[i].GovPointX + Math.cos(PartJSON.Vectors[i].IntAngle)*PartJSON.Vectors[i].PointToIntLength;
-								var SecGovPointY =PartJSON.Vectors[i].GovPointY + Math.sin(PartJSON.Vectors[i].IntAngle)*PartJSON.Vectors[i].PointToIntLength;
-								var DrawX = RecX - MoveOffsetX + Math.round((SecGovPointX)*ViewRatio);
-								var DrawY = RecY + MoveOffsetY + RecHeight - Math.round((SecGovPointY)*ViewRatio);								
-								Edge.lineTo(DrawX,DrawY);
-								Edge.stroke();
-												
-								}
-								
-								if (PartJSON.Vectors[i].hasOwnProperty("IntPointX2"))
-								{
-								Edge.strokeStyle="Red";
-								Edge.lineWidth=1;
-								Edge.beginPath();
-								var DrawX = RecX - MoveOffsetX + Math.round((PartJSON.Vectors[i].IntPointX2)*ViewRatio);
-								var DrawY = RecY + MoveOffsetY + RecHeight - Math.round((PartJSON.Vectors[i].IntPointY2)*ViewRatio);
-								Edge.moveTo(DrawX-5,DrawY);
-								Edge.lineTo(DrawX+5,DrawY);
-								Edge.moveTo(DrawX,DrawY-5);
-								Edge.lineTo(DrawX,DrawY+5);
-								Edge.stroke();					
-												
-								} */
-								
-
-							break;
-					}
-				}
-				//Edge.closePath();
-				if (IsPartShapeEditor == false) 
-				{
-				Edge.fill();
-				Edge.stroke();
-				}
-				
-				
-				Edge.lineWidth=4;
-				//document.getElementById("TestP").innerHTML = "JSON="+ JSON.stringify(ClashingEdges);
-				if (ModeSelection != 'PartShape' & canvasId == 'PartEditCanvas' | canvasId != 'PartEditCanvas')
-				{
-					for (var i = 0; i<ClashingEdges.length; i++)
-					{ 
-						switch (ClashingEdges[i].Edge)
-						{
-						case "N" : var VectorEdgeing = "Black"; break;
-						case "E" : var VectorEdgeing = ClashingStoke; break;
-						case "M" : var VectorEdgeing = ManualClashingStoke; break;
-						}
-						
 					
-							switch (ClashingEdges[i].Type)
-							{
-							case 'Line':
-										Edge.strokeStyle=VectorEdgeing;
-										Edge.beginPath();		
-										Edge.moveTo(ClashingEdges[i].SX,ClashingEdges[i].SY);
-										Edge.lineTo(ClashingEdges[i].EX,ClashingEdges[i].EY);
-										Edge.stroke();
-										break;
-							case 'Arc':
-										Edge.strokeStyle=VectorEdgeing;
-										Edge.beginPath();								
-										Edge.arc(ClashingEdges[i].CX, ClashingEdges[i].CY,ClashingEdges[i].Radius, ClashingEdges[i].BA, ClashingEdges[i].EA,ClashingEdges[i].Dir); // ClashingEdges[i].Dir
-										Edge.stroke();
-										break;
-							}
-					}
-				}
-				Edge.lineWidth=1;
+				var OpFace = PartJSON.Operations[i].Face;
+				if (DrawingFace!= OpFace) {var OpX = RecX - MoveOffsetX + RecWidth - Math.round(CalcOutputValue(PartJSON.Operations[i].X)*ViewRatio);}
+				else {var OpX = RecX - MoveOffsetX + Math.round(CalcOutputValue(PartJSON.Operations[i].X)*ViewRatio);}
+				var OpY = RecY + MoveOffsetY + RecHeight - Math.round(CalcOutputValue(PartJSON.Operations[i].Y)*ViewRatio);
+				var OpWidth = Math.round(CalcOutputValue(PartJSON.Operations[i].Width)*ViewRatio);
+				var OpDepth = CalcOutputValue(PartJSON.Operations[i].Depth);
+				var OpVisibility = CalcOutputCond(PartJSON.Operations[i].VisibleCond);
 				
-			}
+				if (OpDepth < MaterialThick) {Edge.fillStyle = "#c47e17";} else {Edge.fillStyle = "#FFFFFF";}
+				
+					
 
-			for (var i = 0; i<PartJSON.Operations.length; i++)
-			{
-				
-			if (MoveObject.InMove == true & IsItemInList(i,SelectedObjects.Items) & ModeSelection == 'Operations') 
-			{
-			MoveOffsetX = (MoveObject.X-ActiveMouseX)*ViewRatio;	
-			MoveOffsetY = (MoveObject.Y-ActiveMouseY)*ViewRatio;	
-			}
-			else {MoveOffsetX = 0;MoveOffsetY = 0;}
-				
-				
-			var OpFace = PartJSON.Operations[i].Face;
-			if (DrawingFace!= OpFace) {var OpX = RecX - MoveOffsetX + RecWidth - Math.round(CalcOutputValue(PartJSON.Operations[i].X)*ViewRatio);}
-			else {var OpX = RecX - MoveOffsetX + Math.round(CalcOutputValue(PartJSON.Operations[i].X)*ViewRatio);}
-			var OpY = RecY + MoveOffsetY + RecHeight - Math.round(CalcOutputValue(PartJSON.Operations[i].Y)*ViewRatio);
-			var OpWidth = Math.round(CalcOutputValue(PartJSON.Operations[i].Width)*ViewRatio);
-			var OpDepth = CalcOutputValue(PartJSON.Operations[i].Depth);
-			var OpVisibility = CalcOutputCond(PartJSON.Operations[i].VisibleCond);
-			
-			if (OpDepth < MaterialThick) {Edge.fillStyle = "#c47e17";} else {Edge.fillStyle = "#FFFFFF";}
-			
-				
-
-			if (DrawingFace != OpFace) 
-			{
-				if (canvasId == 'PreviewBox') {Edge.setLineDash([3, 1]); } else {Edge.setLineDash([3, 5]); }
-				Edge.strokeStyle=DefSelRecStroke;
-			} 
-			else if (!OpVisibility) 
+				if (DrawingFace != OpFace) 
 				{
-				Edge.setLineDash([5, 5]); 
-				Edge.strokeStyle=HiddenOpStroke;
-				if (PanelColour == '' ) {Edge.fillStyle = "#FFFFFF";} else {Edge.fillStyle = PanelColour;}
+					if (canvasId == 'PreviewBox') {Edge.setLineDash([3, 1]); } else {Edge.setLineDash([3, 5]); }
+					Edge.strokeStyle=DefSelRecStroke;
 				} 
-			else {Edge.setLineDash([]); Edge.strokeStyle=DefOpStroke;}
-			
-			
-				if (canvasId == 'PreviewBox' & OpVisibility | canvasId != 'PreviewBox')
-				{
-					switch (PartJSON.Operations[i].Type)
+				else if (!OpVisibility) 
 					{
-					case 'Hole':
-								Edge.beginPath();
-								Edge.arc(OpX, OpY, OpWidth/2, 0, 2 * Math.PI);
-								if (IsPartShapeEditor == false) {if (DrawingFace == OpFace | OpDepth >= MaterialThick) {Edge.fill();}}
-								Edge.stroke();
-								break;
-					case 'LineBore':
-								var LineAngle = (PartJSON.Operations[i].Angle*degrees)-1.5708;						
-									for (var ii = 0; ii<CalcOutputValue(PartJSON.Operations[i].Qty); ii++)
-									{
-									if (DrawingFace == OpFace)	
-										{ var HoleX = OpX - (((Math.sin(LineAngle)*CalcOutputValue(PartJSON.Operations[i].Spacing))*ii)*ViewRatio);}
-										else { var HoleX = OpX + (((Math.sin(LineAngle)*CalcOutputValue(PartJSON.Operations[i].Spacing))*ii)*ViewRatio);}
-									var HoleY = OpY - (((Math.cos(LineAngle)*CalcOutputValue(PartJSON.Operations[i].Spacing))*ii)*ViewRatio);		
+					Edge.setLineDash([5, 5]); 
+					Edge.strokeStyle=HiddenOpStroke;
+					if (PanelColour == '' ) {Edge.fillStyle = "#FFFFFF";} else {Edge.fillStyle = PanelColour;}
+					} 
+				else {Edge.setLineDash([]); Edge.strokeStyle=DefOpStroke;}
+				
+				
+					if (canvasId == 'PreviewBox' & OpVisibility | canvasId != 'PreviewBox')
+					{
+						switch (PartJSON.Operations[i].Type)
+						{
+						case 'Hole':
 									Edge.beginPath();
-									Edge.arc(HoleX, HoleY, OpWidth/2, 0, 2 * Math.PI);
+									Edge.arc(OpX, OpY, OpWidth/2, 0, 2 * Math.PI);
+									if (IsPartShapeEditor == false) {if (DrawingFace == OpFace | OpDepth >= MaterialThick) {Edge.fill();}}
+									Edge.stroke();
+									break;
+						case 'LineBore':
+									var LineAngle = (PartJSON.Operations[i].Angle*degrees)-1.5708;						
+										for (var ii = 0; ii<CalcOutputValue(PartJSON.Operations[i].Qty); ii++)
+										{
+										if (DrawingFace == OpFace)	
+											{ var HoleX = OpX - (((Math.sin(LineAngle)*CalcOutputValue(PartJSON.Operations[i].Spacing))*ii)*ViewRatio);}
+											else { var HoleX = OpX + (((Math.sin(LineAngle)*CalcOutputValue(PartJSON.Operations[i].Spacing))*ii)*ViewRatio);}
+										var HoleY = OpY - (((Math.cos(LineAngle)*CalcOutputValue(PartJSON.Operations[i].Spacing))*ii)*ViewRatio);		
+										Edge.beginPath();
+										Edge.arc(HoleX, HoleY, OpWidth/2, 0, 2 * Math.PI);
+										if (IsPartShapeEditor == false) { if (DrawingFace == OpFace | OpDepth >= MaterialThick ) {Edge.fill();}}
+										Edge.stroke();
+										}
+									break;
+						default:
+									var LineAngle = (PartJSON.Operations[i].Angle*degrees)-1.5708;
+									var OpLength = Math.round(CalcOutputValue(PartJSON.Operations[i].Length)*ViewRatio);
+									Edge.beginPath();
+									Edge.moveTo(OpX,OpY);
+									var WidthCalX = (Math.sin(LineAngle-1.5708)*OpWidth);
+									var WidthCalY = (Math.cos(LineAngle-1.5708)*OpWidth);
+									if (DrawingFace == OpFace)
+									{
+									Edge.lineTo(OpX - WidthCalX,OpY - WidthCalY);
+									Edge.lineTo(OpX - (Math.sin(LineAngle)*OpLength) - WidthCalX,OpY - (Math.cos(LineAngle)*OpLength) - WidthCalY);
+									Edge.lineTo(OpX - (Math.sin(LineAngle)*OpLength),OpY - (Math.cos(LineAngle)*OpLength) );
+									}
+									else
+									{
+									Edge.lineTo(OpX + WidthCalX,OpY - WidthCalY);
+									Edge.lineTo(OpX + (Math.sin(LineAngle)*OpLength) + WidthCalX,OpY - (Math.cos(LineAngle)*OpLength) - WidthCalY);
+									Edge.lineTo(OpX + (Math.sin(LineAngle)*OpLength),OpY - (Math.cos(LineAngle)*OpLength) );	
+									}
+									Edge.lineTo(OpX,OpY);
 									if (IsPartShapeEditor == false) { if (DrawingFace == OpFace | OpDepth >= MaterialThick ) {Edge.fill();}}
 									Edge.stroke();
-									}
-								break;
-					default:
-								var LineAngle = (PartJSON.Operations[i].Angle*degrees)-1.5708;
-								var OpLength = Math.round(CalcOutputValue(PartJSON.Operations[i].Length)*ViewRatio);
-								Edge.beginPath();
-								Edge.moveTo(OpX,OpY);
-								var WidthCalX = (Math.sin(LineAngle-1.5708)*OpWidth);
-								var WidthCalY = (Math.cos(LineAngle-1.5708)*OpWidth);
-								if (DrawingFace == OpFace)
-								{
-								Edge.lineTo(OpX - WidthCalX,OpY - WidthCalY);
-								Edge.lineTo(OpX - (Math.sin(LineAngle)*OpLength) - WidthCalX,OpY - (Math.cos(LineAngle)*OpLength) - WidthCalY);
-								Edge.lineTo(OpX - (Math.sin(LineAngle)*OpLength),OpY - (Math.cos(LineAngle)*OpLength) );
-								}
-								else
-								{
-								Edge.lineTo(OpX + WidthCalX,OpY - WidthCalY);
-								Edge.lineTo(OpX + (Math.sin(LineAngle)*OpLength) + WidthCalX,OpY - (Math.cos(LineAngle)*OpLength) - WidthCalY);
-								Edge.lineTo(OpX + (Math.sin(LineAngle)*OpLength),OpY - (Math.cos(LineAngle)*OpLength) );	
-								}
-								Edge.lineTo(OpX,OpY);
-								if (IsPartShapeEditor == false) { if (DrawingFace == OpFace | OpDepth >= MaterialThick ) {Edge.fill();}}
-								Edge.stroke();
-								break;
+									break;
 
-					}
-					
-					if (SelectedObjects.Items.length == 1 & i == SelectedObjects.Items[0])
-					{
-					Edge.strokeStyle="Magenta";
-					var RefPointSize = (3*ViewRatio);		
-					Edge.strokeRect(OpX-RefPointSize,OpY-RefPointSize,RefPointSize*2,RefPointSize*2);	
+						}
+						
+						if (SelectedObjects.Items.length == 1 & i == SelectedObjects.Items[0])
+						{
+						Edge.strokeStyle="Magenta";
+						var RefPointSize = (3*ViewRatio);		
+						Edge.strokeRect(OpX-RefPointSize,OpY-RefPointSize,RefPointSize*2,RefPointSize*2);	
+						}
 					}
 				}
-			}
-			Edge.setLineDash([]);
-			
-			
-		if (canvasId == 'PartEditCanvas')
-		{
-		/* Axis Reference Arrow */
-		Edge.font="12px Arial";
-		Edge.fillStyle = 'black';
-		Edge.fillText("Y",4,canvas.height-30);
-		Edge.fillText("X",30,canvas.height-4);
-		Edge.strokeStyle='black'; Edge.lineWidth=1;
-		Edge.beginPath();
-		Edge.moveTo(7,canvas.height-25);
-		Edge.lineTo(7,canvas.height-7);
-		Edge.lineTo(25,canvas.height-7);
-		Edge.stroke();
-
-		Edge.beginPath();
-		Edge.moveTo(5,canvas.height-23);
-		Edge.lineTo(7,canvas.height-25);
-		Edge.lineTo(9,canvas.height-23);
-		Edge.stroke();
-
-		Edge.beginPath();
-		Edge.moveTo(23,canvas.height-9);
-		Edge.lineTo(25,canvas.height-7);
-		Edge.lineTo(23,canvas.height-5);
-		Edge.stroke();
-		/* Banding Colour Key */
-		if (ModeSelection == 'Edgebanding')
-		{
-		Edge.beginPath();
-		Edge.lineWidth=7;
-		Edge.strokeStyle=ClashingStoke;
-		Edge.moveTo(canvas.width-250,canvas.height-35);
-		Edge.lineTo(canvas.width-190,canvas.height-35);
-		Edge.stroke();
-		Edge.fillText("= Invisedge edge",canvas.width-180,canvas.height-31);
-		
-		Edge.beginPath();
-		Edge.lineWidth=7;
-		Edge.strokeStyle=ManualClashingStoke;
-		Edge.moveTo(canvas.width-250,canvas.height-20);
-		Edge.lineTo(canvas.width-190,canvas.height-20);
-		Edge.stroke();
-		Edge.fillText("= Manually applied Invisedge",canvas.width-180,canvas.height-16);
-		}
-		Edge.lineWidth=1;
-		/* Part Dimensions */
-		if (ModeSelection != 'Edgebanding')
-		{
-		Edge.beginPath();
-		Edge.strokeStyle='Black';
-		Edge.moveTo(RecX-50,RecY+RecHeight);
-		Edge.lineTo(RecX-100,RecY+RecHeight);
-		Edge.moveTo(RecX-50,RecY);
-		Edge.lineTo(RecX-100,RecY);
-		Edge.moveTo(RecX-75,RecY);
-		Edge.lineTo(RecX-75,RecY+(RecHeight/2)-30);
-		Edge.moveTo(RecX-75,RecY+(RecHeight/2)+30);
-		Edge.lineTo(RecX-75,RecY+RecHeight);
-		
-		Edge.moveTo(RecX,RecY+RecHeight+50);
-		Edge.lineTo(RecX,RecY+RecHeight+100);
-		Edge.moveTo(RecX+RecWidth,RecY+RecHeight+50);
-		Edge.lineTo(RecX+RecWidth,RecY+RecHeight+100);
-		Edge.moveTo(RecX,RecY+RecHeight+75);
-		Edge.lineTo(RecX+(RecWidth/2)-45,RecY+RecHeight+75);
-		Edge.moveTo(RecX+(RecWidth/2)+45,RecY+RecHeight+75);
-		Edge.lineTo(RecX+RecWidth,RecY+RecHeight+75);
-		
-		Edge.stroke();
-		Edge.font="15px Arial";
-		Edge.fillText("Part Length",RecX-110,RecY+(RecHeight/2)-7);
-		Edge.fillText(PartLength,RecX-88,RecY+(RecHeight/2)+16);
-		Edge.fillText("Part Width",RecX+(RecWidth/2)-35,RecY+RecHeight+70);
-		Edge.fillText(PartWidth,RecX+(RecWidth/2)-18,RecY+RecHeight+90);
-		}
-
-			
-			for (var i = 0; i<SnapPoints.length; i++)
-			{
+				Edge.setLineDash([]);
 				
 				
-				var CalX = RecX + (SnapPoints[i].X*ViewRatio);
-				var CalY = RecY + RecHeight - (SnapPoints[i].Y*ViewRatio);
-				Edge.beginPath();
-				Edge.moveTo(CalX-1,CalY-1);
-				Edge.lineTo(CalX+1,CalY-1);
-				Edge.lineTo(CalX+1,CalY+1);
-				Edge.lineTo(CalX-1,CalY+1);
-				Edge.moveTo(CalX-1,CalY-1);
-				Edge.fillStyle = "black";
-				Edge.fill();
-				//Edge.arc(, , 1, 0, 2 * Math.PI);
-				if (SmartlineH.SnapPointID == i) 
-				{ 
-				Edge.setLineDash([5, 5]);
-				Edge.strokeStyle="blue"
-				Edge.beginPath();
-				Edge.moveTo(RecX + (SmartlineH.X*ViewRatio), RecY + RecHeight - (SmartlineH.Y*ViewRatio));
-				Edge.lineTo(CalX,CalY);
-				Edge.stroke();
-				Edge.setLineDash([]);	
-				}
-				if (SmartlineV.SnapPointID == i) 
-				{ 
-				Edge.setLineDash([5, 5]);
-				Edge.strokeStyle="blue"
-				Edge.beginPath();
-				Edge.moveTo(RecX + (SmartlineV.X*ViewRatio), RecY + RecHeight - (SmartlineV.Y*ViewRatio));
-				Edge.lineTo(CalX,CalY);
-				Edge.stroke();
-				Edge.setLineDash([]);	
-				}
-		
-			}
-			
-			
-			if (ToolPointClicks.length > 0)
+			if (canvasId == 'PartEditCanvas')
 			{
-			var CalcStartX = RecX + Math.round(ToolPointClicks[0].X*ViewRatio);
-			var CalcStartY = RecY + RecHeight - Math.round(ToolPointClicks[0].Y*ViewRatio);
-			var CalcEndX = RecX + Math.round(ActiveMouseX*ViewRatio);
-			var CalcEndY = RecY + RecHeight - Math.round(ActiveMouseY*ViewRatio);
-				switch (ToolsSelection)
-					{
-					case 'MeasureTool':
-							if (ToolPointClicks.length == 2)
-							{
-							var CalcEndX = RecX + Math.round(ToolPointClicks[1].X*ViewRatio);
-							var CalcEndY = RecY + RecHeight - Math.round(ToolPointClicks[1].Y*ViewRatio);
-							}
+			/* Axis Reference Arrow */
+			Edge.font="12px Arial";
+			Edge.fillStyle = 'black';
+			Edge.fillText("Y",4,canvas.height-30);
+			Edge.fillText("X",30,canvas.height-4);
+			Edge.strokeStyle='black'; Edge.lineWidth=1;
+			Edge.beginPath();
+			Edge.moveTo(7,canvas.height-25);
+			Edge.lineTo(7,canvas.height-7);
+			Edge.lineTo(25,canvas.height-7);
+			Edge.stroke();
+
+			Edge.beginPath();
+			Edge.moveTo(5,canvas.height-23);
+			Edge.lineTo(7,canvas.height-25);
+			Edge.lineTo(9,canvas.height-23);
+			Edge.stroke();
+
+			Edge.beginPath();
+			Edge.moveTo(23,canvas.height-9);
+			Edge.lineTo(25,canvas.height-7);
+			Edge.lineTo(23,canvas.height-5);
+			Edge.stroke();
+			/* Banding Colour Key */
+			if (ModeSelection == 'Edgebanding')
+			{
+			Edge.beginPath();
+			Edge.lineWidth=7;
+			Edge.strokeStyle=ClashingStoke;
+			Edge.moveTo(canvas.width-250,canvas.height-35);
+			Edge.lineTo(canvas.width-190,canvas.height-35);
+			Edge.stroke();
+			Edge.fillText("= Invisedge edge",canvas.width-180,canvas.height-31);
+			
+			Edge.beginPath();
+			Edge.lineWidth=7;
+			Edge.strokeStyle=ManualClashingStoke;
+			Edge.moveTo(canvas.width-250,canvas.height-20);
+			Edge.lineTo(canvas.width-190,canvas.height-20);
+			Edge.stroke();
+			Edge.fillText("= Manually applied Invisedge",canvas.width-180,canvas.height-16);
+			}
+			Edge.lineWidth=1;
+			/* Part Dimensions */
+			if (ModeSelection != 'Edgebanding')
+			{
+			Edge.beginPath();
+			Edge.strokeStyle='Black';
+			Edge.moveTo(RecX-50,RecY+RecHeight);
+			Edge.lineTo(RecX-100,RecY+RecHeight);
+			Edge.moveTo(RecX-50,RecY);
+			Edge.lineTo(RecX-100,RecY);
+			Edge.moveTo(RecX-75,RecY);
+			Edge.lineTo(RecX-75,RecY+(RecHeight/2)-30);
+			Edge.moveTo(RecX-75,RecY+(RecHeight/2)+30);
+			Edge.lineTo(RecX-75,RecY+RecHeight);
+			
+			Edge.moveTo(RecX,RecY+RecHeight+50);
+			Edge.lineTo(RecX,RecY+RecHeight+100);
+			Edge.moveTo(RecX+RecWidth,RecY+RecHeight+50);
+			Edge.lineTo(RecX+RecWidth,RecY+RecHeight+100);
+			Edge.moveTo(RecX,RecY+RecHeight+75);
+			Edge.lineTo(RecX+(RecWidth/2)-45,RecY+RecHeight+75);
+			Edge.moveTo(RecX+(RecWidth/2)+45,RecY+RecHeight+75);
+			Edge.lineTo(RecX+RecWidth,RecY+RecHeight+75);
+			
+			Edge.stroke();
+			Edge.font="15px Arial";
+			Edge.fillText("Part Length",RecX-110,RecY+(RecHeight/2)-7);
+			Edge.fillText(PartLength,RecX-88,RecY+(RecHeight/2)+16);
+			Edge.fillText("Part Width",RecX+(RecWidth/2)-35,RecY+RecHeight+70);
+			Edge.fillText(PartWidth,RecX+(RecWidth/2)-18,RecY+RecHeight+90);
+			}
+
+				
+				for (var i = 0; i<SnapPoints.length; i++)
+				{
 					
-							if (CalcEndX > CalcStartX) {var HorStartX = CalcStartX;var HorEndX = CalcEndX;} else {var HorStartX = CalcEndX;var HorEndX = CalcStartX;}
-							if (CalcEndY > CalcStartY) {var HorStartY = CalcStartY;var HorEndY = CalcStartY;} else {var HorStartY = CalcEndY;var HorEndY = CalcEndY;}
-							if (CalcEndX > CalcStartX) {var VertStartX = CalcStartX;var VertEndX = CalcStartX;} else {var VertStartX = CalcEndX;var VertEndX = CalcEndX;}
-							if (CalcEndY > CalcStartY) {var VertStartY = CalcStartY;var VertEndY = CalcEndY;} else {var VertStartY = CalcEndY;var VertEndY = CalcStartY;} 
-							
-							var LineAngle = Math.atan2( (CalcStartY-CalcEndY),(CalcEndX-CalcStartX) );
-							var LineLength = Math.sqrt( ( (CalcEndX-CalcStartX)*(CalcEndX-CalcStartX) )+( (CalcEndY-CalcStartY)*(CalcEndY-CalcStartY) ) );
-
-
-							Edge.font="15px Arial";
-							Edge.fillStyle = DefSelRecStroke;
-							
-							Edge.setLineDash([5, 5]);
-							Edge.strokeStyle=DefSelRecStroke;
-
-							Edge.beginPath();
-							Edge.moveTo(CalcStartX,CalcStartY);
-							Edge.lineTo(CalcEndX,CalcEndY);	
-							Edge.stroke();
-						    Edge.setLineDash([]);
-							
-							if (LineAngle != 0)
-							{
-							Edge.fillText(round((LineAngle*Rad),0)+'\xB0',CalcStartX+Math.cos(LineAngle)*(LineLength*0.7),CalcStartY-Math.sin(LineAngle)*(LineLength*0.7));
-							Edge.fillText(round(LineLength/ViewRatio,0)+'L',CalcStartX+Math.cos(LineAngle)*(LineLength*0.9),CalcStartY-Math.sin(LineAngle)*(LineLength*0.9));
-							}
-							
-							
-							/*Horizontal*/
-							var HorLineDist = HorEndX-HorStartX;
-							if ( HorLineDist > 0)
-							{
-							Edge.beginPath();
-							Edge.moveTo(HorStartX,HorStartY-20);
-							Edge.lineTo(HorStartX,HorStartY);	
-							Edge.stroke();
-							Edge.beginPath();
-							Edge.moveTo(HorEndX,HorEndY-20);
-							Edge.lineTo(HorEndX,HorEndY);	
-							Edge.stroke();							
-								
-							Edge.beginPath();
-							Edge.moveTo(HorStartX,HorStartY-10);
-							Edge.lineTo(HorEndX,HorEndY-10);	
-							Edge.stroke();
-							var HorText = round(HorLineDist/ViewRatio,0);
-							var TextW = Edge.measureText(HorText).width;
-							Edge.fillText(HorText,HorStartX+HorLineDist/2-TextW/2,HorStartY+5);
-							}
-							/*Vertical*/
-							var VertLineDist = VertEndY-VertStartY;
-							if ( VertLineDist > 0)
-							{
-							Edge.beginPath();
-							Edge.moveTo(VertStartX-20,VertStartY);
-							Edge.lineTo(VertEndX,VertStartY);	
-							Edge.stroke();
-							Edge.beginPath();
-							Edge.moveTo(VertStartX-20,VertEndY);
-							Edge.lineTo(VertEndX,VertEndY);	
-							Edge.stroke();								
-								
-							Edge.beginPath();
-							Edge.moveTo(VertStartX-10,VertStartY);
-							Edge.lineTo(VertEndX-10,VertEndY);	
-							Edge.stroke();
-							var VertText = round(VertLineDist/ViewRatio,0);
-							Edge.fillText(VertText,VertStartX-7,VertStartY+VertLineDist/2+7);
-							}
-							
-							break;
-					case 'LineBore':
-							Edge.setLineDash([5, 5]);
-							Edge.strokeStyle=DefSelRecStroke;
-							Edge.beginPath();
-							Edge.moveTo(CalcStartX,CalcStartY);
-							Edge.lineTo(CalcEndX,CalcEndY);
-							Edge.stroke();
-							Edge.setLineDash([]);
-							var LineAngle = Math.atan2( (CalcEndY-CalcStartY),(CalcEndX-CalcStartX) )+1.5708;
-							var LineLength = Math.sqrt( ( (CalcEndX-CalcStartX)*(CalcEndX-CalcStartX) )+( (CalcEndY-CalcStartY)*(CalcEndY-CalcStartY) ) );
-							//document.getElementById("TestP").innerHTML = LineAngle;
-								for (var i = 0; i<Math.trunc((LineLength/ViewRatio)/32)+1; i++)
-								{							
-								var HoleX = CalcStartX + (Math.sin(LineAngle)*(32*ViewRatio))*i;
-								var HoleY = CalcStartY - (Math.cos(LineAngle)*(32*ViewRatio))*i;	
-								Edge.beginPath();
-								Edge.arc(HoleX, HoleY, 2.5*ViewRatio, 0, 2 * Math.PI);
-								Edge.stroke();
-								}
-							break;
-					case 'Rebate':
-								Edge.setLineDash([5, 5]);
-								Edge.strokeStyle=DefSelRecStroke;
-								var LineAngle = Math.atan2( (CalcEndY-CalcStartY),(CalcEndX-CalcStartX) )+1.5708;
-								//document.getElementById("TestP").innerHTML = Math.atan2( (CalcEndY-CalcStartY),(CalcEndX-CalcStartX)*Rad );
-								Edge.beginPath();
-								Edge.moveTo(CalcStartX,CalcStartY);						
-								var WidthCalX = (Math.sin(LineAngle-1.5708)*(10*ViewRatio));
-								var WidthCalY = (Math.cos(LineAngle-1.5708)*(10*ViewRatio));
-								Edge.lineTo(CalcStartX - WidthCalX,CalcStartY + WidthCalY);
-								Edge.lineTo(CalcEndX - WidthCalX,CalcEndY + WidthCalY);
-								Edge.lineTo(CalcEndX,CalcEndY);
-								Edge.lineTo(CalcStartX,CalcStartY);
-								Edge.stroke();
-								Edge.setLineDash([]);			
-								break;
-					case 'Route':
-								Edge.setLineDash([5, 5]);
-								Edge.strokeStyle=DefSelRecStroke;						
-								Edge.strokeRect(CalcStartX,CalcStartY,CalcEndX-CalcStartX,CalcEndY-CalcStartY);
-								Edge.setLineDash([]);			
-								break;
-					case 'ChainLine':
-								Edge.lineWidth=3;
-								Edge.strokeStyle=DefSelRecStroke;
-								Edge.beginPath();
-								Edge.moveTo(CalcStartX,CalcStartY);			
-								Edge.lineTo(CalcEndX,CalcEndY);	
-								Edge.stroke();
-								Edge.lineWidth=1;			
-								break;
-					case 'Line':
-								Edge.lineWidth=3;
-								Edge.strokeStyle=DefSelRecStroke;
-								Edge.beginPath();
-								Edge.moveTo(CalcStartX,CalcStartY);			
-								Edge.lineTo(CalcEndX,CalcEndY);	
-								Edge.stroke();
-								Edge.lineWidth=1;			
-								break;
-					case '3PointArc':			
-							
-								
-								if (ToolPointClicks.length > 1)
+					
+					var CalX = RecX + (SnapPoints[i].X*ViewRatio);
+					var CalY = RecY + RecHeight - (SnapPoints[i].Y*ViewRatio);
+					Edge.beginPath();
+					Edge.moveTo(CalX-1,CalY-1);
+					Edge.lineTo(CalX+1,CalY-1);
+					Edge.lineTo(CalX+1,CalY+1);
+					Edge.lineTo(CalX-1,CalY+1);
+					Edge.moveTo(CalX-1,CalY-1);
+					Edge.fillStyle = "black";
+					Edge.fill();
+					//Edge.arc(, , 1, 0, 2 * Math.PI);
+					if (SmartlineH.SnapPointID == i) 
+					{ 
+					Edge.setLineDash([5, 5]);
+					Edge.strokeStyle="blue";
+					Edge.beginPath();
+					Edge.moveTo(RecX + (SmartlineH.X*ViewRatio), RecY + RecHeight - (SmartlineH.Y*ViewRatio));
+					Edge.lineTo(CalX,CalY);
+					Edge.stroke();
+					Edge.setLineDash([]);	
+					}
+					if (SmartlineV.SnapPointID == i) 
+					{ 
+					Edge.setLineDash([5, 5]);
+					Edge.strokeStyle="blue";
+					Edge.beginPath();
+					Edge.moveTo(RecX + (SmartlineV.X*ViewRatio), RecY + RecHeight - (SmartlineV.Y*ViewRatio));
+					Edge.lineTo(CalX,CalY);
+					Edge.stroke();
+					Edge.setLineDash([]);	
+					}
+			
+				}
+				
+				
+				if (ToolPointClicks.length > 0)
+				{
+				var CalcStartX = RecX + Math.round(ToolPointClicks[0].X*ViewRatio);
+				var CalcStartY = RecY + RecHeight - Math.round(ToolPointClicks[0].Y*ViewRatio);
+				var CalcEndX = RecX + Math.round(ActiveMouseX*ViewRatio);
+				var CalcEndY = RecY + RecHeight - Math.round(ActiveMouseY*ViewRatio);
+					switch (ToolsSelection)
+						{
+						case 'MeasureTool':
+								if (ToolPointClicks.length == 2)
 								{
-								var CalcArcStartX = RecX + Math.round(ToolPointClicks[1].X*ViewRatio);
-								var CalcArcStartY = RecY + RecHeight - Math.round(ToolPointClicks[1].Y*ViewRatio);	
-								var ArcRadius = Math.sqrt( ( (CalcArcStartX-CalcStartX)*(CalcArcStartX-CalcStartX) )+( (CalcArcStartY-CalcStartY)*(CalcArcStartY-CalcStartY) ) );
-								var StartAngle = Math.atan2( (CalcArcStartY-CalcStartY),(CalcArcStartX-CalcStartX) );
-								var EndAngle = Math.atan2( (CalcEndY-CalcStartY),(CalcEndX-CalcStartX) );
-								var ArcIsCC = false;								
-								if ( (StartAngle-EndAngle)*Rad < -180  | (StartAngle-EndAngle)*Rad > 0 & (StartAngle-EndAngle)*Rad <= 180) {ArcIsCC = true;} 
+								var CalcEndX = RecX + Math.round(ToolPointClicks[1].X*ViewRatio);
+								var CalcEndY = RecY + RecHeight - Math.round(ToolPointClicks[1].Y*ViewRatio);
+								}
+						
+								if (CalcEndX > CalcStartX) {var HorStartX = CalcStartX;var HorEndX = CalcEndX;} else {var HorStartX = CalcEndX;var HorEndX = CalcStartX;}
+								if (CalcEndY > CalcStartY) {var HorStartY = CalcStartY;var HorEndY = CalcStartY;} else {var HorStartY = CalcEndY;var HorEndY = CalcEndY;}
+								if (CalcEndX > CalcStartX) {var VertStartX = CalcStartX;var VertEndX = CalcStartX;} else {var VertStartX = CalcEndX;var VertEndX = CalcEndX;}
+								if (CalcEndY > CalcStartY) {var VertStartY = CalcStartY;var VertEndY = CalcEndY;} else {var VertStartY = CalcEndY;var VertEndY = CalcStartY;} 
 								
-								//document.getElementById("TestP").innerHTML = "StartAngle="+StartAngle*Rad+" EndAngle="+EndAngle*Rad+" ArcRadius="+ArcRadius;
-								
-								Edge.lineWidth=3;
-								Edge.strokeStyle=DefSelRecStroke;
-								Edge.beginPath();
-								Edge.arc(CalcStartX, CalcStartY, ArcRadius, StartAngle,EndAngle, ArcIsCC);
-								Edge.stroke();
+								var LineAngle = Math.atan2( (CalcStartY-CalcEndY),(CalcEndX-CalcStartX) );
+								var LineLength = Math.sqrt( ( (CalcEndX-CalcStartX)*(CalcEndX-CalcStartX) )+( (CalcEndY-CalcStartY)*(CalcEndY-CalcStartY) ) );
 
-								Edge.lineWidth=1;
+
+								Edge.font="15px Arial";
+								Edge.fillStyle = DefSelRecStroke;
+								
 								Edge.setLineDash([5, 5]);
 								Edge.strokeStyle=DefSelRecStroke;
+
 								Edge.beginPath();
-								Edge.moveTo(CalcStartX,CalcStartY);								
-								Edge.lineTo(CalcArcStartX,CalcArcStartY);
+								Edge.moveTo(CalcStartX,CalcStartY);
+								Edge.lineTo(CalcEndX,CalcEndY);	
 								Edge.stroke();
 								Edge.setLineDash([]);
 								
+								if (LineAngle != 0)
+								{
+								Edge.fillText(round((LineAngle*Rad),0)+'\xB0',CalcStartX+Math.cos(LineAngle)*(LineLength*0.7),CalcStartY-Math.sin(LineAngle)*(LineLength*0.7));
+								Edge.fillText(round(LineLength/ViewRatio,0)+'L',CalcStartX+Math.cos(LineAngle)*(LineLength*0.9),CalcStartY-Math.sin(LineAngle)*(LineLength*0.9));
 								}
-								//else
-								//{
-								Edge.lineWidth=1;
+								
+								
+								/*Horizontal*/
+								var HorLineDist = HorEndX-HorStartX;
+								if ( HorLineDist > 0)
+								{
+								Edge.beginPath();
+								Edge.moveTo(HorStartX,HorStartY-20);
+								Edge.lineTo(HorStartX,HorStartY);	
+								Edge.stroke();
+								Edge.beginPath();
+								Edge.moveTo(HorEndX,HorEndY-20);
+								Edge.lineTo(HorEndX,HorEndY);	
+								Edge.stroke();							
+									
+								Edge.beginPath();
+								Edge.moveTo(HorStartX,HorStartY-10);
+								Edge.lineTo(HorEndX,HorEndY-10);	
+								Edge.stroke();
+								var HorText = round(HorLineDist/ViewRatio,0);
+								var TextW = Edge.measureText(HorText).width;
+								Edge.fillText(HorText,HorStartX+HorLineDist/2-TextW/2,HorStartY+5);
+								}
+								/*Vertical*/
+								var VertLineDist = VertEndY-VertStartY;
+								if ( VertLineDist > 0)
+								{
+								Edge.beginPath();
+								Edge.moveTo(VertStartX-20,VertStartY);
+								Edge.lineTo(VertEndX,VertStartY);	
+								Edge.stroke();
+								Edge.beginPath();
+								Edge.moveTo(VertStartX-20,VertEndY);
+								Edge.lineTo(VertEndX,VertEndY);	
+								Edge.stroke();								
+									
+								Edge.beginPath();
+								Edge.moveTo(VertStartX-10,VertStartY);
+								Edge.lineTo(VertEndX-10,VertEndY);	
+								Edge.stroke();
+								var VertText = round(VertLineDist/ViewRatio,0);
+								Edge.fillText(VertText,VertStartX-7,VertStartY+VertLineDist/2+7);
+								}
+								
+								break;
+						case 'LineBore':
 								Edge.setLineDash([5, 5]);
 								Edge.strokeStyle=DefSelRecStroke;
 								Edge.beginPath();
-								Edge.moveTo(CalcStartX,CalcStartY);	
-								Edge.lineTo(CalcEndX,CalcEndY);								
+								Edge.moveTo(CalcStartX,CalcStartY);
 								Edge.lineTo(CalcEndX,CalcEndY);
 								Edge.stroke();
-								Edge.setLineDash([]);	
-								//}
-								
-								
+								Edge.setLineDash([]);
+								var LineAngle = Math.atan2( (CalcEndY-CalcStartY),(CalcEndX-CalcStartX) )+1.5708;
+								var LineLength = Math.sqrt( ( (CalcEndX-CalcStartX)*(CalcEndX-CalcStartX) )+( (CalcEndY-CalcStartY)*(CalcEndY-CalcStartY) ) );
+								//document.getElementById("TestP").innerHTML = LineAngle;
+									for (var i = 0; i<Math.trunc((LineLength/ViewRatio)/32)+1; i++)
+									{							
+									var HoleX = CalcStartX + (Math.sin(LineAngle)*(32*ViewRatio))*i;
+									var HoleY = CalcStartY - (Math.cos(LineAngle)*(32*ViewRatio))*i;	
+									Edge.beginPath();
+									Edge.arc(HoleX, HoleY, 2.5*ViewRatio, 0, 2 * Math.PI);
+									Edge.stroke();
+									}
 								break;
-					}
-			//Edge.setLineDash([5, 3]);
-			//Edge.strokeStyle="#464646";
-			//Edge.setLineDash([]);		
-			}
+						case 'Rebate':
+									Edge.setLineDash([5, 5]);
+									Edge.strokeStyle=DefSelRecStroke;
+									var LineAngle = Math.atan2( (CalcEndY-CalcStartY),(CalcEndX-CalcStartX) )+1.5708;
+									//document.getElementById("TestP").innerHTML = Math.atan2( (CalcEndY-CalcStartY),(CalcEndX-CalcStartX)*Rad );
+									Edge.beginPath();
+									Edge.moveTo(CalcStartX,CalcStartY);						
+									var WidthCalX = (Math.sin(LineAngle-1.5708)*(10*ViewRatio));
+									var WidthCalY = (Math.cos(LineAngle-1.5708)*(10*ViewRatio));
+									Edge.lineTo(CalcStartX - WidthCalX,CalcStartY + WidthCalY);
+									Edge.lineTo(CalcEndX - WidthCalX,CalcEndY + WidthCalY);
+									Edge.lineTo(CalcEndX,CalcEndY);
+									Edge.lineTo(CalcStartX,CalcStartY);
+									Edge.stroke();
+									Edge.setLineDash([]);			
+									break;
+						case 'Route':
+									Edge.setLineDash([5, 5]);
+									Edge.strokeStyle=DefSelRecStroke;						
+									Edge.strokeRect(CalcStartX,CalcStartY,CalcEndX-CalcStartX,CalcEndY-CalcStartY);
+									Edge.setLineDash([]);			
+									break;
+						case 'ChainLine':
+									Edge.lineWidth=3;
+									Edge.strokeStyle=DefSelRecStroke;
+									Edge.beginPath();
+									Edge.moveTo(CalcStartX,CalcStartY);			
+									Edge.lineTo(CalcEndX,CalcEndY);	
+									Edge.stroke();
+									Edge.lineWidth=1;			
+									break;
+						case 'Line':
+									Edge.lineWidth=3;
+									Edge.strokeStyle=DefSelRecStroke;
+									Edge.beginPath();
+									Edge.moveTo(CalcStartX,CalcStartY);			
+									Edge.lineTo(CalcEndX,CalcEndY);	
+									Edge.stroke();
+									Edge.lineWidth=1;			
+									break;
+						case '3PointArc':			
+								
+									
+									if (ToolPointClicks.length > 1)
+									{
+									var CalcArcStartX = RecX + Math.round(ToolPointClicks[1].X*ViewRatio);
+									var CalcArcStartY = RecY + RecHeight - Math.round(ToolPointClicks[1].Y*ViewRatio);	
+									var ArcRadius = Math.sqrt( ( (CalcArcStartX-CalcStartX)*(CalcArcStartX-CalcStartX) )+( (CalcArcStartY-CalcStartY)*(CalcArcStartY-CalcStartY) ) );
+									var StartAngle = Math.atan2( (CalcArcStartY-CalcStartY),(CalcArcStartX-CalcStartX) );
+									var EndAngle = Math.atan2( (CalcEndY-CalcStartY),(CalcEndX-CalcStartX) );
+									var ArcIsCC = false;								
+									if ( (StartAngle-EndAngle)*Rad < -180  | (StartAngle-EndAngle)*Rad > 0 & (StartAngle-EndAngle)*Rad <= 180) {ArcIsCC = true;} 
+									
+									//document.getElementById("TestP").innerHTML = "StartAngle="+StartAngle*Rad+" EndAngle="+EndAngle*Rad+" ArcRadius="+ArcRadius;
+									
+									Edge.lineWidth=3;
+									Edge.strokeStyle=DefSelRecStroke;
+									Edge.beginPath();
+									Edge.arc(CalcStartX, CalcStartY, ArcRadius, StartAngle,EndAngle, ArcIsCC);
+									Edge.stroke();
 
-
-			if (SelectedObjects.Items.length > 0)
-			{
-			if (ModeSelection != 'PartShape') {SelRecMargin = 2;} else {SelRecMargin = 5;}
-				if (MoveObject.InMove == true) 
-				{
-				MoveOffsetX = (MoveObject.X-ActiveMouseX)*ViewRatio;	
-				MoveOffsetY = (MoveObject.Y-ActiveMouseY)*ViewRatio;	
-				}	
-				
-			Edge.setLineDash([5, 3]);
-			Edge.strokeStyle=DefSelRecStroke;
-			var CalcStartX = RecX - MoveOffsetX +  Math.round(SelectedObjects.StartX*ViewRatio)-SelRecMargin;
-			var CalcStartY = RecY + MoveOffsetY + RecHeight - Math.round(SelectedObjects.StartY*ViewRatio)+SelRecMargin;
-			var CalcEndX = RecX - MoveOffsetX + Math.round(SelectedObjects.EndX*ViewRatio)+SelRecMargin;
-			var CalcEndY = RecY + MoveOffsetY + RecHeight - Math.round(SelectedObjects.EndY*ViewRatio)-SelRecMargin;
-			Edge.strokeRect(CalcStartX,CalcStartY,CalcEndX-CalcStartX,CalcEndY-CalcStartY);
-			Edge.setLineDash([]);		
-			}
-			
-			if (SelectBox.InSelect == true) 
-			{
-			Edge.setLineDash([5, 3]);
-			Edge.strokeStyle=DefSelRecStroke;
-			var CalcStartX = RecX + Math.round(SelectBox.StartX*ViewRatio);
-			var CalcStartY = RecY + RecHeight - Math.round(SelectBox.StartY*ViewRatio);
-			var CalcEndX = RecX + Math.round(SelectBox.EndX*ViewRatio);
-			var CalcEndY = RecY + RecHeight - Math.round(SelectBox.EndY*ViewRatio);		
-			Edge.strokeRect(CalcStartX,CalcStartY,CalcEndX-CalcStartX,CalcEndY-CalcStartY);	
-			Edge.setLineDash([]);
-			}
-				
-			
-		}
-
-		if (canvasId.indexOf("PartCanvas") > -1)
-		{
-		Edge.font="12px Arial";
-		if (RGBIsDark(PanelColour) == true) {Edge.fillStyle = 'rgb(255,255,255)';} else {Edge.fillStyle = 'rgb(0,0,0)';}
-		Edge.fillText("Line "+LineNumber+" "+PartDesc+" "+PartLength+"Lx"+PartWidth+"W "+PartUnitRef,10,20);
-		}
-
-	if (PanelType == 'Roller Surround' ) 
-	{
-		if (BotedgeNode == 'LaserEdge') { Edge.strokeStyle=ClashingStoke; Edge.lineWidth=3; } else { Edge.strokeStyle="black"; Edge.lineWidth=1;}
-
-
-
-		Edge.fillStyle = "#FFFFFF";
-		if (DrawingFace == 'Front') {Edge.fillRect(RecX+RollerLeft,RecY+RollerTop+1,RecWidth-RollerLeft-RollerRight,RecHeight-RollerTop+1);}
-		else {Edge.fillRect(RecX+RollerRight,RecY+RollerTop+1,RecWidth-RollerLeft-RollerRight,RecHeight-RollerTop+1);}
-
-
-		Edge.beginPath();
-		if (DrawingFace == 'Front') {Edge.moveTo(RecX+RollerLeft,RecHeight+RecY); Edge.lineTo(RecX,RecHeight+RecY);}
-		else {Edge.moveTo(RecX+RecWidth-RollerLeft,RecHeight+RecY); Edge.lineTo(RecX+RecWidth,RecHeight+RecY);}
-		Edge.stroke();
-
-		Edge.strokeStyle=ClashingStoke; Edge.lineWidth=3;
-		Edge.beginPath();
-		if (DrawingFace == 'Front')
-		{
-		Edge.moveTo(RecX+RecWidth-RollerRight,RecHeight+RecY);
-		Edge.lineTo(RecX+RecWidth-RollerRight,RecY+RollerTop);
-		Edge.lineTo(RecX+RollerLeft,RecY+RollerTop);
-		Edge.lineTo(RecX+RollerLeft,RecHeight+RecY);
-		}
-		else
-		{
-		Edge.moveTo(RecX+RollerRight,RecHeight+RecY);
-		Edge.lineTo(RecX+RollerRight,RecY+RollerTop);
-		Edge.lineTo(RecX+RecWidth-RollerLeft,RecY+RollerTop);
-		Edge.lineTo(RecX+RecWidth-RollerLeft,RecHeight+RecY);
-		}
-		Edge.stroke();
-	}
-
-
-	if (PanelType == 'Builtup Panel' && WidthNode > 0 )
-	{
-		var ThickString = GetMatThickFromName(itemMaterial); 
-		//PanelThick=myRound(parseFloat(itemMaterial.slice(itemMaterial.length-8,itemMaterial.length-6))*(PlanBoxWidth/WidthNode));
-		PanelThick=myRound(parseFloat(ThickString)*(PlanBoxWidth/WidthNode));
-		//alert(ThickString);
-		var ReturnValue = document.getElementById("Return").value;
-		PlanBox.fillStyle="Peru";
-
-		if (ReturnValue =="Full") {   PlanBox.fillRect(0.5,PlanBoxHeight-(17*(PlanBoxWidth/WidthNode)),PlanBoxWidth-1,(17*(PlanBoxWidth/WidthNode))); PlanBox.fillRect(0.5,PlanBoxHeight-PanelThick,PlanBoxWidth-1,(18*(PlanBoxWidth/WidthNode)));  }
-		else { PlanBox.fillRect(0.5,PlanBoxHeight-(17*(PlanBoxWidth/WidthNode)),PlanBoxWidth-1,(17*(PlanBoxWidth/WidthNode))); PlanBox.fillRect(0.5,PlanBoxHeight-PanelThick,parseFloat(ReturnValue)*(PlanBoxWidth/WidthNode)-1,(18*(PlanBoxWidth/WidthNode))); } 
-
-		if (ThickString > 36) { 
-		PlanBox.fillRect(0.5,PlanBoxHeight-PanelThick+(18*(PlanBoxWidth/WidthNode)),(100*(PlanBoxWidth/WidthNode)),PanelThick-(36*(PlanBoxWidth/WidthNode)));
-		if (ReturnValue =="Full") { PlanBox.fillRect(0.5+PlanBoxWidth-(100*(PlanBoxWidth/WidthNode)),PlanBoxHeight-PanelThick+(18*(PlanBoxWidth/WidthNode)),(100*(PlanBoxWidth/WidthNode)),PanelThick-(36*(PlanBoxWidth/WidthNode)));   }
-		else {PlanBox.fillRect(0.5+(parseFloat(ReturnValue)*(PlanBoxWidth/WidthNode))-(100*(PlanBoxWidth/WidthNode)),PlanBoxHeight-PanelThick+(18*(PlanBoxWidth/WidthNode)),(100*(PlanBoxWidth/WidthNode)),PanelThick-(36*(PlanBoxWidth/WidthNode)));   }
-
-		PlanBox.strokeStyle="black"; PlanBox.lineWidth=1;
-		PlanBox.beginPath();
-		PlanBox.moveTo(0.5,PlanBoxHeight-PanelThick+(18*(PlanBoxWidth/WidthNode))-0.5);
-		if (ReturnValue == "Full") { PlanBox.lineTo(PlanBoxWidth,PlanBoxHeight-PanelThick+(18*(PlanBoxWidth/WidthNode))-0.5); } 
-		else { PlanBox.lineTo(parseFloat(ReturnValue)*(PlanBoxWidth/WidthNode),PlanBoxHeight-PanelThick+(18*(PlanBoxWidth/WidthNode))-0.5); }
-		PlanBox.stroke();
-
-
-		}
-
-		PlanBox.strokeStyle="black"; PlanBox.lineWidth=1;
-		PlanBox.beginPath();
-		PlanBox.moveTo(0.5,PlanBoxHeight-0.5);
-		PlanBox.lineTo(PlanBoxWidth,PlanBoxHeight-0.5);
-		PlanBox.stroke();
-
-
-		PlanBox.beginPath();
-		PlanBox.moveTo(0.5,PlanBoxHeight-PanelThick-0.5);
-		if (ReturnValue=="Full") { PlanBox.lineTo(PlanBoxWidth,PlanBoxHeight-PanelThick-0.5); } 
-		else 
-		{ 
-		PlanBox.lineTo(parseFloat(ReturnValue)*(PlanBoxWidth/WidthNode),PlanBoxHeight-PanelThick-0.5);
-		PlanBox.lineTo(parseFloat(ReturnValue)*(PlanBoxWidth/WidthNode),PlanBoxHeight-(17.5*(PlanBoxWidth/WidthNode))); 
-		}
-		PlanBox.stroke();
-		PlanBox.beginPath();
-		PlanBox.moveTo(0.5,PlanBoxHeight-(17.5*(PlanBoxWidth/WidthNode)));
-		PlanBox.lineTo(PlanBoxWidth,PlanBoxHeight-(17.5*(PlanBoxWidth/WidthNode)));
-		PlanBox.stroke();
-
-		if (LeftedgeNode == 'LaserEdge') { PlanBox.strokeStyle=ClashingStoke; PlanBox.lineWidth=4; } else { PlanBox.strokeStyle="black"; PlanBox.lineWidth=1;}
-		PlanBox.beginPath();
-		PlanBox.moveTo(0.5,PlanBoxHeight-0.5);
-		PlanBox.lineTo(0.5,PlanBoxHeight-PanelThick-0.5);
-		PlanBox.stroke();
-
-		if (RightedgeNode == 'LaserEdge') { PlanBox.strokeStyle=ClashingStoke; PlanBox.lineWidth=4; } else { PlanBox.strokeStyle="black"; PlanBox.lineWidth=1;}
-		PlanBox.beginPath();
-		PlanBox.moveTo(PlanBoxWidth,PlanBoxHeight-0.5);
-		if (ReturnValue =="Full") {  PlanBox.lineTo(PlanBoxWidth,PlanBoxHeight-PanelThick-0.5); } 
-		else { PlanBox.lineTo(PlanBoxWidth,PlanBoxHeight-(17.5*(PlanBoxWidth/WidthNode))); }
-		PlanBox.stroke(); 
-		
-		
-		Edge.strokeStyle=DefSelRecStroke;
-		Edge.lineWidth=1;
-		Edge.setLineDash([5, 5]);
-		
-		if (ReturnValue=="Full" | parseFloat(ReturnValue) > 200) {var FirstBuildUpXPos = RecX+(100*ViewRatio);}
-		else {var FirstBuildUpXPos = parseFloat(ReturnValue)*ViewRatio;}
-		
-		Edge.beginPath();	
-		Edge.moveTo(FirstBuildUpXPos,RecY+RecHeight);
-		Edge.lineTo(FirstBuildUpXPos,RecY);
-		Edge.stroke();		
-		
-		if (ReturnValue=="Full" | parseFloat(ReturnValue) > 200) 
-		{
-			if (ReturnValue=="Full") {var SecBuildUpXPos = RecX+RecWidth-(100*ViewRatio);}
-			else {var SecBuildUpXPos = RecX+((parseFloat(ReturnValue)-100)*ViewRatio);}
-			
-			Edge.beginPath();	
-			Edge.moveTo(SecBuildUpXPos,RecY+RecHeight);
-			Edge.lineTo(SecBuildUpXPos,RecY);
-			Edge.stroke();
-		} 
-		
-		if (parseFloat(ReturnValue) > 200) 	
-		{
-			Edge.beginPath();	
-			Edge.moveTo(RecX+parseFloat(ReturnValue)*ViewRatio,RecY+RecHeight);
-			Edge.lineTo(RecX+parseFloat(ReturnValue)*ViewRatio,RecY);
-			Edge.stroke();			
-		}
-
-
-		
-		Edge.setLineDash([]);		
-	}
-
-
-	if (itemMaterial != "" ) 
-	{
-	if ( Materials[FindItem(itemMaterial,Materials,"Name")].Grained == "True" ) 
-	{
-	Edge.strokeStyle="Red"; Edge.lineWidth=1;
-	Edge.beginPath();
-	Edge.moveTo(RecX+(RecWidth/2),RecY+(RecHeight*0.3));
-	Edge.lineTo(RecX+(RecWidth/2),RecHeight+RecY-(RecHeight*0.3));
-	Edge.moveTo(RecX+(RecWidth/2)-(RecHeight*0.05),RecY+(RecHeight*0.35));
-	Edge.lineTo(RecX+(RecWidth/2),RecY+(RecHeight*0.3));
-	Edge.moveTo(RecX+(RecWidth/2)+(RecHeight*0.05),RecY+(RecHeight*0.35));
-	Edge.lineTo(RecX+(RecWidth/2),RecY+(RecHeight*0.3));
-	Edge.stroke();
-	Edge.font="15px Arial";
-	Edge.fillStyle = 'red';
-	Edge.fillText("Grain",RecX+(RecWidth/2)+5,RecY+(RecHeight/2));
-	}
-	}
-	
-	/*HDF operations*/
-	if (itemMaterial.indexOf(HDFPrefix) > -1) 
-	{
-	//RecHeight=myRound(LengthNode*ViewRatio);
-	//RecWidth=myRound(WidthNode*ViewRatio);	
-		
-		var ProfileName = GetHDFProfileName(itemMaterial);	
-		var HHDItemIndex = FindItem(ProfileName,HDFDoorSpecData,'Profile');
-		if (HHDItemIndex > -1)
-		{
-			var Framed = HDFDoorSpecData[HHDItemIndex].Frame;
-			var VGrooves = HDFDoorSpecData[HHDItemIndex].VGrooves;
-			
-			Edge.strokeStyle=DefOpStroke; Edge.lineWidth=1;
-
-			if (DrawingFace != 'Front')
-			{
-				if (canvasId == 'PreviewBox') {Edge.setLineDash([3, 1]); } else {Edge.setLineDash([3, 5]); }	
-			}
-
-			var FrameMargin = parseFloat(HDFDoorSpecData[HHDItemIndex].ProfileMargin);	
-			var TEL = parseFloat(GetExtraParValue("TEL",LineDivID));
-			if (isNaN(TEL)) {TEL = 0;}
-			var LEL = parseFloat(GetExtraParValue("LEL",LineDivID)); 
-			if (isNaN(LEL)) {LEL = 0;}
-			var REL = parseFloat(GetExtraParValue("REL",LineDivID));
-			if (isNaN(REL)) {REL = 0;}
-			var BEL = parseFloat(GetExtraParValue("BEL",LineDivID));
-			if (isNaN(BEL)) {BEL = 0;}
-			var ProfileQty = 1
-			var ProfileQtyValue = GetExtraParValue("ProfileQty",LineDivID);
-			var BaseDoorHeight = parseFloat(GetExtraParValue("BDH",LineDivID));
-			if (isNaN(BaseDoorHeight)) {BaseDoorHeight = 720;}
-			var RailWidth = parseFloat(GetExtraParValue("RailW",LineDivID));
-			if (isNaN(RailWidth)) {RailWidth = FrameMargin+2;}
-			
-			
-			var DrwFrontOption = GetExtraParValue("DrwFrontOption",LineDivID);
-			
-			if (DrwFrontOption != undefined & DrwFrontOption != '') 
-			{
-				//alert(DrwFrontOption);
-				var GroupNumber = GetExtraParValue("GrainMatchGroup",LineDivID);
-				var GroupOrder = GetExtraParValue("GrainMatchOrder",LineDivID);
-				var TopGroupOrder = FindLastGroupPartOrder(GroupNumber);
-				
-				if (DrwFrontOption == "ReducedRails") {var AdjForDrwFrontOption = -((FrameMargin/2)-1);}
-				if (DrwFrontOption == "DrwPack") {var AdjForDrwFrontOption = -FrameMargin;} 
-			
-				
-				if (GroupOrder == 1) {BEL = AdjForDrwFrontOption;}
-				else if (GroupOrder == TopGroupOrder) {TEL = AdjForDrwFrontOption; }
-				else {TEL = AdjForDrwFrontOption; BEL = AdjForDrwFrontOption;}
-			
-				//alert(TopGroupOrder);		
-			}
-			
-			
-			
-			
-			var PocketHeight = 0;
-			var CombPocketHeight = LengthNode-(FrameMargin*2)-TEL-BEL;
-			var PocketWidth = WidthNode-(FrameMargin*2)-REL-LEL;
-			var StartYPos = FrameMargin+BEL;
-			if (DrawingFace == 'Front') {var AdjXPos = LEL;} else {var AdjXPos = REL;}
-			var PocketXPos = FrameMargin+AdjXPos;
-			var PocketYPos = 0;
-
-			var MaxSpacing = 0;
-			var MinSpacing = 0;
-			var MaxEdge = 0;
-			var IsFixedSpacing = 0;
-			var VGrooveFixedSideMargin = 0;
-			if (VGrooves != undefined) {VGrooveFixedSideMargin = VGrooves.FixedSideMargin;}
-			
-			var VGrooveSpacing = 0;
-			var VGrooveQty = 0;
-			var VGrooveSideMargin = 0;
-			var VGrooveXPos = 0;
-			var VGrooveYPos = 0;
-			
-			var FlatWidth = 0
-			var MaxScallopWidth = 0
-			var GrooveWidth = 0
-
-			
-			//alert(VGrooves);
-			
-			switch (ProfileQtyValue)
-			{
-				case 'BaseDoorHeight' : 
-							ProfileQty = 2;
-							break;
-				case '2V' : ProfileQty = 2; break;
-				case '3V' : ProfileQty = 3; break;
-			}
-		
-					
-			for (var i = 1; i<=ProfileQty; i++) 
-			{
-				
-				if (ProfileQtyValue == 'BaseDoorHeight')
-				{
-					if (i == 1) 
-					{
-					PocketHeight = BaseDoorHeight-(FrameMargin*2);
-					PocketYPos = StartYPos;					
-					} 
-					else
-					{
-					PocketHeight = CombPocketHeight-(BaseDoorHeight-FrameMargin)-(RailWidth-FrameMargin);
-					PocketYPos = BEL+BaseDoorHeight+(RailWidth-FrameMargin);					
-					}
-				}
-				else
-				{
-				PocketHeight = (CombPocketHeight-(RailWidth*(ProfileQty-1)))/ProfileQty;
-				PocketYPos = StartYPos+((PocketHeight+RailWidth)*(i-1))				
-				}	
-				//alert(PocketHeight);
-				
-				if (VGrooveFixedSideMargin != 0 & VGrooveFixedSideMargin != undefined)
-				{
-				PocketWidth = WidthNode-(VGrooveFixedSideMargin*2)-(FrameMargin*2)-REL-LEL;
-				PocketXPos = FrameMargin+AdjXPos+VGrooveFixedSideMargin;
+									Edge.lineWidth=1;
+									Edge.setLineDash([5, 5]);
+									Edge.strokeStyle=DefSelRecStroke;
+									Edge.beginPath();
+									Edge.moveTo(CalcStartX,CalcStartY);								
+									Edge.lineTo(CalcArcStartX,CalcArcStartY);
+									Edge.stroke();
+									Edge.setLineDash([]);
+									
+									}
+									//else
+									//{
+									Edge.lineWidth=1;
+									Edge.setLineDash([5, 5]);
+									Edge.strokeStyle=DefSelRecStroke;
+									Edge.beginPath();
+									Edge.moveTo(CalcStartX,CalcStartY);	
+									Edge.lineTo(CalcEndX,CalcEndY);								
+									Edge.lineTo(CalcEndX,CalcEndY);
+									Edge.stroke();
+									Edge.setLineDash([]);	
+									//}
+									
+									
+									break;
+						}
+				//Edge.setLineDash([5, 3]);
+				//Edge.strokeStyle="#464646";
+				//Edge.setLineDash([]);		
 				}
 
-				if (Framed) 
+
+				if (SelectedObjects.Items.length > 0)
 				{
-					if (PanelType == 'Glass Frame' )
+				if (ModeSelection != 'PartShape') {SelRecMargin = 2;} else {SelRecMargin = 5;}
+					if (MoveObject.InMove == true) 
 					{
-					Edge.fillStyle = "#D8D8D8";
-					Edge.fillRect(RecX+(PocketXPos*ViewRatio),RecY+RecHeight-((PocketYPos+PocketHeight)*ViewRatio),PocketWidth*ViewRatio,PocketHeight*ViewRatio);
+					MoveOffsetX = (MoveObject.X-ActiveMouseX)*ViewRatio;	
+					MoveOffsetY = (MoveObject.Y-ActiveMouseY)*ViewRatio;	
 					}	
 					
-				Edge.beginPath();
-				Edge.moveTo(RecX+(PocketXPos*ViewRatio),RecY+RecHeight-(PocketYPos*ViewRatio)); 
-				Edge.lineTo(RecX+(PocketXPos*ViewRatio),RecY+RecHeight-((PocketYPos+PocketHeight)*ViewRatio));
-				Edge.lineTo(RecX+((PocketXPos+PocketWidth)*ViewRatio),RecY+RecHeight-((PocketYPos+PocketHeight)*ViewRatio));
-				Edge.lineTo(RecX+((PocketXPos+PocketWidth)*ViewRatio),RecY+RecHeight-(PocketYPos*ViewRatio));
-				Edge.lineTo(RecX+(PocketXPos*ViewRatio),RecY+RecHeight-(PocketYPos*ViewRatio));
-				Edge.stroke();
+				Edge.setLineDash([5, 3]);
+				Edge.strokeStyle=DefSelRecStroke;
+				var CalcStartX = RecX - MoveOffsetX +  Math.round(SelectedObjects.StartX*ViewRatio)-SelRecMargin;
+				var CalcStartY = RecY + MoveOffsetY + RecHeight - Math.round(SelectedObjects.StartY*ViewRatio)+SelRecMargin;
+				var CalcEndX = RecX - MoveOffsetX + Math.round(SelectedObjects.EndX*ViewRatio)+SelRecMargin;
+				var CalcEndY = RecY + MoveOffsetY + RecHeight - Math.round(SelectedObjects.EndY*ViewRatio)-SelRecMargin;
+				Edge.strokeRect(CalcStartX,CalcStartY,CalcEndX-CalcStartX,CalcEndY-CalcStartY);
+				Edge.setLineDash([]);		
+				}
+				
+				if (SelectBox.InSelect == true) 
+				{
+				Edge.setLineDash([5, 3]);
+				Edge.strokeStyle=DefSelRecStroke;
+				var CalcStartX = RecX + Math.round(SelectBox.StartX*ViewRatio);
+				var CalcStartY = RecY + RecHeight - Math.round(SelectBox.StartY*ViewRatio);
+				var CalcEndX = RecX + Math.round(SelectBox.EndX*ViewRatio);
+				var CalcEndY = RecY + RecHeight - Math.round(SelectBox.EndY*ViewRatio);		
+				Edge.strokeRect(CalcStartX,CalcStartY,CalcEndX-CalcStartX,CalcEndY-CalcStartY);	
+				Edge.setLineDash([]);
+				}
 					
+				
+			}
+
+			if (canvasId.indexOf("PartCanvas") > -1)
+			{
+			Edge.font="12px Arial";
+			if (RGBIsDark(PanelColour) == true) {Edge.fillStyle = 'rgb(255,255,255)';} else {Edge.fillStyle = 'rgb(0,0,0)';}
+			Edge.fillText("Line "+LineNumber+" "+PartDesc+" "+PartLength+"Lx"+PartWidth+"W "+PartUnitRef,10,20);
+			}
+
+		if (PanelType == 'Roller Surround' ) 
+		{
+			if (BotedgeNode == 'LaserEdge') { Edge.strokeStyle=ClashingStoke; Edge.lineWidth=3; } else { Edge.strokeStyle="black"; Edge.lineWidth=1;}
+
+
+
+			Edge.fillStyle = "#FFFFFF";
+			if (DrawingFace == 'Front') {Edge.fillRect(RecX+RollerLeft,RecY+RollerTop+1,RecWidth-RollerLeft-RollerRight,RecHeight-RollerTop+1);}
+			else {Edge.fillRect(RecX+RollerRight,RecY+RollerTop+1,RecWidth-RollerLeft-RollerRight,RecHeight-RollerTop+1);}
+
+
+			Edge.beginPath();
+			if (DrawingFace == 'Front') {Edge.moveTo(RecX+RollerLeft,RecHeight+RecY); Edge.lineTo(RecX,RecHeight+RecY);}
+			else {Edge.moveTo(RecX+RecWidth-RollerLeft,RecHeight+RecY); Edge.lineTo(RecX+RecWidth,RecHeight+RecY);}
+			Edge.stroke();
+
+			Edge.strokeStyle=ClashingStoke; Edge.lineWidth=3;
+			Edge.beginPath();
+			if (DrawingFace == 'Front')
+			{
+			Edge.moveTo(RecX+RecWidth-RollerRight,RecHeight+RecY);
+			Edge.lineTo(RecX+RecWidth-RollerRight,RecY+RollerTop);
+			Edge.lineTo(RecX+RollerLeft,RecY+RollerTop);
+			Edge.lineTo(RecX+RollerLeft,RecHeight+RecY);
+			}
+			else
+			{
+			Edge.moveTo(RecX+RollerRight,RecHeight+RecY);
+			Edge.lineTo(RecX+RollerRight,RecY+RollerTop);
+			Edge.lineTo(RecX+RecWidth-RollerLeft,RecY+RollerTop);
+			Edge.lineTo(RecX+RecWidth-RollerLeft,RecHeight+RecY);
+			}
+			Edge.stroke();
+		}
+
+
+		if (PanelType == 'Builtup Panel' && WidthNode > 0 )
+		{
+			var ThickString = GetMatThickFromName(itemMaterial); 
+			//PanelThick=myRound(parseFloat(itemMaterial.slice(itemMaterial.length-8,itemMaterial.length-6))*(PlanBoxWidth/WidthNode));
+			PanelThick=myRound(parseFloat(ThickString)*(PlanBoxWidth/WidthNode));
+			//alert(ThickString);
+			var ReturnValue = document.getElementById("Return").value;
+			PlanBox.fillStyle="Peru";
+
+			if (ReturnValue =="Full") {   PlanBox.fillRect(0.5,PlanBoxHeight-(17*(PlanBoxWidth/WidthNode)),PlanBoxWidth-1,(17*(PlanBoxWidth/WidthNode))); PlanBox.fillRect(0.5,PlanBoxHeight-PanelThick,PlanBoxWidth-1,(18*(PlanBoxWidth/WidthNode)));  }
+			else { PlanBox.fillRect(0.5,PlanBoxHeight-(17*(PlanBoxWidth/WidthNode)),PlanBoxWidth-1,(17*(PlanBoxWidth/WidthNode))); PlanBox.fillRect(0.5,PlanBoxHeight-PanelThick,parseFloat(ReturnValue)*(PlanBoxWidth/WidthNode)-1,(18*(PlanBoxWidth/WidthNode))); } 
+
+			if (ThickString > 36) { 
+			PlanBox.fillRect(0.5,PlanBoxHeight-PanelThick+(18*(PlanBoxWidth/WidthNode)),(100*(PlanBoxWidth/WidthNode)),PanelThick-(36*(PlanBoxWidth/WidthNode)));
+			if (ReturnValue =="Full") { PlanBox.fillRect(0.5+PlanBoxWidth-(100*(PlanBoxWidth/WidthNode)),PlanBoxHeight-PanelThick+(18*(PlanBoxWidth/WidthNode)),(100*(PlanBoxWidth/WidthNode)),PanelThick-(36*(PlanBoxWidth/WidthNode)));   }
+			else {PlanBox.fillRect(0.5+(parseFloat(ReturnValue)*(PlanBoxWidth/WidthNode))-(100*(PlanBoxWidth/WidthNode)),PlanBoxHeight-PanelThick+(18*(PlanBoxWidth/WidthNode)),(100*(PlanBoxWidth/WidthNode)),PanelThick-(36*(PlanBoxWidth/WidthNode)));   }
+
+			PlanBox.strokeStyle="black"; PlanBox.lineWidth=1;
+			PlanBox.beginPath();
+			PlanBox.moveTo(0.5,PlanBoxHeight-PanelThick+(18*(PlanBoxWidth/WidthNode))-0.5);
+			if (ReturnValue == "Full") { PlanBox.lineTo(PlanBoxWidth,PlanBoxHeight-PanelThick+(18*(PlanBoxWidth/WidthNode))-0.5); } 
+			else { PlanBox.lineTo(parseFloat(ReturnValue)*(PlanBoxWidth/WidthNode),PlanBoxHeight-PanelThick+(18*(PlanBoxWidth/WidthNode))-0.5); }
+			PlanBox.stroke();
+
+
+			}
+
+			PlanBox.strokeStyle="black"; PlanBox.lineWidth=1;
+			PlanBox.beginPath();
+			PlanBox.moveTo(0.5,PlanBoxHeight-0.5);
+			PlanBox.lineTo(PlanBoxWidth,PlanBoxHeight-0.5);
+			PlanBox.stroke();
+
+
+			PlanBox.beginPath();
+			PlanBox.moveTo(0.5,PlanBoxHeight-PanelThick-0.5);
+			if (ReturnValue=="Full") { PlanBox.lineTo(PlanBoxWidth,PlanBoxHeight-PanelThick-0.5); } 
+			else 
+			{ 
+			PlanBox.lineTo(parseFloat(ReturnValue)*(PlanBoxWidth/WidthNode),PlanBoxHeight-PanelThick-0.5);
+			PlanBox.lineTo(parseFloat(ReturnValue)*(PlanBoxWidth/WidthNode),PlanBoxHeight-(17.5*(PlanBoxWidth/WidthNode))); 
+			}
+			PlanBox.stroke();
+			PlanBox.beginPath();
+			PlanBox.moveTo(0.5,PlanBoxHeight-(17.5*(PlanBoxWidth/WidthNode)));
+			PlanBox.lineTo(PlanBoxWidth,PlanBoxHeight-(17.5*(PlanBoxWidth/WidthNode)));
+			PlanBox.stroke();
+
+			if (LeftedgeNode == 'LaserEdge') { PlanBox.strokeStyle=ClashingStoke; PlanBox.lineWidth=4; } else { PlanBox.strokeStyle="black"; PlanBox.lineWidth=1;}
+			PlanBox.beginPath();
+			PlanBox.moveTo(0.5,PlanBoxHeight-0.5);
+			PlanBox.lineTo(0.5,PlanBoxHeight-PanelThick-0.5);
+			PlanBox.stroke();
+
+			if (RightedgeNode == 'LaserEdge') { PlanBox.strokeStyle=ClashingStoke; PlanBox.lineWidth=4; } else { PlanBox.strokeStyle="black"; PlanBox.lineWidth=1;}
+			PlanBox.beginPath();
+			PlanBox.moveTo(PlanBoxWidth,PlanBoxHeight-0.5);
+			if (ReturnValue =="Full") {  PlanBox.lineTo(PlanBoxWidth,PlanBoxHeight-PanelThick-0.5); } 
+			else { PlanBox.lineTo(PlanBoxWidth,PlanBoxHeight-(17.5*(PlanBoxWidth/WidthNode))); }
+			PlanBox.stroke(); 
+			
+			
+			Edge.strokeStyle=DefSelRecStroke;
+			Edge.lineWidth=1;
+			Edge.setLineDash([5, 5]);
+
+		
+			if (ThickString > 36)
+			{
+
+				if (ReturnValue=="Full"| parseFloat(ReturnValue) > 200) {var FirstBuildUpXPos = RecX+(100*ViewRatio);}
+				else {var FirstBuildUpXPos = RecX+parseFloat(ReturnValue)*ViewRatio;}
+				
+				Edge.beginPath();	
+				Edge.moveTo(FirstBuildUpXPos,RecY+RecHeight);
+				Edge.lineTo(FirstBuildUpXPos,RecY);
+				Edge.stroke();		
+				
+				if (ReturnValue=="Full" | parseFloat(ReturnValue) > 200) 
+				{
+					if (ReturnValue=="Full") {var SecBuildUpXPos = RecX+RecWidth-(100*ViewRatio);}
+					else {var SecBuildUpXPos = RecX+((parseFloat(ReturnValue)-100)*ViewRatio);}
+					
+					Edge.beginPath();	
+					Edge.moveTo(SecBuildUpXPos,RecY+RecHeight);
+					Edge.lineTo(SecBuildUpXPos,RecY);
+					Edge.stroke();
+				}
+			}
+			
+			if (parseFloat(ReturnValue) > 200 | ThickString == 36 & ReturnValue != "Full") 	
+			{
+				Edge.beginPath();	
+				Edge.moveTo(RecX+parseFloat(ReturnValue)*ViewRatio,RecY+RecHeight);
+				Edge.lineTo(RecX+parseFloat(ReturnValue)*ViewRatio,RecY);
+				Edge.stroke();			
+			}
+
+
+			
+			Edge.setLineDash([]);		
+		}
+
+
+		if (itemMaterial != "" ) 
+		{
+		if ( Materials[FindItem(itemMaterial,Materials,"Name")].Grained == "True" ) 
+		{
+		Edge.strokeStyle="Red"; Edge.lineWidth=1;
+		Edge.beginPath();
+		Edge.moveTo(RecX+(RecWidth/2),RecY+(RecHeight*0.3));
+		Edge.lineTo(RecX+(RecWidth/2),RecHeight+RecY-(RecHeight*0.3));
+		Edge.moveTo(RecX+(RecWidth/2)-(RecHeight*0.05),RecY+(RecHeight*0.35));
+		Edge.lineTo(RecX+(RecWidth/2),RecY+(RecHeight*0.3));
+		Edge.moveTo(RecX+(RecWidth/2)+(RecHeight*0.05),RecY+(RecHeight*0.35));
+		Edge.lineTo(RecX+(RecWidth/2),RecY+(RecHeight*0.3));
+		Edge.stroke();
+		Edge.font="15px Arial";
+		Edge.fillStyle = 'red';
+		Edge.fillText("Grain",RecX+(RecWidth/2)+5,RecY+(RecHeight/2));
+		}
+		}
+		
+		/*HDF operations*/
+		if (itemMaterial.indexOf(HDFPrefix) > -1) 
+		{
+		//RecHeight=myRound(LengthNode*ViewRatio);
+		//RecWidth=myRound(WidthNode*ViewRatio);	
+			
+			var ProfileName = GetHDFProfileName(itemMaterial);	
+			var HHDItemIndex = FindItem(ProfileName,HDFDoorSpecData,'Profile');
+			if (HHDItemIndex > -1)
+			{
+				var Framed = HDFDoorSpecData[HHDItemIndex].Frame;
+				var VGrooves = HDFDoorSpecData[HHDItemIndex].VGrooves;
+				
+				Edge.strokeStyle=DefOpStroke; Edge.lineWidth=1;
+
+				if (DrawingFace != 'Front')
+				{
+					if (canvasId == 'PreviewBox') {Edge.setLineDash([3, 1]); } else {Edge.setLineDash([3, 5]); }	
+				}
+
+				var FrameMargin = parseFloat(HDFDoorSpecData[HHDItemIndex].ProfileMargin);	
+				var TEL = parseFloat(GetExtraParValue("TEL",LineDivID));
+				if (isNaN(TEL)) 
+				{
+					if (HDFDoorSpecData[HHDItemIndex].hasOwnProperty("TEL")) {TEL = HDFDoorSpecData[HHDItemIndex].TEL;}
+					else {TEL = 0;}
+				}
+				var LEL = parseFloat(GetExtraParValue("LEL",LineDivID)); 
+				if (isNaN(LEL)) {LEL = 0;}
+				var REL = parseFloat(GetExtraParValue("REL",LineDivID));
+				if (isNaN(REL)) {REL = 0;}
+				var BEL = parseFloat(GetExtraParValue("BEL",LineDivID));
+				if (isNaN(BEL)) {BEL = 0;}
+				var ProfileQty = 1
+				var ProfileQtyValue = GetExtraParValue("ProfileQty",LineDivID);
+				var BaseDoorHeight = parseFloat(GetExtraParValue("BDH",LineDivID));
+				if (isNaN(BaseDoorHeight)) {BaseDoorHeight = 720;}
+				var RailWidth = parseFloat(GetExtraParValue("RailW",LineDivID));
+				if (isNaN(RailWidth)) {RailWidth = FrameMargin+2;}
+				
+				
+				var DrwFrontOption = GetExtraParValue("DrwFrontOption",LineDivID);
+				
+				if (DrwFrontOption != undefined & DrwFrontOption != '') 
+				{
+					//alert(DrwFrontOption);
+					var GroupNumber = GetExtraParValue("GrainMatchGroup",LineDivID);
+					var GroupOrder = GetExtraParValue("GrainMatchOrder",LineDivID);
+					var TopGroupOrder = FindLastGroupPartOrder(GroupNumber);
+					
+					if (DrwFrontOption == "ReducedRails") {var AdjForDrwFrontOption = -((FrameMargin/2)-1);}
+					if (DrwFrontOption == "DrwPack") {var AdjForDrwFrontOption = -FrameMargin;} 
+				
+					
+					if (GroupOrder == 1) {BEL = AdjForDrwFrontOption;}
+					else if (GroupOrder == TopGroupOrder) {TEL = AdjForDrwFrontOption; }
+					else {TEL = AdjForDrwFrontOption; BEL = AdjForDrwFrontOption;}
+				
+					//alert(TopGroupOrder);		
 				}
 				
 				
-				//"VGrooves" : [{"MaxSpacing" : 0 , "MaxEdge" : 0 , "IsFixedSpacing" : false}] },
-				if (VGrooves != undefined)
+				
+				
+				var PocketHeight = 0;
+				var CombPocketHeight = LengthNode-(FrameMargin*2)-TEL-BEL;
+				var PocketWidth = WidthNode-(FrameMargin*2)-REL-LEL;
+				var StartYPos = FrameMargin+BEL;
+				if (DrawingFace == 'Front') {var AdjXPos = LEL;} else {var AdjXPos = REL;}
+				var PocketXPos = FrameMargin+AdjXPos;
+				var PocketYPos = 0;
+
+				var MaxSpacing = 0;
+				var MinSpacing = 0;
+				var MaxEdge = 0;
+				var IsFixedSpacing = 0;
+				var VGrooveFixedSideMargin = 0;
+				if (VGrooves != undefined) {VGrooveFixedSideMargin = VGrooves.FixedSideMargin;}
+				
+				var VGrooveSpacing = 0;
+				var VGrooveQty = 0;
+				var VGrooveSideMargin = 0;
+				var VGrooveXPos = 0;
+				var VGrooveYPos = 0;
+				
+				var FlatWidth = 0
+				var MaxScallopWidth = 0
+				var GrooveWidth = 0
+				
+				
+				//alert(VGrooves);
+				
+				switch (ProfileQtyValue)
 				{
-				MaxSpacing = VGrooves.MaxSpacing;
-				MinSpacing = VGrooves.MinSpacing;
-				MaxEdge = VGrooves.MaxEdge;
-				IsFixedSpacing = VGrooves.IsFixedSpacing;
-				var ExtendVGrooveThroughFrame = VGrooves.ExtendThroughFrame;
-				if (ExtendVGrooveThroughFrame == undefined) {ExtendVGrooveThroughFrame = false;}
-				//var UserSpacing = false;
-				var DrawWidth = VGrooves.Width;
-				if (DrawWidth == undefined) {DrawWidth = 0;}
-				
-
-					//if (VGrooves.UserSpacing != undefined) {UserSpacing = VGrooves.UserSpacing;}	
-					if (VGrooves.UserSpacing) 
-					{
-						MaxSpacing = parseFloat(GetExtraParValue("VGSpacing",LineDivID));
-						if (isNaN(MaxSpacing)) {MaxSpacing = parseFloat(document.getElementById("VGSpacing").value);}
-					}
-					if (VGrooves.MaxScallopWidth) 
-					{
-						MaxScallopWidth = parseFloat(GetExtraParValue("MaxScallopW",LineDivID));
-						if (isNaN(MaxScallopWidth)) {MaxScallopWidth = parseFloat(document.getElementById("MaxScallopW").value);}
-					}		
+					case 'BaseDoorHeight' : 
+								ProfileQty = 2;
+								break;
+					case '2V' : ProfileQty = 2; break;
+					case '3V' : ProfileQty = 3; break;
+				}
+			
+						
+				for (var i = 1; i<=ProfileQty; i++) 
+				{
 					
-					if (VGrooves.FlatWidth != undefined)
+					if (ProfileQtyValue == 'BaseDoorHeight')
 					{
-						FlatWidth = parseFloat(GetExtraParValue("FlatW",LineDivID));
-						if (isNaN(FlatWidth)) {FlatWidth = parseFloat(document.getElementById("FlatW").value);}
-					}
-					if (VGrooves.GrooveWidth != undefined)
-					{
-						GrooveWidth = parseFloat(GetExtraParValue("GrooveW",LineDivID));
-						if (isNaN(GrooveWidth)) {GrooveWidth = parseFloat(document.getElementById("GrooveW").value);}
-					}
-						
-						
-					if (MaxScallopWidth > 0 | GrooveWidth > 0)
-					{
-																		
-						if (MaxScallopWidth > 0) 
+						if (i == 1) 
 						{
-							VGrooveQty = 1+Math.floor((PocketWidth-0.01 - FlatWidth)/(MaxScallopWidth+FlatWidth));
-							VGrooveSpacing = (PocketWidth-FlatWidth)/VGrooveQty;
-							DrawWidth = VGrooveSpacing-FlatWidth;
-						}
-						else 
-						{
-							VGrooveQty = Math.floor((PocketWidth+0.01 + GrooveWidth)/MaxSpacing);
-							VGrooveSpacing = (PocketWidth+GrooveWidth)/(VGrooveQty+1);
-							DrawWidth = GrooveWidth;							
-						}
-
-				
-						
-						if (MaxScallopWidth > 0)
-						{
-						var ScallopDepth = 35-Math.pow((Math.pow(35,2)-Math.pow(DrawWidth/2,2)),0.5)+0.5; 	
-						document.getElementById("ScallopDepthCalcDiv").style.display = "inherit";
-						document.getElementById("ScallopDepthCalc").innerHTML = round(ScallopDepth, 1);
-						}
-						
-						
-						//if (!isNaN(VGrooveSpacing)) {document.getElementById("VGSpacingCalc").innerHTML = round(VGrooveSpacing, 1);}
-					}
-					else
-					{	
-						if (IsFixedSpacing) 
-						{	
-						VGrooveSpacing = MaxSpacing;	
-						VGrooveQty = Math.floor(2+(((PocketWidth-MaxEdge*2)/VGrooveSpacing)));
-						//VGrooveSideMargin:= ((PocketWidth - (VGrooveSpcng*(VGrooveQty-1)))/2) + (ProfMargin+LeftExtraLength);
-						}
+						PocketHeight = BaseDoorHeight-(FrameMargin*2);
+						PocketYPos = StartYPos;					
+						} 
 						else
 						{
-							if (VGrooveFixedSideMargin != 0 & VGrooveFixedSideMargin != undefined)
+						PocketHeight = CombPocketHeight-(BaseDoorHeight-FrameMargin)-(RailWidth-FrameMargin);
+						PocketYPos = BEL+BaseDoorHeight+(RailWidth-FrameMargin);					
+						}
+					}
+					else
+					{
+					PocketHeight = (CombPocketHeight-(RailWidth*(ProfileQty-1)))/ProfileQty;
+					PocketYPos = StartYPos+((PocketHeight+RailWidth)*(i-1))				
+					}	
+					//alert(PocketHeight);
+					
+					if (VGrooveFixedSideMargin != 0 & VGrooveFixedSideMargin != undefined)
+					{
+					PocketWidth = WidthNode-(VGrooveFixedSideMargin*2)-(FrameMargin*2)-REL-LEL;
+					PocketXPos = FrameMargin+AdjXPos+VGrooveFixedSideMargin;
+					}
+
+					if (Framed) 
+					{
+						if (PanelType == 'Glass Frame' )
+						{
+						Edge.fillStyle = "#D8D8D8";
+						Edge.fillRect(RecX+(PocketXPos*ViewRatio),RecY+RecHeight-((PocketYPos+PocketHeight)*ViewRatio),PocketWidth*ViewRatio,PocketHeight*ViewRatio);
+						}	
+						
+					Edge.beginPath();
+					Edge.moveTo(RecX+(PocketXPos*ViewRatio),RecY+RecHeight-(PocketYPos*ViewRatio)); 
+					Edge.lineTo(RecX+(PocketXPos*ViewRatio),RecY+RecHeight-((PocketYPos+PocketHeight)*ViewRatio));
+					Edge.lineTo(RecX+((PocketXPos+PocketWidth)*ViewRatio),RecY+RecHeight-((PocketYPos+PocketHeight)*ViewRatio));
+					Edge.lineTo(RecX+((PocketXPos+PocketWidth)*ViewRatio),RecY+RecHeight-(PocketYPos*ViewRatio));
+					Edge.lineTo(RecX+(PocketXPos*ViewRatio),RecY+RecHeight-(PocketYPos*ViewRatio));
+					Edge.stroke();
+					
+						if (ProfileQtyValue == 'BaseDoorHeight' & i == 1)
+						{
+							//DrawDimension(Edge,'1000',10,40,40,30,30);
+							//DrawDimension(Edge,'1000',10,30,110,10,110);	
+
+							DrawDimension(Edge,PocketYPos,10,RecX+RecWidth,RecY+RecHeight,RecX+RecWidth,RecY+RecHeight-(PocketYPos*ViewRatio));	
+							DrawDimension(Edge,PocketHeight,10,RecX+RecWidth,RecY+RecHeight-(PocketYPos*ViewRatio),RecX+RecWidth,RecY+RecHeight-((PocketYPos+PocketHeight)*ViewRatio));
+							DrawDimension(Edge,RailWidth,10,RecX+RecWidth,RecY+RecHeight-((PocketYPos+PocketHeight)*ViewRatio),RecX+RecWidth,RecY+RecHeight-((PocketYPos+PocketHeight+RailWidth)*ViewRatio));		
+						}
+						
+					}
+
+					if (DrawingFace != 'Front')
+					{
+						if (canvasId == 'PreviewBox') {Edge.setLineDash([3, 1]); } else {Edge.setLineDash([3, 5]); }	
+					}
+					
+					
+					//"VGrooves" : [{"MaxSpacing" : 0 , "MaxEdge" : 0 , "IsFixedSpacing" : false}] },
+					if (VGrooves != undefined)
+					{
+					MaxSpacing = VGrooves.MaxSpacing;
+					MinSpacing = VGrooves.MinSpacing;
+					MaxEdge = VGrooves.MaxEdge;
+					IsFixedSpacing = VGrooves.IsFixedSpacing;
+					var ExtendVGrooveThroughFrame = VGrooves.ExtendThroughFrame;
+					if (ExtendVGrooveThroughFrame == undefined) {ExtendVGrooveThroughFrame = false;}
+					//var UserSpacing = false;
+					var DrawWidth = VGrooves.Width;
+					if (DrawWidth == undefined) {DrawWidth = 0;}
+					
+
+						//if (VGrooves.UserSpacing != undefined) {UserSpacing = VGrooves.UserSpacing;}	
+						if (VGrooves.UserSpacing) 
+						{
+							MaxSpacing = parseFloat(GetExtraParValue("VGSpacing",LineDivID));
+							if (isNaN(MaxSpacing)) {MaxSpacing = parseFloat(document.getElementById("VGSpacing").value);}
+						}
+						if (VGrooves.MaxScallopWidth) 
+						{
+							MaxScallopWidth = parseFloat(GetExtraParValue("MaxScallopW",LineDivID));
+							if (isNaN(MaxScallopWidth)) {MaxScallopWidth = parseFloat(document.getElementById("MaxScallopW").value);}
+						}		
+						
+						if (VGrooves.FlatWidth != undefined)
+						{
+							FlatWidth = parseFloat(GetExtraParValue("FlatW",LineDivID));
+							if (isNaN(FlatWidth)) {FlatWidth = parseFloat(document.getElementById("FlatW").value);}
+						}
+						if (VGrooves.GrooveWidth != undefined)
+						{
+							GrooveWidth = parseFloat(GetExtraParValue("GrooveW",LineDivID));
+							if (isNaN(GrooveWidth)) {GrooveWidth = parseFloat(document.getElementById("GrooveW").value);}
+						}
+							
+							
+						if (MaxScallopWidth > 0 | GrooveWidth > 0)
+						{
+														
+							if (MaxScallopWidth > 0) 
 							{
-								if (MinSpacing > 0)
+								if (VGrooves.HalfSpacingSideMargin) 
 								{
-								VGrooveSpacing = PocketWidth/(Math.floor(PocketWidth/MinSpacing));
-								VGrooveQty = Math.floor((PocketWidth/MinSpacing)+1);
-								}									
-								else
-								{
-								VGrooveSpacing = (PocketWidth-0.01)/(1+Math.floor((PocketWidth-0.01)/MaxSpacing));
-								VGrooveQty = Math.floor(((PocketWidth-0.01)/MaxSpacing)+2);
+								VGrooveQty = 2+Math.floor((PocketWidth-0.01 - FlatWidth)/(MaxScallopWidth+FlatWidth));
+								VGrooveSpacing = (PocketWidth)/VGrooveQty;	
 								}
+								else 
+								{
+								VGrooveQty = 1+Math.floor((PocketWidth-0.01 - FlatWidth)/(MaxScallopWidth+FlatWidth));	
+								VGrooveSpacing = (PocketWidth-FlatWidth)/VGrooveQty;
+								}
+								DrawWidth = VGrooveSpacing-FlatWidth;
+							}
+							else 
+							{
+								VGrooveQty = Math.floor((PocketWidth+0.01 + GrooveWidth)/MaxSpacing);
+								VGrooveSpacing = (PocketWidth+GrooveWidth)/(VGrooveQty+1);
+								DrawWidth = GrooveWidth;							
+							}
+
+					
+							
+							if (MaxScallopWidth > 0)
+							{
+							var ScallopToolRad = VGrooves.ScallopToolRad;	
+							var ScallopDepth = ScallopToolRad-Math.pow((Math.pow(ScallopToolRad,2)-Math.pow(DrawWidth/2,2)),0.5)+0.5; 	
+							document.getElementById("ScallopDepthCalcDiv").style.display = "inherit";
+							document.getElementById("ScallopDepthCalc").innerHTML = round(ScallopDepth, 1);
+							}
+							
+							
+							//if (!isNaN(VGrooveSpacing)) {document.getElementById("VGSpacingCalc").innerHTML = round(VGrooveSpacing, 1);}
+						}
+						else
+						{	
+							if (IsFixedSpacing) 
+							{	
+							VGrooveSpacing = MaxSpacing;	
+							VGrooveQty = Math.floor(2+(((PocketWidth-MaxEdge*2)/VGrooveSpacing)));
+							//VGrooveSideMargin:= ((PocketWidth - (VGrooveSpcng*(VGrooveQty-1)))/2) + (ProfMargin+LeftExtraLength);
 							}
 							else
 							{
-							VGrooveSpacing = (PocketWidth-0.01)/(1+Math.floor((PocketWidth-0.01)/MaxSpacing));
-								if (VGrooves.HalfSpacingSideMargin) {VGrooveQty = Math.floor((PocketWidth-0.01)/MaxSpacing)+1;}
-								else {VGrooveQty = Math.floor((PocketWidth-0.01)/MaxSpacing);}
+								if (VGrooveFixedSideMargin != 0 & VGrooveFixedSideMargin != undefined)
+								{
+									if (MinSpacing > 0)
+									{
+									VGrooveSpacing = PocketWidth/(Math.floor(PocketWidth/MinSpacing));
+									VGrooveQty = Math.floor((PocketWidth/MinSpacing)+1);
+									}									
+									else
+									{
+									VGrooveSpacing = (PocketWidth-0.01)/(1+Math.floor((PocketWidth-0.01)/MaxSpacing));
+									VGrooveQty = Math.floor(((PocketWidth-0.01)/MaxSpacing)+2);
+									}
+								}
+								else
+								{
+								VGrooveSpacing = (PocketWidth-0.01)/(1+Math.floor((PocketWidth-0.01)/MaxSpacing));
+									if (VGrooves.HalfSpacingSideMargin) {VGrooveQty = Math.floor((PocketWidth-0.01)/MaxSpacing)+1;}
+									else {VGrooveQty = Math.floor((PocketWidth-0.01)/MaxSpacing);}
+								}
+								
+								
 							}
-							
-							
 						}
-					}
-					
-
-					
-					if (!isNaN(VGrooveSpacing)) 
-					{
-					document.getElementById("VGSpacingCalc").innerHTML = round(VGrooveSpacing, 1);
-						if (DrawWidth > 0)
-						{
-						document.getElementById("FlatWidthCalcDiv").style.display = "inherit";
-						document.getElementById("FlatWidthCalc").innerHTML = round(VGrooveSpacing-DrawWidth, 1);
-						}
-					}
-					
-					
-					
-
-					VGrooveSideMargin = ((PocketWidth - (VGrooveSpacing*(VGrooveQty-1)))/2) + PocketXPos;
-
-					if (VGrooveFixedSideMargin != 0 & VGrooveFixedSideMargin != undefined)  {VGrooveSideMargin = PocketXPos;}				
-					
-					//alert(VGrooveSpacing + " " + VGrooveQty);
-					//alert((VGrooveSpacing*(VGrooveQty-1)));
-					
-					
-					
-					if (ExtendVGrooveThroughFrame) 
-					{	
-					Edge.beginPath();
-					Edge.moveTo(RecX+(PocketXPos*ViewRatio),RecY+RecHeight); 
-					Edge.lineTo(RecX+(PocketXPos*ViewRatio),RecY);
-					Edge.stroke();
-					
-					Edge.beginPath();
-					Edge.lineTo(RecX+((PocketXPos+PocketWidth)*ViewRatio),RecY+RecHeight);
-					Edge.lineTo(RecX+((PocketXPos+PocketWidth)*ViewRatio),RecY);
-					Edge.stroke();
-					}
-					
-					for (var r = 0; r<VGrooveQty; r++) 
-					{
-					VGrooveXPos = (r*VGrooveSpacing)+VGrooveSideMargin-(DrawWidth/2);
-					VGrooveYPos = PocketYPos;
-
-	
-					
-					Edge.beginPath();
-					Edge.moveTo(RecX+(VGrooveXPos*ViewRatio),RecY+RecHeight-(VGrooveYPos*ViewRatio)); 
-					Edge.lineTo(RecX+(VGrooveXPos*ViewRatio),RecY+RecHeight-((VGrooveYPos+PocketHeight)*ViewRatio));
-					Edge.stroke();
-
-					Edge.beginPath();
-					Edge.moveTo(RecX+((VGrooveXPos+DrawWidth)*ViewRatio),RecY+RecHeight-(VGrooveYPos*ViewRatio)); 
-					Edge.lineTo(RecX+((VGrooveXPos+DrawWidth)*ViewRatio),RecY+RecHeight-((VGrooveYPos+PocketHeight)*ViewRatio));
-					Edge.stroke();
-
-						if (DrawingFace == 'Front')
-						{
-						var grd = Edge.createLinearGradient(RecX+(VGrooveXPos*ViewRatio), 0,RecX+((VGrooveXPos+(DrawWidth/2))*ViewRatio), 0);
-						grd.addColorStop(0,"#cbad6c");
-						grd.addColorStop(1,"#EDCB82");
-						Edge.fillStyle = grd;//"#EDCB82";
-						Edge.fillRect(RecX+(VGrooveXPos*ViewRatio),RecY+RecHeight-((VGrooveYPos+PocketHeight-3)*ViewRatio),(DrawWidth/2)*ViewRatio,(PocketHeight-6)*ViewRatio);
 						
-						grd = Edge.createLinearGradient(RecX+((VGrooveXPos+(DrawWidth/2))*ViewRatio), 0,RecX+((VGrooveXPos+DrawWidth)*ViewRatio), 0);
-						grd.addColorStop(0,"#EDCB82");
-						grd.addColorStop(1,"#cbad6c");
-						Edge.fillStyle = grd;//"#EDCB82";
-						Edge.fillRect(RecX+((VGrooveXPos+(DrawWidth/2))*ViewRatio),RecY+RecHeight-((VGrooveYPos+PocketHeight-3)*ViewRatio),(DrawWidth/2)*ViewRatio,(PocketHeight-6)*ViewRatio);
+
+						
+						if (!isNaN(VGrooveSpacing)) 
+						{
+						document.getElementById("VGSpacingCalc").innerHTML = round(VGrooveSpacing, 1);
+							if (DrawWidth > 0)
+							{
+							document.getElementById("FlatWidthCalcDiv").style.display = "inherit";
+							document.getElementById("FlatWidthCalc").innerHTML = round(VGrooveSpacing-DrawWidth, 1);
+							}
 						}
+						
+						
+						
+
+						VGrooveSideMargin = ((PocketWidth - (VGrooveSpacing*(VGrooveQty-1)))/2) + PocketXPos;
+
+						if (VGrooveFixedSideMargin != 0 & VGrooveFixedSideMargin != undefined)  {VGrooveSideMargin = PocketXPos;}				
+						
+						//alert(VGrooveSpacing + " " + VGrooveQty);
+						//alert((VGrooveSpacing*(VGrooveQty-1)));
+						
+						
+						
+						if (ExtendVGrooveThroughFrame) 
+						{	
+						Edge.beginPath();
+						Edge.moveTo(RecX+(PocketXPos*ViewRatio),RecY+RecHeight); 
+						Edge.lineTo(RecX+(PocketXPos*ViewRatio),RecY);
+						Edge.stroke();
+						
+						Edge.beginPath();
+						Edge.lineTo(RecX+((PocketXPos+PocketWidth)*ViewRatio),RecY+RecHeight);
+						Edge.lineTo(RecX+((PocketXPos+PocketWidth)*ViewRatio),RecY);
+						Edge.stroke();
+						}
+						
+						for (var r = 0; r<VGrooveQty; r++) 
+						{
+						VGrooveXPos = (r*VGrooveSpacing)+VGrooveSideMargin-(DrawWidth/2);
+						VGrooveYPos = PocketYPos;
+
+		
+						
+						Edge.beginPath();
+						Edge.moveTo(RecX+(VGrooveXPos*ViewRatio),RecY+RecHeight-(VGrooveYPos*ViewRatio)); 
+						Edge.lineTo(RecX+(VGrooveXPos*ViewRatio),RecY+RecHeight-((VGrooveYPos+PocketHeight)*ViewRatio));
+						Edge.stroke();
+
+						Edge.beginPath();
+						Edge.moveTo(RecX+((VGrooveXPos+DrawWidth)*ViewRatio),RecY+RecHeight-(VGrooveYPos*ViewRatio)); 
+						Edge.lineTo(RecX+((VGrooveXPos+DrawWidth)*ViewRatio),RecY+RecHeight-((VGrooveYPos+PocketHeight)*ViewRatio));
+						Edge.stroke();
+
+							if (DrawingFace == 'Front')
+							{
+							var grd = Edge.createLinearGradient(RecX+(VGrooveXPos*ViewRatio), 0,RecX+((VGrooveXPos+(DrawWidth/2))*ViewRatio), 0);
+							grd.addColorStop(0,"#cbad6c");
+							grd.addColorStop(1,"#EDCB82");
+							Edge.fillStyle = grd;//"#EDCB82";
+							Edge.fillRect(RecX+(VGrooveXPos*ViewRatio),RecY+RecHeight-((VGrooveYPos+PocketHeight-3)*ViewRatio),(DrawWidth/2)*ViewRatio,(PocketHeight-6)*ViewRatio);
+							
+							grd = Edge.createLinearGradient(RecX+((VGrooveXPos+(DrawWidth/2))*ViewRatio), 0,RecX+((VGrooveXPos+DrawWidth)*ViewRatio), 0);
+							grd.addColorStop(0,"#EDCB82");
+							grd.addColorStop(1,"#cbad6c");
+							Edge.fillStyle = grd;//"#EDCB82";
+							Edge.fillRect(RecX+((VGrooveXPos+(DrawWidth/2))*ViewRatio),RecY+RecHeight-((VGrooveYPos+PocketHeight-3)*ViewRatio),(DrawWidth/2)*ViewRatio,(PocketHeight-6)*ViewRatio);
+							}
+						}
+					
+						
 					}
-				
 					
 				}
-				
 			}
 		}
-	}
-	else
-	{
-		framewidth=60*ViewRatio;
-		
-		if (PanelType == 'Glass Frame' )
+		else
 		{
-		Edge.strokeStyle=ClashingStoke;
-		Edge.lineWidth=3;
+			//framewidth=60*ViewRatio;
+			
+			if (PanelType == 'Glass Frame' )
+			{
+				var FrameTop = parseFloat(GetExtraParValue("GFMTop",LineDivID))*ViewRatio;
+				var FrameLeft = parseFloat(GetExtraParValue("GFMLeft",LineDivID))*ViewRatio; 
+				var FrameRight = parseFloat(GetExtraParValue("GFMRight",LineDivID))*ViewRatio;
+				var FrameBot = parseFloat(GetExtraParValue("GFMBot",LineDivID))*ViewRatio;
+				var FrameWidth = parseFloat(GetExtraParValue("GFRW",LineDivID))*ViewRatio;
 
-		Edge.beginPath();
-		Edge.moveTo(RecX+framewidth,RecHeight+RecY-framewidth); 
-		Edge.lineTo(RecX+framewidth,RecY+framewidth);
-		Edge.stroke();
+				if (DrawingFace == 'Back') /*swap around if looking at the back*/
+				{
+				FrameLeft = parseFloat(GetExtraParValue("GFMRight",LineDivID))*ViewRatio;
+				FrameRight = parseFloat(GetExtraParValue("GFMLeft",LineDivID))*ViewRatio;	
+				}
 
-		Edge.beginPath();
+				if (isNaN(FrameTop)) {FrameTop = 60*ViewRatio;}
+				if (isNaN(FrameLeft)) {FrameLeft = 60*ViewRatio;}
+				if (isNaN(FrameRight)) {FrameRight = 60*ViewRatio;}
+				if (isNaN(FrameBot)) {FrameBot = 60*ViewRatio;}
+				if (isNaN(FrameWidth)) {FrameWidth = 10*ViewRatio;}
 
-		Edge.moveTo(RecX+RecWidth-framewidth,RecHeight+RecY-framewidth);
-		Edge.lineTo(RecX+RecWidth-framewidth,RecY+framewidth);
-		Edge.stroke();
+				if (DrawingFace == 'Back')
+				{
+				Edge.fillStyle = "#c47e17";
+				Edge.fillRect(RecX+FrameLeft-FrameWidth,RecY+FrameTop-FrameWidth,RecWidth-FrameLeft-FrameRight+(FrameWidth*2),RecHeight-FrameTop-FrameBot+(FrameWidth*2));
+				}
+				else {Edge.setLineDash([5, 3]);}
+		
+				Edge.strokeStyle=DefSelRecStroke;
+				Edge.lineWidth=1;	
+				Edge.beginPath();
+				Edge.rect(RecX+FrameLeft-FrameWidth,RecY+FrameTop-FrameWidth,RecWidth-FrameLeft-FrameRight+(FrameWidth*2),RecHeight-FrameTop-FrameBot+(FrameWidth*2));
+				Edge.stroke();
+				Edge.setLineDash([]);	
+			
 
-		Edge.beginPath();
-		Edge.moveTo(RecX+framewidth,RecY+framewidth);
-		Edge.lineTo(RecX+RecWidth-framewidth,RecY+framewidth);
-		Edge.stroke();
+				Edge.fillStyle = "#D8D8D8";
+				Edge.fillRect(RecX+FrameLeft+1,RecY+FrameTop+1,RecWidth-FrameLeft-FrameRight-2,RecHeight-FrameTop-FrameBot-2);
 
-		Edge.beginPath();
-		Edge.moveTo(RecX+framewidth,RecY+RecHeight-framewidth);
-		Edge.lineTo(RecX+RecWidth-framewidth,RecY+RecHeight-framewidth);
-		Edge.stroke();
+				Edge.strokeStyle=ClashingStoke;
+				Edge.lineWidth=3;
 
-		Edge.fillStyle = "#D8D8D8";
-		Edge.fillRect(RecX+framewidth+1,RecY+framewidth+1,RecWidth-(framewidth*2)-2,RecHeight-(framewidth*2)-2);
+				Edge.beginPath();
+				Edge.rect(RecX+FrameLeft,RecY+FrameTop,RecWidth-FrameLeft-FrameRight,RecHeight-FrameTop-FrameBot);
+				Edge.stroke();
 
-		}		
-	}
-	
 
+			}		
+		}
+		
+		}
 	}
 } //end if DrawerPreview
 
@@ -4736,10 +4909,12 @@ var Shortstring = ExtraParamNode.slice(ExtraParamNode.indexOf("Return"),ExtraPar
 
 function GetExtraParValue(Parameter,LineDivID)
 {
+var Result = null;	
 var LineDiv = document.getElementById(LineDivID);
 var LineNumber = LineDiv.getAttribute("data-LineNumber");	
 var ExtraParamNode = document.getElementById("ExtraPar"+LineNumber);
-var Shortstring = ExtraParamNode.value.slice(ExtraParamNode.value.indexOf(Parameter),ExtraParamNode.value.length);
+var ParamPos = ExtraParamNode.value.indexOf(Parameter);
+var Shortstring = ExtraParamNode.value.slice(ParamPos,ExtraParamNode.value.length);
 var CarPos = Shortstring.indexOf(";");
 var Result = Shortstring.slice(Parameter.length+1,CarPos);
 return Result
@@ -4804,19 +4979,31 @@ var CheckResult = true;
 function submitForm(Type)
 { 
 
-	if (Type != 'PrintCompOrder')
+	if (Type != 'PrintCompOrder' & Type != "")
 	{
-	PromptStayOnPageWithTabClose = false;	
-	 var MainForm = document.getElementById("Mainform"); 
-		var 	Input = document.createElement("input");
-		Input.id = "Type";
-		Input.type = "hidden";
-		Input.name = "SaveType";
-		Input.value = Type;
-		MainForm.appendChild( Input );
-	popup("Please wait while data is being processed!",160,400,3);
-	document.getElementById("LineQty").value = counter-1; document.getElementById("Freightinput").value = document.getElementById("Freight").innerHTML;
-	MainForm.submit();
+		PromptStayOnPageWithTabClose = false;	
+		var MainForm = document.getElementById("Mainform"); 
+			var 	Input = document.createElement("input");
+			Input.id = "Type";
+			Input.type = "hidden";
+			Input.name = "SaveType";
+			Input.value = Type;
+			MainForm.appendChild( Input );
+		
+		/*Enable Disabled Lines*/
+		for (var r = 1; r<counter; r++) 
+		{
+		document.getElementById("Material"+r).removeAttribute("disabled");
+		document.getElementById("Qty"+r).removeAttribute("disabled");
+		document.getElementById("Description"+r).removeAttribute("disabled");
+		document.getElementById("Length"+r).removeAttribute("disabled");
+		document.getElementById("Width"+r).removeAttribute("disabled");
+		document.getElementById("UnitRef"+r).removeAttribute("disabled");
+		}
+			
+		popup("Please wait while data is being processed!",160,400,3);
+		document.getElementById("LineQty").value = counter-1; document.getElementById("Freightinput").value = document.getElementById("Freight").innerHTML;
+		MainForm.submit();
 	}
 }
 
@@ -4984,7 +5171,7 @@ function ExecSubMaterial()
 	 
 	for (var r = 1; r<counter; r++) 
 	{
-		if ( document.getElementById("Material"+r).value == document.getElementById('SubMatList').value)
+		if ( document.getElementById("Material"+r).value == document.getElementById('SubMatList').value) //document.getElementById("PNCPartID"+r).value == 0
 		{
 		document.getElementById("Material"+r).value = document.getElementById('NewMatList').value;	
 			
@@ -5054,8 +5241,7 @@ function ExecSubMaterial()
 
 			if ( !IsGrained & !HDFFramedDoor) 
 			{
-			RemoveExtraPar("GrainMatchGroup","LineDiv"+r);
-			RemoveExtraPar("GrainMatchOrder","LineDiv"+r);
+			RemoveGrainMatchParams("LineDiv"+r)
 			RemoveExtraPar("DrwFrontOption","LineDiv"+r);
 			}
 			
@@ -5094,139 +5280,192 @@ if (JSONList[r] == SearchItem) { x = r; }
 if (x > -1) { return x; } else { return -1; } 
 }
 
-
-
-function SubMatDisableMatOpt()
+function LineMaterialHavePNCPartID(TargetMaterial)
 {
-var MaterialList = document.getElementById("NewMatList");
-	
-		for (var i = 0; i<MaterialList.length; i++)
+var Result = false;
+	for (var r = 1; r<counter; r++) 
+	{
+		if (TargetMaterial == document.getElementById("Material"+r).value)
 		{
-			if (document.getElementById('SubMatList').value.indexOf("36") == -1 && document.getElementById('SubMatList').value.indexOf("60") == -1 )
-			{
-				if (MaterialList.childNodes.item(i).value.indexOf("36") == -1 && MaterialList.childNodes.item(i).value.indexOf("60") == -1)  
-				{ MaterialList.childNodes.item(i).removeAttribute("disabled"); }
-				if (MaterialList.childNodes.item(i).value.indexOf("36") > -1 || MaterialList.childNodes.item(i).value.indexOf("60") > -1)
-				{ MaterialList.childNodes.item(i).setAttribute("disabled", "disabled");  }
-			}
-			else
-			{
-				if (MaterialList.childNodes.item(i).value.indexOf("36") > -1 || MaterialList.childNodes.item(i).value.indexOf("60") > -1)  
-				{ MaterialList.childNodes.item(i).removeAttribute("disabled"); }
-				if (MaterialList.childNodes.item(i).value.indexOf("36") == -1 && MaterialList.childNodes.item(i).value.indexOf("60") == -1)
-				{ MaterialList.childNodes.item(i).setAttribute("disabled", "disabled");  }
-			} 	
-				
+			var PNCPartID = document.getElementById("PNCPartID"+r).value;
+			if (PNCPartID > 0) {Result = true;break;}
 		}
-		
-		MaterialList.value = null;
+	}
+
+	return Result;
 }
 
 
+
+
+function BuildLineMaterialsList()
+{
+var MatList	= [];	
+var OrderMaterials = [];
+
+	for (var r = 1; r<counter; r++) 
+	{
+		var LineMaterial = document.getElementById("Material"+r).value;
+		if ( FindItemInArray(OrderMaterials,LineMaterial) == -1)
+		{
+			var ItemIndex = FindItem(LineMaterial,Materials,"Name");
+			if (ItemIndex > -1)
+			{
+			MatList.push({ "Name" : ""+Materials[ItemIndex].Name+"" , "colour" : ""+Materials[ItemIndex].colour+"" });
+			OrderMaterials.push(LineMaterial);
+			}
+		}		
+	}
+	return MatList
+}
+
+function SubMaterialsList()
+{
+var MatList	= [];
+var SelMaterial = document.getElementById('SubMatList').value;	
+var HasPNCParts = LineMaterialHavePNCPartID(SelMaterial);
+var ExistMatThick = GetMatThickFromName(SelMaterial);
+
+	if (SelMaterial != "")
+	{
+		for (var i=0; i<Materials.length;i++) 
+		{
+			if (SelMaterial.indexOf("36") == -1 & SelMaterial.indexOf("60") == -1)
+			{
+				var MatThick = GetMatThickFromName(Materials[i].Name);
+				if (MatThick > ExistMatThick-1 & MatThick < ExistMatThick+1 & HasPNCParts | !HasPNCParts)
+				{
+					if (Materials[i].Name.indexOf("36") == -1 & Materials[i].Name.indexOf("60") == -1)
+					{ MatList.push({ "Name" : ""+Materials[i].Name+"" , "colour" : ""+Materials[i].colour+"" }); }
+				}
+			}
+			else
+			{
+				if (Materials[i].Name.indexOf("36") > -1 | Materials[i].Name.indexOf("60") > -1)
+				{ MatList.push({ "Name" : ""+Materials[i].Name+"" , "colour" : ""+Materials[i].colour+"" }); }
+			}
+		}
+	}
+	return MatList
+}
+
+function ClearNewSubMatBox()
+{
+	document.getElementById('NewMatList').value = "";	
+}
 
 
 function ShowMaterialSubWindow(WinHieght,WinWidth) {
     var HiddenDIv = document.getElementById("hiddenDiv2");
 	var frm = document.getElementById('Mainform');
-	var OrderMaterials = [];
+	//var OrderMaterials = [];
 
 
-if (HiddenDIv.childNodes.length == 0 ) 
-{
-
-
-
-	var Blanket = document.createElement("div");
-	Blanket.id = "blanket2";
-	HiddenDIv.appendChild( Blanket );
-    
-	var popUpDiv = document.createElement("div");
-	popUpDiv.id = "popUpDiv2";
-	//var styleAtt = document.createAttribute("style"); StyleAtt.value="width:"; popUpDiv.setAttributeNode(StyleAtt);
-	
- 	var SubMatButton = document.createElement("input");
-	SubMatButton.id = "SubMatButton";
-	SubMatButton.type = "button";
-	SubMatButton.value = "Substitute";
-	SubMatButton.setAttribute("class", "BigButton");
-	SubMatButton.setAttribute("onclick", "ExecSubMaterial();");
-	SubMatButton.setAttribute("style", "position:absolute;bottom:20px;width:100px;");	
-	popUpDiv.appendChild( SubMatButton );
-	
-	 var CancelButton = document.createElement("input");
-	CancelButton.id = "CancelButton";
-	CancelButton.type = "button";
-	CancelButton.value = "Cancel";
-	CancelButton.setAttribute("class", "BigButton");
-	CancelButton.setAttribute("onclick", "CloseWindow('hiddenDiv2','popUpDiv2','blanket2');");
-	CancelButton.setAttribute("style", "position:absolute;bottom:20px;width:100px;");	
-	popUpDiv.appendChild( CancelButton );
-	
-	
-	var SubMatLabel = document.createElement("label");
-	SubMatLabel.id = "SubMatLabel";
-	SubMatLabel.innerHTML = "Material to Substitute";
-	SubMatLabel.setAttribute("style", "position:absolute;top:32px;");
-     popUpDiv.appendChild( SubMatLabel );
-	
-	var SelectBox1= document.createElement("select");
-	SelectBox1.id = "SubMatList";
-	SelectBox1.setAttribute("style", "position:absolute;Top:30px;width:250px;");
-	SelectBox1.setAttribute("onchange", "SubMatDisableMatOpt();");
-
-	
-	for (var r = 1; r<counter; r++) 
+	if (HiddenDIv.childNodes.length == 0 ) 
 	{
-		if ( FindItemInArray(OrderMaterials,document.getElementById("Material"+r).value) == -1)
-		{
-		var List = document.createElement("option");
-		List.innerHTML = document.getElementById("Material"+r).value;
-		List.value = document.getElementById("Material"+r).value;		
-		SelectBox1.appendChild(List);
-		OrderMaterials.push(document.getElementById("Material"+r).value);
-		}		
-	}
-	
-	
 
-	
-	popUpDiv.appendChild( SelectBox1 );
-	
-	
-	var SubMatLabel = document.createElement("label");
-	SubMatLabel.id = "NewMatLabel";
-	SubMatLabel.innerHTML = "New Material";
-	SubMatLabel.setAttribute("style", "position:absolute;top:72px;");
-     popUpDiv.appendChild( SubMatLabel );
-	
-	var SelectBox2= document.createElement("select");
-	SelectBox2.id = "NewMatList";
-	SelectBox2.setAttribute("style", "position:absolute;Top:70px;width:250px;");
-	
-	for (var i = 0; i<Materials.length; i++){
-	var List = document.createElement("option");
-	List.innerHTML = Materials[i].Name;
-	List.value = Materials[i].Name;
-	SelectBox2.appendChild(List);
-	}
-	popUpDiv.appendChild( SelectBox2 );
+
+
+		var Blanket = document.createElement("div");
+		Blanket.id = "blanket2";
+		HiddenDIv.appendChild( Blanket );
+		
+		var popUpDiv = document.createElement("div");
+		popUpDiv.id = "popUpDiv2";
+		//var styleAtt = document.createAttribute("style"); StyleAtt.value="width:"; popUpDiv.setAttributeNode(StyleAtt);
+		
+		var SubMatButton = document.createElement("input");
+		SubMatButton.id = "SubMatButton";
+		SubMatButton.type = "button";
+		SubMatButton.value = "Substitute";
+		SubMatButton.setAttribute("class", "BigButton");
+		SubMatButton.setAttribute("onclick", "ExecSubMaterial();");
+		SubMatButton.setAttribute("style", "position:absolute;bottom:20px;width:100px;");	
+		popUpDiv.appendChild( SubMatButton );
+		
+		var CancelButton = document.createElement("input");
+		CancelButton.id = "CancelButton";
+		CancelButton.type = "button";
+		CancelButton.value = "Cancel";
+		CancelButton.setAttribute("class", "BigButton");
+		CancelButton.setAttribute("onclick", "CloseWindow('hiddenDiv2','popUpDiv2','blanket2');");
+		CancelButton.setAttribute("style", "position:absolute;bottom:20px;width:100px;");	
+		popUpDiv.appendChild( CancelButton );
 		
 		
-	HiddenDIv.appendChild( popUpDiv );
+		var SubMatLabel = document.createElement("label");
+		SubMatLabel.id = "SubMatLabel";
+		SubMatLabel.innerHTML = "Material to Substitute";
+		SubMatLabel.setAttribute("style", "position:absolute;top:32px;");
+		popUpDiv.appendChild( SubMatLabel );
+		
+		var SelectBox1= document.createElement("input");
+		SelectBox1.id = "SubMatList";
+		SelectBox1.className = "Inputlines";
+		SelectBox1.setAttribute("style","top:30px;width:227px;font-size:0.75em;user-select: none;cursor:context-menu");
+		SelectBox1.setAttribute("onmouseup","ShowCustomDropDown(this,BuildLineMaterialsList())");
+		SelectBox1.setAttribute("oninput","KeyDownShowCustomDropDown(this,BuildLineMaterialsList())");
+		SelectBox1.setAttribute("onchange", "ClearNewSubMatBox();");
+		SelectBox1.setAttribute("data-AssocInputID","SubMatList");
+
+		var SelectBox1Button = document.createElement("input");
+		SelectBox1Button.id = "SubMatListButton";
+		SelectBox1Button.className = "Inputlines RightDropDownButton";
+		SelectBox1Button.type = "button";
+		SelectBox1Button.setAttribute("style","top:30px;width:23px;");
+		SelectBox1Button.setAttribute("onmouseup","ShowCustomDropDown(this,BuildLineMaterialsList())");
+		SelectBox1Button.setAttribute("data-AssocInputID","SubMatList");
+		
+		
+		popUpDiv.appendChild( SelectBox1 );
+		popUpDiv.appendChild( SelectBox1Button );
+		
+		var SubMatLabel = document.createElement("label");
+		SubMatLabel.id = "NewMatLabel";
+		SubMatLabel.innerHTML = "New Material";
+		SubMatLabel.setAttribute("style", "position:absolute;top:72px;");
+		popUpDiv.appendChild( SubMatLabel );
+
+
+		var SelectBox2= document.createElement("input");
+		SelectBox2.id = "NewMatList";
+		SelectBox2.className = "Inputlines";
+		SelectBox2.setAttribute("style","top:70px;width:227px;font-size:0.75em;user-select: none;cursor:context-menu");
+		SelectBox2.setAttribute("onmouseup","ShowCustomDropDown(this,SubMaterialsList())");
+		SelectBox2.setAttribute("oninput","KeyDownShowCustomDropDown(this,SubMaterialsList())");
+		SelectBox2.setAttribute("data-AssocInputID","NewMatList");
 	
-	document.getElementById("SubMatButton").style.left=((WinWidth-200)/2) + "px";
-	document.getElementById("CancelButton").style.left=((WinWidth-200)/2+120) + "px";
-	document.getElementById("SubMatList").style.left=((WinWidth-70)/2) + "px";
-	document.getElementById("SubMatLabel").style.left=((WinWidth-390)/2) + "px";	
-	document.getElementById("NewMatList").style.left=((WinWidth-70)/2) + "px";
-	document.getElementById("NewMatLabel").style.left=((WinWidth-300)/2) + "px";
+		var SelectBox2Button = document.createElement("input");
+		SelectBox2Button.id = "NewMatListButton";
+		SelectBox2Button.className = "Inputlines RightDropDownButton";
+		SelectBox2Button.type = "button";
+		SelectBox2Button.setAttribute("style","top:70px;width:23px;");
+		SelectBox2Button.setAttribute("onmouseup","ShowCustomDropDown(this,SubMaterialsList())");
+		SelectBox2Button.setAttribute("data-AssocInputID","NewMatList");	
 
-	SetpopupWin(popUpDiv,Blanket,WinHieght,WinWidth);
+		popUpDiv.appendChild( SelectBox2 );
+		popUpDiv.appendChild( SelectBox2Button );	
+			
+		HiddenDIv.appendChild( popUpDiv );
+		
+		document.getElementById("SubMatButton").style.left=((WinWidth-200)/2) + "px";
+		document.getElementById("CancelButton").style.left=((WinWidth-200)/2+120) + "px";
+		//document.getElementById("SubMatList").style.left=((WinWidth-70)/2) + "px";
+		SelectBox1.style.left=((WinWidth-70)/2) + "px";
+		var LeftPos = parseInt(SelectBox1.style.left);
+		var ElemWidth = parseInt(SelectBox1.style.width);
+		SelectBox1Button.style.left= (LeftPos + ElemWidth) + "px";
+		document.getElementById("SubMatLabel").style.left=((WinWidth-390)/2) + "px";	
+		SelectBox2.style.left=((WinWidth-70)/2) + "px";
+		var LeftPos = parseInt(SelectBox2.style.left);
+		var ElemWidth = parseInt(SelectBox2.style.width);
+		SelectBox2Button.style.left= (LeftPos + ElemWidth) + "px";
+		document.getElementById("NewMatLabel").style.left=((WinWidth-300)/2) + "px";
 
- 	
+		SetpopupWin(popUpDiv,Blanket,WinHieght,WinWidth);
 
-SubMatDisableMatOpt();
-}
+		
+	}
 
 } //ShowMaterialSubWindow
 
@@ -5237,6 +5476,13 @@ function allowDrop(ev) {
 
 function drag(ev) {
     ev.dataTransfer.setData("text", ev.target.id);
+	var ElemRect = ev.target.getBoundingClientRect();
+	var MouseX = ev.clientX;
+	var MouseY = ev.clientY;
+	var XOffset = ElemRect.left - MouseX;
+	var YOffset = ElemRect.top - MouseY;	
+	ev.target.setAttribute("XOffset", ""+XOffset+"");
+	ev.target.setAttribute("YOffset", ""+YOffset+"");
 }
 
 function drop(ev) 
@@ -5246,8 +5492,10 @@ ev.preventDefault();
 	if (ev.target.id == "GroupBox" || ev.target.id == "PartsListBox")
 	{
 	var data = ev.dataTransfer.getData("text");
-	var LineNumber = document.getElementById(document.getElementById(data).name).getAttribute("data-LineNumber");	
+	var DropElem = document.getElementById(data);
+	var LineNumber = document.getElementById(DropElem.name).getAttribute("data-LineNumber");	
 	var AddPartQty = document.getElementById("Qty"+LineNumber).value;
+	var PanelType = document.getElementById("PanelType"+LineNumber).value;
 	
 	var AddPartMaterial = document.getElementById("Material"+LineNumber).value;
 	if (ev.target.children.length > 0) 
@@ -5266,39 +5514,118 @@ ev.preventDefault();
 			{	
 			SetHDFDrwFrontOptionsVisibility(AddPartMaterial);
 
-				ev.target.appendChild(document.getElementById(data));
-				var PartLineDivID = document.getElementById(data).name;
+				ev.target.appendChild(DropElem);
+				var PartLineDivID = DropElem.name;
 				var GroupBoxDiv = document.getElementById('GroupBox');
 
 				if (ev.target.id == "PartsListBox")
 				{
-				//UpdateExtraPar("GrainMatchGroup","GrainMatchGroup#0",document.getElementById(document.getElementById(data).name).id);
-				//UpdateExtraPar("GrainMatchOrder","GrainMatchOrder#0",document.getElementById(document.getElementById(data).name).id);
-				RemoveExtraPar("GrainMatchGroup",PartLineDivID);
-				RemoveExtraPar("GrainMatchOrder",PartLineDivID);
-				RemoveExtraPar("DrwFrontOption",PartLineDivID);
-				
+				DropElem.style.position = "relative";
+				DropElem.style.left = "0px";
+				DropElem.style.top = "0px";	
+				//UpdateExtraPar("GrainMatchGroup","GrainMatchGroup#0",document.getElementById(DropElem.name).id);
+				//UpdateExtraPar("GrainMatchOrder","GrainMatchOrder#0",document.getElementById(DropElem.name).id);
+				RemoveGrainMatchParams(PartLineDivID);			
 				
 					if (GroupBoxDiv.children.length == 0) {document.getElementById("HDFDrwFrontOptions").style.display = "none";} 
+					document.getElementById("AddInfo"+LineNumber).removeAttribute("placeholder");
 				}
 				else
 				{
-				var CurrentGroupNumber = GetGrainMatchGroupNumber(document.getElementById("GroupSelect").value);
-				UpdateExtraPar("GrainMatchGroup","GrainMatchGroup#"+CurrentGroupNumber,PartLineDivID);
+					var CurrentGroupNumber = GetGrainMatchGroupNumber(document.getElementById("GroupSelect").value);
+					UpdateExtraPar("GrainMatchGroup","GrainMatchGroup#"+CurrentGroupNumber,PartLineDivID);
 
-				if (IsHDFMaterial) {UpdateExtraPar("DrwFrontOption","DrwFrontOption#"+document.getElementById("HDFDrwFrontOptions").value,PartLineDivID);}
-	
-					for (var r = 0; r<GroupBoxDiv.children.length; r++) 
+					if (IsHDFMaterial | PanelType == 'Profile Handle') 
 					{
-					UpdateExtraPar("GrainMatchOrder","GrainMatchOrder#"+parseFloat(r+1),GroupBoxDiv.children[r].name);						
+						UpdateExtraPar("DrwFrontOption","DrwFrontOption#"+document.getElementById("HDFDrwFrontOptions").value,PartLineDivID);
+						for (var r = 0; r<GroupBoxDiv.children.length; r++) 
+						{
+							UpdateExtraPar("GrainMatchOrder","GrainMatchOrder#"+parseFloat(r+1),GroupBoxDiv.children[r].name);		
+						}
 					}
-							
+					else
+					{
+					var MouseX = ev.clientX;
+					var MouseY = ev.clientY;
+					var GroupBoxRect = GroupBoxDiv.getBoundingClientRect();
+					var XOffset = parseFloat(DropElem.getAttribute("XOffset"));	
+					var YOffset = parseFloat(DropElem.getAttribute("YOffset"));
+					var AbsLeftPos = parseFloat(MouseX - GroupBoxRect.left + XOffset);
+					var AbsTopPos = parseFloat(MouseY - GroupBoxRect.top + YOffset);
+					var AbsRightPos = AbsLeftPos + parseFloat(DropElem.style.width);
+					var AbsBotPos = AbsTopPos + parseFloat(DropElem.style.height);
+					var MinLeft = 0;
+					var MinTop = 0;
+					var TrueLeftPos = 0;
+					var TrueTopPos = 0;
+					var MaxTop = 0;	
+
+						if (ev.ctrlKey)
+						{
+							MinLeft	= AbsLeftPos;	
+							MinTop = AbsTopPos;	
+						}
+						else
+						{
+							for (var r = 0; r<GroupBoxDiv.children.length; r++) 
+							{
+								if (GroupBoxDiv.children[r] != DropElem)
+								{
+								var ChildLeft = GroupBoxDiv.children[r].offsetLeft;
+								var ChildTop = GroupBoxDiv.children[r].offsetTop; 
+								var ChildRight = GroupBoxDiv.children[r].offsetLeft+GroupBoxDiv.children[r].offsetWidth;
+								var ChildBot = GroupBoxDiv.children[r].offsetTop+GroupBoxDiv.children[r].offsetHeight;
+								//alert("AbsRightPos="+AbsRightPos*GrainMatchPartSizeRatio+" ChildLeft="+ChildLeft*GrainMatchPartSizeRatio);
+
+								if (AbsTopPos < ChildBot & AbsLeftPos > ChildRight & AbsRightPos > ChildLeft & AbsBotPos > ChildTop & ChildRight > MinLeft) 
+								{
+									MinLeft = ChildRight;
+									popup('Note: all grain matching is cut on our CNC with a 9mm tool, so side-by-side grain matching will not line up perfectly with vertical parts in the same group. Contact us if this will cause any issues',200,400,1);
+								}
+								if (AbsLeftPos < ChildRight & AbsBotPos > ChildTop & AbsRightPos > ChildLeft & ChildBot > MinTop) {MinTop = ChildBot;}
+								//if (AbsTopPos > ChildBot & AbsLeftPos > ChildRight & AbsRightPos > ChildLeft & ChildBot > MinTop) {MinTop = ChildBot;}
+		
+								}	
+							}
+						}
+
+						DropElem.style.position = "absolute";
+						DropElem.style.left = MinLeft + "px";
+						DropElem.style.top = MinTop + "px";
+
+					
+
+						TrueLeftPos = Math.ceil(MinLeft*GrainMatchPartSizeRatio);
+						//TrueTopPos = Math.ceil(MinTop*GrainMatchPartSizeRatio);		
+
+						UpdateExtraPar("GrainMatchXPos","GrainMatchXPos#"+parseFloat(TrueLeftPos),PartLineDivID);
+						//UpdateExtraPar("GrainMatchYPos","GrainMatchYPos#"+parseFloat(TrueTopPos),PartLineDivID);
+						for (var r = 0; r<GroupBoxDiv.children.length; r++) 
+						{
+							var ChildBot = GroupBoxDiv.children[r].offsetTop+GroupBoxDiv.children[r].offsetHeight;
+							if (ChildBot > MaxTop) {MaxTop = ChildBot;}
+						}
+						
+
+						for (var r = 0; r<GroupBoxDiv.children.length; r++) 
+						{
+							var ChildBot = GroupBoxDiv.children[r].offsetTop+GroupBoxDiv.children[r].offsetHeight;
+							TrueTopPos = Math.ceil((MaxTop-ChildBot)*GrainMatchPartSizeRatio);
+							UpdateExtraPar("GrainMatchYPos","GrainMatchYPos#"+parseFloat(TrueTopPos),GroupBoxDiv.children[r].name);	
+						}
+
+						
+
+
+					
+					}
+					document.getElementById("AddInfo"+LineNumber).placeholder = "Group " + CurrentGroupNumber;	
 				}
 				
 				
-				if (IsHDFMaterial) 
+				if (IsHDFMaterial | PanelType == 'Profile Handle') 
 				{
-				DrawPreview(document.getElementById(data).firstChild.id,'PreviewBox2',PartLineDivID);
+				DrawPreview(DropElem.firstChild.id,'PreviewBox2',PartLineDivID);
 
 					for (var r = 0; r<GroupBoxDiv.children.length; r++) 
 					{
@@ -5367,11 +5694,11 @@ var Result = -1;
 var LastOrder = 100;
 	for (var r = 0; r<ListBox.children.length; r++) 
 	{
-		if (ListBox.children[r].getAttribute("GroupOrder") != ThisGroupOrder)
+	var GroupOrder = ListBox.children[r].getAttribute("GroupOrder");	
+		if (GroupOrder != ThisGroupOrder)
 		{
 			//alert(ListBox.childNodes[r].getAttribute("GroupOrder"));
-			if (ListBox.children[r].getAttribute("GroupOrder") > ThisGroupOrder & ListBox.children[r].getAttribute("GroupOrder") < LastOrder) 
-			{Result = r; LastOrder = ListBox.children[r].getAttribute("GroupOrder"); }
+			if (GroupOrder > ThisGroupOrder & GroupOrder < LastOrder) {Result = r; LastOrder = GroupOrder;}
 		}
 	}
 	return Result
@@ -5390,6 +5717,40 @@ var LastGroupOrder = 0;
 		}
 	}
 	return LastGroupOrder;
+}
+
+function FindMaxGroupYPos(GroupNumber)
+{
+var MaxYPos = 0;
+	for (var r = 1; r<counter; r++) 
+	{
+	var OtherGroupNumber = GetExtraParValue("GrainMatchGroup",document.getElementById("LineDiv"+r).id);
+		if (OtherGroupNumber === GroupNumber)
+		{
+			var Ypos = parseFloat(GetExtraParValue("GrainMatchYPos",document.getElementById("LineDiv"+r).id));
+			//alert(Ypos+ " index="+r+" OtherGroup="+OtherGroupNumber+" Group="+GroupNumber);
+			var Height = parseFloat(document.getElementById("Length"+r).value);
+			if (Ypos+Height > MaxYPos) {MaxYPos = Ypos+Height;}
+		}
+	}
+	return MaxYPos;
+}
+
+function FindMinGroupXPos(GroupNumber)
+{
+var MinXPos = 100000;
+	for (var r = 1; r<counter; r++) 
+	{
+	var OtherGroupNumber = GetExtraParValue("GrainMatchGroup",document.getElementById("LineDiv"+r).id);
+		if (OtherGroupNumber === GroupNumber)
+		{
+			var Xpos = parseFloat(GetExtraParValue("GrainMatchXPos",document.getElementById("LineDiv"+r).id));
+			//alert(Ypos+ " index="+r+" OtherGroup="+OtherGroupNumber+" Group="+GroupNumber);
+			var Width = parseFloat(document.getElementById("Width"+r).value);
+			if (Xpos < MinXPos) {MinXPos = Xpos;}
+		}
+	}
+	return MinXPos;
 }
 
 function SetHDFDrwFrontOptionsVisibility(LineMaterial)
@@ -5412,6 +5773,11 @@ function IsHDFFramedDoor(LineMaterial)
 function PopulateGrainMatchPartLists(GroupNumber,PartsListBox)
 {
 
+	/*Remove items from the list box first*/
+	while (PartsListBox.firstChild) {
+		PartsListBox.removeChild(PartsListBox.firstChild);
+	  }
+
 	var PartNamePrex = PartsListBox.id;
 	var FirstPart = true;
 	
@@ -5420,12 +5786,16 @@ function PopulateGrainMatchPartLists(GroupNumber,PartsListBox)
 			var CurrentGroupNumber = GetExtraParValue("GrainMatchGroup",document.getElementById("LineDiv"+r).id);
 			//alert(GetExtraParValue("GrainMatchGroup",document.getElementById("LineDiv"+r).id));
 			var LineMaterial = document.getElementById("Material"+r).value;
+			var PanelType = document.getElementById("PanelType"+r).value;
+			var IsGrained = (Materials[FindItem(LineMaterial,Materials,"Name")].Grained == "True");
+
+			if (GetMatThickFromName(LineMaterial) < 20) {var ToolWidth = 10;} else {var ToolWidth = 13;}
 			
 			if (LineMaterial.indexOf(HDFPrefix) > -1 ) {var IsHDFMaterial = true} else {var IsHDFMaterial = false}
 	
 			var HDFFramedDoor = IsHDFFramedDoor(LineMaterial);
 
-			if ( (Materials[FindItem(LineMaterial,Materials,"Name")].Grained  == "True" | HDFFramedDoor) & CurrentGroupNumber == GroupNumber & document.getElementById("PanelType"+r).value != 'Builtup Panel' & document.getElementById("PanelType"+r).value != 'Profile Handle')
+			if ( (IsGrained | HDFFramedDoor) & CurrentGroupNumber == GroupNumber & PanelType != 'Builtup Panel') // & PanelType != 'Profile Handle'
 			{
 				if (FirstPart) {SetHDFDrwFrontOptionsVisibility(LineMaterial);}
 
@@ -5435,18 +5805,21 @@ function PopulateGrainMatchPartLists(GroupNumber,PartsListBox)
 				//var PartUnitRef = document.getElementById("UnitRef"+r).value;
 				//var PanelColour = Materials[FindItem(LineMaterial,Materials,"Name")].colour;
 				//if (PanelColour == '' ) {PanelColour = "rgb(255,255,255)";} 
-				var GroupOrder = GetExtraParValue("GrainMatchOrder",document.getElementById("LineDiv"+r).id);
+				var ThisItemID = document.getElementById("LineDiv"+r).id;
+				var GroupOrder = GetExtraParValue("GrainMatchOrder",ThisItemID);
 				
 				//if (PartUnitRef != '' ) {PartUnitRef = "Unit "+PartUnitRef;}
 				
 				
 				var ListPart = document.createElement("div");
+				var PartGap = Math.ceil((ToolWidth/2)/GrainMatchPartSizeRatio);
+				//var CSSPos = PartNamePrex == "GroupBox" ? "absolute" : "relative";
 				ListPart.id = PartNamePrex+"Part"+r;
 				ListPart.name = "LineDiv"+r;
 				ListPart.setAttribute("draggable", "true" );
 				ListPart.setAttribute("ondragstart", "drag(event)");
 				ListPart.setAttribute("GroupOrder", ""+GroupOrder+"");
-				ListPart.setAttribute("style", "height:"+PartLength/GrainMatchPartSizeRatio+"px;width:"+PartWidth/GrainMatchPartSizeRatio+"px;margin:5px;position: relative;"); //border: 1px solid black;background-color:"+PanelColour+"
+				ListPart.setAttribute("style", "height:"+PartLength/GrainMatchPartSizeRatio+"px;width:"+PartWidth/GrainMatchPartSizeRatio+"px;margin:"+PartGap+"px;position:relative;"); //border: 1px solid black;background-color:"+PanelColour+"
 		
 								
 				var ListPartCanvas = document.createElement("canvas");
@@ -5462,28 +5835,47 @@ function PopulateGrainMatchPartLists(GroupNumber,PartsListBox)
 				if (RGBIsDark(PanelColour) == true ) {ListPartLabel.setAttribute("style", "font-size:75%;color:rgb(255,255,255);");} 
 				else {ListPartLabel.setAttribute("style", "font-size:75%;");}
 				ListPart.appendChild(ListPartLabel); */
-			
-				if (PartNamePrex == "GroupBox")
+		
+				var MaxYPos = FindMaxGroupYPos(GroupNumber);
+				var MinXPos = FindMinGroupXPos(GroupNumber);
+				var XPos = (parseFloat(GetExtraParValue("GrainMatchXPos",ThisItemID))-MinXPos)/GrainMatchPartSizeRatio;
+				var YPos = (MaxYPos-PartLength-parseFloat(GetExtraParValue("GrainMatchYPos",ThisItemID)))/GrainMatchPartSizeRatio;
+
+				var BeforeItemNo = GetGrainMatchPartAfter(PartsListBox,GroupOrder);
+				if (CurrentGroupNumber > 0 & PartsListBox.children.length > 0 & BeforeItemNo > -1) 
 				{
-					if (IsHDFMaterial & FirstPart) { document.getElementById("HDFDrwFrontOptions").value = GetExtraParValue("DrwFrontOption",document.getElementById("LineDiv"+r).id);}
+				PartsListBox.insertBefore(ListPart, PartsListBox.children[BeforeItemNo]);
+				}
+				else
+				{
+				PartsListBox.appendChild(ListPart);	
 				}
 
-					if (CurrentGroupNumber > 0 & PartsListBox.children.length > 0) 
-					{
-						var BeforeItemNo = GetGrainMatchPartAfter(PartsListBox,GroupOrder);
-						//alert(GetGrainMatchPartAfter(PartsListBox,GroupOrder));
-						if (BeforeItemNo > -1) 
-						{
-						PartsListBox.insertBefore(ListPart, PartsListBox.children[BeforeItemNo]);	
-						}
-						else {PartsListBox.appendChild(ListPart);}	
-					}
+				if (PartNamePrex == "GroupBox") 
+				{
+			
+					//alert(MaxYPos);
+					if (IsHDFMaterial) /*Only for Optidoor drawer packs*/ 
+					{ 
+						if (FirstPart) {document.getElementById("HDFDrwFrontOptions").value = GetExtraParValue("DrwFrontOption",ThisItemID);}
+					} 
 					else
 					{
-					PartsListBox.appendChild(ListPart);	
+						if (PanelType != 'Profile Handle')
+						{
+						//alert("GrainMatchYPos="+parseFloat(GetExtraParValue("GrainMatchYPos",ThisItemID))+"YPos="+YPos);
+						ListPart.style.position = "absolute";
+						ListPart.style.left = XPos+"px";
+						ListPart.style.top = YPos+"px";
+						}
 					}
+				}
+
+
+				
 
 				DrawPreview(PartNamePrex+"PartCanvas"+r,'PreviewBox2',"LineDiv"+r);
+				FirstPart = false;	
 			}	
 		
 		}
@@ -5511,15 +5903,10 @@ else {var NextGroupNumber = parseFloat(GetGrainMatchGroupNumber(GroupSelect.last
 	else {popup("Cannot create new group because current group is empty",150,400,1);}
 }
 
-
-function GrainMatchWindow(WinHieght,WinWidth) {
-    var HiddenDIv = document.getElementById("hiddenDiv2");
-	var frm = document.getElementById('Mainform');
-	var LastPartWidth = 0;
-
-if (HiddenDIv.childNodes.length == 0 && document.getElementById("Orderlines").childNodes.length > 0 ) 
+function SetGrainMatchPartSizeRatio(WinWidth)
 {
-	
+var LastPartWidth = 0;
+
 	for (var r = 1; r<counter; r++) 
 	{ 
 		var LineMaterial = document.getElementById("Material"+r).value;
@@ -5529,129 +5916,195 @@ if (HiddenDIv.childNodes.length == 0 && document.getElementById("Orderlines").ch
 		{ 
 			if (PartWidth > LastPartWidth) 
 			{
-			GrainMatchPartSizeRatio = PartWidth/(((WinWidth-80)/2)-24);
+			GrainMatchPartSizeRatio = PartWidth/(((WinWidth-80)/2)-24)*1.5;
 			LastPartWidth = PartWidth;				
 			}
 	
 		}		
 	}
+}
 
+function CloseGrainMatchWindow()
+{
 
+	if (counter > 1) {Calculations(document.getElementById("Material1").parentNode.id)};
+	CloseWindow('hiddenDiv2','popUpDiv2','blanket2');
+}
 
-	var Blanket = document.createElement("div");
-	Blanket.id = "blanket2";
-	HiddenDIv.appendChild( Blanket );
-    
-	var popUpDiv = document.createElement("div");
-	popUpDiv.id = "popUpDiv2";
-	//var styleAtt = document.createAttribute("style"); StyleAtt.value="width:"; popUpDiv.setAttributeNode(StyleAtt);
-	
-	
-	var CloseButton = document.createElement("input");
-	CloseButton.id = "CloseButton";
-	CloseButton.type = "button";
-	CloseButton.value = "Save & Close";
-	CloseButton.setAttribute("class", "BigButton");
-	CloseButton.setAttribute("onclick", "CloseWindow('hiddenDiv2','popUpDiv2','blanket2');");
-	CloseButton.setAttribute("style", "position:absolute;bottom:20px;width:120px;");	
-	popUpDiv.appendChild( CloseButton );
-	
-	var PartsListLabel = document.createElement("label");
-	PartsListLabel.id = "PartsListLabel";
-	PartsListLabel.innerHTML = "Pending Grain Match parts";
-	PartsListLabel.setAttribute("style", "position:absolute;top:7px;left:20px;");
-     popUpDiv.appendChild( PartsListLabel);
-	
-	
-	var PartsListBox = document.createElement("div");
-	PartsListBox.id = "PartsListBox";
-	PartsListBox.setAttribute("ondrop", "drop(event)" );
-	PartsListBox.setAttribute("ondragover", "allowDrop(event)");
-	PartsListBox.setAttribute("style", "position:absolute;overflow-y:auto;padding-bottom:200px;top:30px;left:20px;border: 1px solid #ddd;");
-	PartsListBox.setAttribute("title", "Drag and drop parts into group box to grain match");	
-	popUpDiv.appendChild( PartsListBox );
-
-	
-	var GroupLabel = document.createElement("label");
-	GroupLabel.id = "PartsListLabel";
-	GroupLabel.innerHTML = "Grain Match Group";
-	GroupLabel.setAttribute("style", "position:absolute;top:7px;left:"+((WinWidth/2)+20)+"px;");
-     popUpDiv.appendChild( GroupLabel );
-	
-	var GroupSelect= document.createElement("select");
-	GroupSelect.id = "GroupSelect";
-	GroupSelect.setAttribute("style", "position:absolute;left:"+((WinWidth/2)+20)+"px;Top:35px;width:80px;");
-	GroupSelect.setAttribute("onchange", "GrainMatchGroupSelectChange();");
-	//GroupSelect.setAttribute("onchange", "SubMatDisableMatOpt();");
-
-	
-	//for (var r = 1; r<counter; r++) 
-	//{
-		//if ( FindItemInArray(OrderMaterials,document.getElementById("Material"+r).value) == -1)
-		//{
-		var List = document.createElement("option");
-		List.innerHTML = "Group 1";
-		List.value = "Group 1";
-		GroupSelect.appendChild(List);
-		//}		
-	//}
-
-	popUpDiv.appendChild( GroupSelect );
-	
-	var AddGroupButton = document.createElement("input");
-	AddGroupButton.id = "AddGroupButton";
-	AddGroupButton.type = "button";
-	AddGroupButton.value = "Add Group";
-	AddGroupButton.setAttribute("class", "NormalButton");
-	AddGroupButton.setAttribute("onclick", "AddGrainMatchGroup(false,0);");
-	AddGroupButton.setAttribute("style", "position:absolute;left:"+((WinWidth/2)+115)+"px;top:35px;width:85px;height:24px;");	
-	popUpDiv.appendChild( AddGroupButton );
-	
-	var HDFDrwFrontOptions = document.createElement("select");
-	HDFDrwFrontOptions.id = "HDFDrwFrontOptions";
-	//HDFDrwFrontOptions.value = "Drawer Pack";
-	HDFDrwFrontOptions.setAttribute("onchange", "ChangeHDFDrwFrontOption();");
-	HDFDrwFrontOptions.setAttribute("style", "position:absolute;left:"+((WinWidth/2)+210)+"px;Top:35px;width:120px;display:none;");
-	popUpDiv.appendChild( HDFDrwFrontOptions );
-	
-		var List = document.createElement("option");
-		List.innerHTML = "Reduced Rails";
-		List.value = "ReducedRails";
-		HDFDrwFrontOptions.appendChild(List);
-		var List = document.createElement("option");
-		List.innerHTML = "Drawer Pack";
-		List.value = "DrwPack";
-		HDFDrwFrontOptions.appendChild(List);	
-	
-	var GroupBox = document.createElement("div");
-	GroupBox.id = "GroupBox";
-	GroupBox.innerHTML = "Drop Parts Here!";
-	GroupBox.setAttribute("ondrop", "drop(event)" );
-	GroupBox.setAttribute("ondragover", "allowDrop(event)");
-	GroupBox.setAttribute("style", "position:absolute;overflow-y:auto;padding-bottom:200px;top:70px;border: 1px solid #ddd;");
-	GroupBox.setAttribute("title", "Drag and drop parts into pending box to remove from group");	
-	popUpDiv.appendChild( GroupBox );
-	
-		
-	HiddenDIv.appendChild( popUpDiv );
-	
+function GrainMatchWinZoom(Direction)
+{
+	switch (Direction)
+	{
+	case 'In' :
+		GrainMatchPartSizeRatio = GrainMatchPartSizeRatio*0.8;
+		break;
+	case 'Out' :
+		GrainMatchPartSizeRatio = GrainMatchPartSizeRatio*1.2;	
+		break;
+	}
 
 	PopulateGrainMatchPartLists(0,document.getElementById("PartsListBox"));
-	PopulateGrainMatchGroupSelect();
 	PopulateGrainMatchPartLists(GetGrainMatchGroupNumber(document.getElementById("GroupSelect").value),document.getElementById("GroupBox"));
-	
-
-	document.getElementById("CloseButton").style.left=((WinWidth/2)-50) + "px";
-	document.getElementById("PartsListBox").style.width=((WinWidth-80)/2) + "px";
-	document.getElementById("PartsListBox").style.height=(WinHieght-300) + "px";
-	
-	document.getElementById("GroupBox").style.left=((WinWidth/2)+20) + "px";
-	document.getElementById("GroupBox").style.width=((WinWidth-80)/2) + "px";
-	document.getElementById("GroupBox").style.height=(WinHieght-340) + "px";
-
-	SetpopupWin(popUpDiv,Blanket,WinHieght,WinWidth);
+}
 
 
- }
+function GrainMatchWindow(WinHieght,WinWidth) {
+    var HiddenDIv = document.getElementById("hiddenDiv2");
+	var frm = document.getElementById('Mainform');
+
+
+	if (HiddenDIv.childNodes.length == 0 && document.getElementById("Orderlines").childNodes.length > 0 ) 
+	{
+		
+		SetGrainMatchPartSizeRatio(WinWidth);	
+
+		var Blanket = document.createElement("div");
+		Blanket.id = "blanket2";
+		HiddenDIv.appendChild( Blanket );
+		
+		var popUpDiv = document.createElement("div");
+		popUpDiv.id = "popUpDiv2";
+		//var styleAtt = document.createAttribute("style"); StyleAtt.value="width:"; popUpDiv.setAttributeNode(StyleAtt);
+		
+		
+		var CloseButton = document.createElement("input");
+		CloseButton.id = "CloseButton";
+		CloseButton.type = "button";
+		CloseButton.value = "Save & Close";
+		CloseButton.setAttribute("class", "BigButton");
+		CloseButton.setAttribute("onclick", "CloseGrainMatchWindow();");
+		CloseButton.setAttribute("style", "position:absolute;bottom:20px;width:120px;");	
+		popUpDiv.appendChild( CloseButton );
+
+		var ZoomInButton = document.createElement("button");
+		ZoomInButton.id = "GMWinZoomInButton";
+		ZoomInButton.setAttribute("class", "Imagebutton");
+		ZoomInButton.setAttribute("onclick", "GrainMatchWinZoom('In');"); 
+		ZoomInButton.setAttribute("style", "position:absolute;bottom:20px;left:20px;padding:1px;");
+		popUpDiv.appendChild( ZoomInButton );
+		
+		var ZoomOutButton = document.createElement("button");
+		ZoomOutButton.id = "GMWinZoomOutButton";
+		ZoomOutButton.setAttribute("class", "Imagebutton");
+		ZoomOutButton.setAttribute("onclick", "GrainMatchWinZoom('Out');");  
+		ZoomOutButton.setAttribute("style", "position:absolute;bottom:20px;left:70px;padding:1px;");
+		popUpDiv.appendChild( ZoomOutButton );
+		
+		var PartsListLabel = document.createElement("label");
+		PartsListLabel.id = "PartsListLabel";
+		PartsListLabel.innerHTML = "Pending Grain Match parts";
+		PartsListLabel.setAttribute("style", "position:absolute;top:7px;left:20px;");
+		popUpDiv.appendChild( PartsListLabel);
+		
+		
+		var PartsListBox = document.createElement("div");
+		PartsListBox.id = "PartsListBox";
+		PartsListBox.setAttribute("ondrop", "drop(event)" );
+		PartsListBox.setAttribute("ondragover", "allowDrop(event)");
+		PartsListBox.setAttribute("style", "position:absolute;overflow-y:auto;padding-bottom:200px;top:30px;left:20px;border: 1px solid #ddd;");
+		PartsListBox.setAttribute("title", "Drag and drop parts into group box to grain match");	
+		popUpDiv.appendChild( PartsListBox );
+
+		
+		var GroupLabel = document.createElement("label");
+		GroupLabel.id = "PartsListLabel";
+		GroupLabel.innerHTML = "Grain Match Group";
+		GroupLabel.setAttribute("style", "position:absolute;top:7px;left:"+((WinWidth/2)+20)+"px;");
+		popUpDiv.appendChild( GroupLabel );
+		
+		var GroupSelect= document.createElement("select");
+		GroupSelect.id = "GroupSelect";
+		GroupSelect.setAttribute("style", "position:absolute;left:"+((WinWidth/2)+20)+"px;Top:35px;width:80px;");
+		GroupSelect.setAttribute("onchange", "GrainMatchGroupSelectChange();");
+		//GroupSelect.setAttribute("onchange", "SubMatDisableMatOpt();");
+
+		
+		//for (var r = 1; r<counter; r++) 
+		//{
+			//if ( FindItemInArray(OrderMaterials,document.getElementById("Material"+r).value) == -1)
+			//{
+			var List = document.createElement("option");
+			List.innerHTML = "Group 1";
+			List.value = "Group 1";
+			GroupSelect.appendChild(List);
+			//}		
+		//}
+
+		popUpDiv.appendChild( GroupSelect );
+		
+		var AddGroupButton = document.createElement("input");
+		AddGroupButton.id = "AddGroupButton";
+		AddGroupButton.type = "button";
+		AddGroupButton.value = "Add Group";
+		AddGroupButton.setAttribute("class", "NormalButton");
+		AddGroupButton.setAttribute("onclick", "AddGrainMatchGroup(false,0);");
+		AddGroupButton.setAttribute("style", "position:absolute;left:"+((WinWidth/2)+115)+"px;top:35px;width:85px;height:24px;");	
+		popUpDiv.appendChild( AddGroupButton );
+		
+		var HDFDrwFrontOptions = document.createElement("select");
+		HDFDrwFrontOptions.id = "HDFDrwFrontOptions";
+		//HDFDrwFrontOptions.value = "Drawer Pack";
+		HDFDrwFrontOptions.setAttribute("onchange", "ChangeHDFDrwFrontOption();");
+		HDFDrwFrontOptions.setAttribute("style", "position:absolute;left:"+((WinWidth/2)+210)+"px;Top:35px;width:120px;display:none;");
+		popUpDiv.appendChild( HDFDrwFrontOptions );
+		
+			var List = document.createElement("option");
+			List.innerHTML = "Reduced Rails";
+			List.value = "ReducedRails";
+			HDFDrwFrontOptions.appendChild(List);
+			var List = document.createElement("option");
+			List.innerHTML = "Drawer Pack";
+			List.value = "DrwPack";
+			HDFDrwFrontOptions.appendChild(List);	
+		
+		var GroupBox = document.createElement("div");
+		GroupBox.id = "GroupBox";
+		GroupBox.innerHTML = "Drop Parts Here!";
+		GroupBox.setAttribute("ondrop", "drop(event)" );
+		GroupBox.setAttribute("ondragover", "allowDrop(event)");
+		GroupBox.setAttribute("style", "position:absolute;overflow-y:auto;padding-bottom:200px;top:70px;border: 1px solid #ddd;");
+		GroupBox.setAttribute("title", "Drag and drop parts into pending box to remove from group");	
+		popUpDiv.appendChild( GroupBox );
+		
+			
+		HiddenDIv.appendChild( popUpDiv );
+		
+
+		PopulateGrainMatchPartLists(0,document.getElementById("PartsListBox"));
+		PopulateGrainMatchGroupSelect();
+		PopulateGrainMatchPartLists(GetGrainMatchGroupNumber(document.getElementById("GroupSelect").value),document.getElementById("GroupBox"));
+		
+
+		document.getElementById("CloseButton").style.left=((WinWidth/2)-50) + "px";
+		document.getElementById("PartsListBox").style.width=((WinWidth-80)/2) + "px";
+		document.getElementById("PartsListBox").style.height=(WinHieght-300) + "px";
+		
+		document.getElementById("GroupBox").style.left=((WinWidth/2)+20) + "px";
+		document.getElementById("GroupBox").style.width=((WinWidth-80)/2) + "px";
+		document.getElementById("GroupBox").style.height=(WinHieght-340) + "px";
+
+		SetpopupWin(popUpDiv,Blanket,WinHieght,WinWidth);
+
+
+	}
 }  //GrainMatchWindow
 
+function UploadJobFileButtonClick()
+{
+	if (OrderNumber != "") 
+	{
+	popup("Are you sure you would like to import a file in this order? This will clear any existing data!",150,400,2,"GoToUploadFilePage()");
+	}
+	else {GoToUploadFilePage();}
+}
+
+function GoToUploadFilePage()
+{
+	PromptStayOnPageWithTabClose = false;
+	document.getElementById("UploadFile").name = 'UploadFile';
+	document.getElementById("UploadFile").value = OrderNumber;
+	document.getElementById("ExistOrderType").name = 'OrderType';
+	document.getElementById("ExistOrderType").value = OrderType;	
+	popup("Please wait while page is loaded!",160,400,3);
+	document.getElementById('Mainform').submit();
+}

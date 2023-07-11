@@ -221,6 +221,13 @@ var RowWasInserted = false;
 			if (FilterText == "" | FilterText == undefined | FilterText == null | DataArray[i].RefNo.toUpperCase().indexOf(FilterText) > -1 | DataArray[i].CreatedBy.toUpperCase().indexOf(FilterText) > -1 
 			| DataArray[i].JobDesc.toUpperCase().indexOf(FilterText) > -1 | DataArray[i].JobRef.toUpperCase().indexOf(FilterText) > -1 | DataArray[i].DeliveryAddress.toUpperCase().indexOf(FilterText) > -1)
 			{
+				switch (DataArray[i].Type)
+				{
+				case '.pnc' : var ImageClass = "TRows CVFileImage FileImageSmall"; var OrderType = "PNC"; break; 
+				case '.sdf' : var ImageClass = "TRows MicroFileImage FileImageSmall"; var OrderType = "SDF"; break; 
+				default : var ImageClass = "TRows"; var OrderType = "Manual"; break; 
+				}	
+				
 				var DataDiv = document.createElement("div");
 				DataDiv.className = "TRows";
 				switch (RowI)
@@ -235,7 +242,7 @@ var RowWasInserted = false;
 						
 						DataDiv.appendChild(CheckBoxCntrl);
 						break;
-				case 2 : DataDiv.setAttribute("style","width:70px;"); DataDiv.innerHTML = DataArray[i].Type; break;
+				case 2 : DataDiv.setAttribute("style","width:70px;"); DataDiv.className = ImageClass; DataDiv.innerHTML = OrderType;break;
 				case 3 : DataDiv.setAttribute("style","width:70px;"); DataDiv.innerHTML = DataArray[i].RefNo; break;
 				case 4 : DataDiv.setAttribute("style","width:100px;");DataDiv.innerHTML = DataArray[i].CreateDate; break;
 				case 5 : DataDiv.setAttribute("style","width:130px;"); DataDiv.innerHTML = DataArray[i].CreatedBy; break;

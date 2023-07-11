@@ -297,7 +297,7 @@ if (HiddenDIv.childNodes.length == 1 )
 
 	//clearInterval(TimerID);
 	//alert(TimerID);
-	if (Type == 3) {TimerID = setInterval(RunTimer,8000);}
+	if (Type == 3) {TimerID = setInterval(RunTimer,120000);}
 	//alert(TimerID);
 }
 
@@ -554,4 +554,427 @@ var PageContentsItems = ParentContainer.getElementsByClassName("PageContents");
 
 }
 
+
+function GetMatThickFromName(MatName)
+{
+var NewText = '';
+
+   for (var i = 0; i < MatName.length; i++) 
+   {
+	    //alert(MatName[i]);	
+	   
+	    if ( !isNaN(parseInt(MatName[i])) | MatName[i] == '.' & NewText.length > 0)
+	    {NewText = NewText+MatName[i];}
+		else
+		{
+			if (NewText.length > 1) {break;} else {NewText = '';}
+		}
+   }
+	return parseFloat(NewText);
+}
+
+//------------------------------------ CustomDropDown -------------------------------------
+
+function ShowCustomDropStyleSelectItem(e) 
+{
+var ExistingDropDown = document.getElementById("DropDownDiv");
+var MouseOverItem = ExistingDropDown.getAttribute("data-MouseOverItem")
+
+	if (ExistingDropDown.hasAttribute("data-MouseOverItem") & MouseOverItem != "" & MouseOverItem != null) 
+	{
+	var CurrntMouseOverItem = document.getElementById(MouseOverItem);
+	CurrntMouseOverItem.style.backgroundColor = "inherit";	
+	}
+	
+	e.target.style.backgroundColor = "rgba(43, 43, 43, 0.7)";
+	ExistingDropDown.setAttribute("data-MouseOverItem",e.target.id);
+    ExistingDropDown.setAttribute("data-SearchItemFound",e.target.id);
+
+}
+
+
+function ShowCustomDropSetItemMouseMove(Remove)
+{
+var ExistingDropDown = document.getElementById("DropDownDiv");
+	
+	for (var i = 0; i<ExistingDropDown.children.length; i++) 
+	{
+		if (Remove)
+		{ ExistingDropDown.children[i].removeAttribute("onmouseover");}
+		else	
+		{ ExistingDropDown.children[i].setAttribute("onmouseover","ShowCustomDropStyleSelectItem(event);"); }
+	}
+}
+
+function KeyDownShowCustomDropDown(TrigElem,List)
+{
+var ExistingDropDown = document.getElementById("DropDownDiv");
+
+	if (ExistingDropDown == null) {ShowCustomDropDown(TrigElem,List);}
+	else 
+	{
+		//var ExistingSearchText = ExistingDropDown.getAttribute("data-SearchItemText");
+		//SearchItem(ExistingDropDown,ExistingSearchText);	
+	}
+}
+
+
+function ShowCustomDropDown(TrigElem,List,KeepDropDownOpen) 
+{
+var ElemAssocID = TrigElem.getAttribute("data-AssocInputID");
+var AssocInputElem = document.getElementById(ElemAssocID);
+var HTMLElem = document.querySelector("html");
+var ExistingDropDown = document.getElementById("DropDownDiv");
+var ExistingDropDownAssocID = "";
+var IconText = '';
+var ItemHeight = 20;
+var Tempimg = new Image();
+var ExistingSelItem = null;	
+//alert(TrigElem.getAttribute("disabled"));
+
+
+	if (ExistingDropDown != null) 
+	{
+	ExistingDropDownAssocID = ExistingDropDown.getAttribute("data-AssocInputID");
+	HTMLElem.removeChild(ExistingDropDown);
+	HTMLElem.removeAttribute("onkeyup");	
+	}
+	
+
+	if (TrigElem.readOnly == false & AssocInputElem.disabled == false)
+	{
+		if (ExistingDropDownAssocID != ElemAssocID | ExistingDropDownAssocID == "")
+		{
+		var viewportOffset = AssocInputElem.getBoundingClientRect();
+		// these are relative to the viewport, i.e. the window
+
+
+
+		var DropDownDiv = document.createElement("div");
+		DropDownDiv.id = "DropDownDiv";
+		DropDownDiv.className = "DropDownMenu";
+		DropDownDiv.setAttribute("data-AssocInputID",ElemAssocID);
+		//DropDownDiv.setAttribute("onfocusout","HideDropDown()");
+		//DropDownDiv.setAttribute("style",""); //z-index:50;
+		//ValueListWin.setAttribute("onkeyup","function CloseOnEnter(event){ if (event.key == 10 ) {ShowHideValueListEditWin("+LineNumber+");} };");
+		DropDownDiv.style.left = viewportOffset.left+"px";
+		DropDownDiv.style.top = viewportOffset.top+AssocInputElem.offsetHeight+HTMLElem.scrollTop+"px";
+		DropDownDiv.style.zIndex = "10000";
+		//DropDownDiv.style.height = "300px";
+		//DropDownDiv.style.width = "200px";
+		//alert(KeepOpen);
+		if (KeepDropDownOpen) {HTMLElem.removeAttribute("onClick");}	
+		else {HTMLElem.setAttribute("onClick","HideDropDown(event,'"+ElemAssocID+"')");}
+		
+		
+		HTMLElem.setAttribute("onkeyup","findDropDownItem(event);");
+		
+		HTMLElem.appendChild( DropDownDiv);	
+		
+		
+			for (var i = 0; i<List.length; i++) 
+			{
+				var DropDownItem = document.createElement("div");	
+				DropDownItem.className = "DropDownItem LeftIcon";
+				//DropDownItem.setAttribute("onmouseover","ShowCustomDropStyleSelectItem(event);");
+				
+					var IconBlock = document.createElement("div");
+					IconBlock.setAttribute("style","position:absolute;width:20px;height:20px;left:0px;top:1px;");
+		
+					if (List[i].hasOwnProperty("Icon"))
+					{ IconText = List[i].Icon; }
+					/* else if (List[i].hasOwnProperty("JSON"))
+					{		
+						if (List[i].JSON.hasOwnProperty("Icon")) {IconText = List[i].JSON.Icon;}
+					} */
+					
+					if (IconText != '')
+					{
+
+					Tempimg.src = "data:image/png;base64,"+IconText;
+					/* Tempimg.onload = function()
+					{
+						var ImgWidth = this.naturalWidth;
+						var ImgHeight = this.naturalHeight;
+					} */
+					var ImgWidth = Tempimg.naturalWidth;
+					var ImgHeight = Tempimg.naturalHeight;
+					
+						if (ImgWidth == 0 | ImgHeight == 0)
+						{
+						ImgHeight = "20px";
+						ImgWidth = "20px";
+						}
+					
+					
+					IconBlock.style.height = ImgHeight+"px";
+					IconBlock.style.width = ImgWidth+"px";
+					IconBlock.style.backgroundImage = "url('data:image/png;base64,"+IconText+"')";
+					//alert(Tempimg.naturalHeight + " - " +IconText);
+					ItemHeight = ImgHeight;
+					DropDownItem.style.paddingLeft = ImgWidth+"px";
+					}
+					
+					
+					
+					if (List[i].hasOwnProperty("colour"))
+					{ IconBlock.style.backgroundColor = List[i].colour;	}
+			
+					DropDownItem.appendChild(IconBlock);
+					
+				//DropDownItem.setAttribute("onclick","SelectDropDownItem(this)");
+				var DropDownText = document.createElement("div");
+				DropDownText.innerHTML = List[i].Name;
+				DropDownText.id = "ItemText"+i;
+				DropDownText.style.height = ItemHeight+"px";
+				DropDownText.setAttribute("onclick","SelectDropDownItem(this)");
+				DropDownText.setAttribute("onmouseover","ShowCustomDropStyleSelectItem(event);");
+
+				
+				DropDownItem.appendChild(DropDownText);
+				
+				DropDownDiv.appendChild(DropDownItem);
+			
+				if (AssocInputElem.value == List[i].Name) 
+				{
+				ExistingSelItem = DropDownText;
+				}
+			
+			}
+			
+		
+			var DropDownRect = DropDownDiv.getBoundingClientRect();
+			
+			//alert((DropDownRect.bottom-DropDownRect.top));
+			
+			if (DropDownRect.bottom > window.innerHeight)
+			{
+			DropDownDiv.style.maxHeight	= viewportOffset.top-10+"px"; 
+			DropDownRect = DropDownDiv.getBoundingClientRect();
+			
+			DropDownDiv.style.top = viewportOffset.top+HTMLElem.scrollTop-(DropDownRect.bottom-DropDownRect.top)-2+"px";
+			//DropDownDiv.style.paddingRight = "-20px";
+			
+			}
+			
+			DropDownDiv.style.width = DropDownDiv.offsetWidth+10+"px";
+			
+			if (ExistingSelItem != null) {ExistingSelItem.scrollIntoView(true);}
+
+		}
+	}
+			
+}
+
+function ClearAllSelectItemStyle()
+{
+var ExistingDropDown = document.getElementById("DropDownDiv");
+	for (var i = 0; i<ExistingDropDown.children.length; i++) 
+	{
+	
+	 ExistingDropDown.children[i].children[1].style.backgroundColor = "inherit";
+	}
+}
+
+function ClearDropDownSearchSelect()
+{
+var ExistingDropDown = document.getElementById("DropDownDiv");
+var ChildItem = document.getElementById(ExistingDropDown.getAttribute("data-SearchItemFound"));
+
+
+//alert(ChildItem.innerHTML);
+	if (ChildItem != null)
+	{
+	ChildItem.style.backgroundColor = "inherit";
+	ExistingDropDown.removeAttribute("data-SearchItemFound");
+	ExistingDropDown.removeAttribute("data-SearchItemText");
+	ExistingDropDown.removeAttribute("onmousemove");
+	ShowCustomDropSetItemMouseMove(false);
+	}
+
+	ClearAllSelectItemStyle();
+}
+
+function findDropDownItem(e)
+{
+var ExistingDropDown = document.getElementById("DropDownDiv");		
+//var Keychar = e.which || e.keyCode;
+
+var Keychar = e.key;
+var ExistingSearchText = ExistingDropDown.getAttribute("data-SearchItemText");
+var FoundChildItem = ExistingDropDown.getAttribute("data-SearchItemFound");
+//alert(Keychar);
+
+	//if (ExistingDropDown.hasAttribute("data-MouseOverItem")) 
+	//{
+	//var CurrntMouseOverItem = document.getElementById(ExistingDropDown.getAttribute("data-MouseOverItem"));
+	//CurrntMouseOverItem.style.backgroundColor = "inherit";	
+	//}
+
+	if ( FoundChildItem != "" & FoundChildItem != null) //ExistingSearchText != "" & ExistingSearchText != null &
+	{
+	var SelItem = document.getElementById(FoundChildItem);
+		switch(Keychar)
+		{
+		case 'Enter' :  SelectDropDownItem(SelItem); break;
+		case 'Tab' :  SelectDropDownItem(SelItem); break;
+		case 'ArrowUp' : 
+						if (SelItem.parentNode.previousSibling != null)
+						{
+						ClearDropDownSearchSelect();	
+						var nextItem = SelItem.parentNode.previousSibling.children[1];
+						//nextItem.focus();
+						nextItem.style.backgroundColor = "rgba(43, 43, 43, 0.7)";
+						//nextItem.scrollIntoView(true);
+						if (nextItem.parentNode.offsetTop <= ExistingDropDown.scrollTop) {nextItem.scrollIntoView(true);}
+						//alert(nextItem.parentNode.offsetTop + " - " + ExistingDropDown.scrollTop);
+						ExistingDropDown.setAttribute("data-SearchItemFound",nextItem.id);
+						
+						}						
+						break;
+		case 'ArrowDown' : 
+						if (SelItem.parentNode.nextSibling != null)
+						{
+						ClearDropDownSearchSelect();	
+						var nextItem = SelItem.parentNode.nextSibling.children[1]; 
+						//nextItem.focus();
+						nextItem.style.backgroundColor = "rgba(43, 43, 43, 0.7)";
+						//nextItem.scrollIntoView(false);
+						if (nextItem.parentNode.offsetTop+nextItem.parentNode.offsetHeight >= ExistingDropDown.scrollTop+ExistingDropDown.offsetHeight) {nextItem.scrollIntoView(false);}
+						ExistingDropDown.setAttribute("data-SearchItemFound",nextItem.id);
+						}
+						break;
+		}
+		
+
+	}
+	
+	var SearchItemText = ExistingSearchText;	
+	if (Keychar == "Backspace" & SearchItemText != null) 
+	{
+	SearchItemText = SearchItemText.substr(0,SearchItemText.length-1);
+	SearchItem(ExistingDropDown,SearchItemText);
+	}
+
+	if (Keychar.length == 1)
+	{
+		
+		if (ExistingDropDown.hasAttribute("data-SearchItemText")) 
+		{
+		SearchItemText = SearchItemText+Keychar;
+		}	
+		else 
+		{var SearchItemText = Keychar;}
+	
+		ExistingDropDown.setAttribute("onmousemove","ClearDropDownSearchSelect();");
+		ShowCustomDropSetItemMouseMove(true);
+
+		SearchItem(ExistingDropDown,SearchItemText);
+	}
+	
+
+}
+
+function SearchItem(ExistingDropDown,SearchItemText)
+{
+var AssocDropDown = document.getElementById(ExistingDropDown.getAttribute("data-AssocInputID"));
+var FoundItemName = "";
+
+	for (var i = 0; i<ExistingDropDown.children.length; i++) 
+	{
+	var ChildItemText = ExistingDropDown.children[i].children[1];
+	
+		if (ChildItemText.innerHTML.toUpperCase().startsWith(SearchItemText.toUpperCase()) ) 
+		{
+		ClearAllSelectItemStyle();	
+		ChildItemText.focus();
+		ChildItemText.style.backgroundColor = "rgba(43, 43, 43, 0.7)";
+		ChildItemText.scrollIntoView(true);
+		ExistingDropDown.setAttribute("data-SearchItemFound",ChildItemText.id);
+		FoundItemName = ChildItemText.innerHTML;
+		break;		
+		}
+
+	}
+	
+	if (FoundItemName != "") 
+	{
+	AssocDropDown.value = FoundItemName;
+	setCaretPosition(AssocDropDown, SearchItemText.length);
+	}
+	else {AssocDropDown.value = SearchItemText;}
+
+	//alert(SearchItemText);
+	ExistingDropDown.setAttribute("data-SearchItemText",SearchItemText);
+}
+
+function setCaretPosition(ctrl, pos) {
+  // Modern browsers
+  if (ctrl.setSelectionRange) {
+    ctrl.focus();
+    ctrl.setSelectionRange(pos, pos);
   
+  // IE8 and below
+  } else if (ctrl.createTextRange) {
+    var range = ctrl.createTextRange();
+    range.collapse(true);
+    range.moveEnd('character', pos);
+    range.moveStart('character', pos);
+    range.select();
+  }
+}
+
+
+//scrollIntoView(alignTo)
+
+function SelectDropDownItem(SelectedItem)
+{
+var ExistingDropDown = document.getElementById("DropDownDiv");	
+var AssocDropDown = document.getElementById(ExistingDropDown.getAttribute("data-AssocInputID"));
+AssocDropDown.value = SelectedItem.innerHTML;//children[1]
+ExistingDropDown.parentNode.removeAttribute("onkeyup");
+ExistingDropDown.parentNode.removeChild(ExistingDropDown);
+
+AssocDropDown.onchange();
+//AssocDropDown.oninput();	
+}
+
+function HideDropDown(e,ElemAssocIDTarget) 
+{
+
+var ExistingDropDown = document.getElementById("DropDownDiv");
+	if (ExistingDropDown != null)
+	{
+		//alert("hide");	
+		var ElemAssocIDTag = e.target.getAttribute("data-AssocInputID");
+		//alert(ElemAssocIDTarget + " " + ElemAssocIDTag);
+		if (ElemAssocIDTarget != ElemAssocIDTag & e.target.id != "DropDownDiv" & e.target.parentNode.id != "DropDownDiv")
+		{
+		ExistingDropDown.parentNode.removeAttribute("onkeyup");
+		ExistingDropDown.parentNode.removeChild(ExistingDropDown);
+		//document.querySelector("html").removeAttribute("onkeydown");	
+		}
+	
+	}
+
+}
+
+
+//------------------------------------ CustomDropDown End -------------------------------------
+
+  
+ function ToggleTreeItem(Item) {
+     Item.parentElement.querySelector(".nested").classList.toggle("active");
+     Item.classList.toggle("caret-down");
+  }
+
+
+ /*  var toggler = document.getElementsByClassName("caret");
+  var i;
+  
+  for (i = 0; i < toggler.length; i++) {
+	toggler[i].addEventListener("click", function() {
+	  this.parentElement.querySelector(".nested").classList.toggle("active");
+	  this.classList.toggle("caret-down");
+	});
+  }   */

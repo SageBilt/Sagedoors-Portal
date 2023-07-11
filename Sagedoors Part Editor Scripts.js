@@ -1,3 +1,5 @@
+const AjaxRequestsURL = "https://remote.sagemfg.co.nz:8443/?script=Sagedoors%20Portal%20Ajax%20Requests";
+
 var Rad = 180/Math.PI;
 var degrees = Math.PI/180;
 var UserRad = 50;
@@ -191,6 +193,7 @@ var CanvasObject = document.getElementById("CanvasBorder");
 														{
 														PartJSON.Operations[SelectedObjects.Items[i]].X = (NewXPos).toString();
 														PartJSON.Operations[SelectedObjects.Items[i]].Y = (NewYPos).toString();
+														delete PartJSON.PNCOperations;
 														}
 														else {popup("Invalid position! Operation too close to Edgebanding!",120,350,1);}
 													}
@@ -200,6 +203,7 @@ var CanvasObject = document.getElementById("CanvasBorder");
 														var	NewYPos = parseFloat(CalcOutputValue(PartJSON.Operations[SelectedObjects.Items[i]].Y))-round(MoveObject.Y-ActiveMouseY,3);
 														PartJSON.Operations[SelectedObjects.Items[i]].X = (NewXPos).toString();
 														PartJSON.Operations[SelectedObjects.Items[i]].Y = (NewYPos).toString();
+														delete PartJSON.PNCOperations;
 													}
 														
 												}
@@ -220,6 +224,7 @@ var CanvasObject = document.getElementById("CanvasBorder");
 													PartJSON.Vectors[SelectedObjects.Items[i]].CX = (parseFloat(CalcOutputValue(PartJSON.Vectors[SelectedObjects.Items[i]].CX))-round(MoveObject.X-ActiveMouseX,3)).toString();
 													PartJSON.Vectors[SelectedObjects.Items[i]].CY = (parseFloat(CalcOutputValue(PartJSON.Vectors[SelectedObjects.Items[i]].CY))-round(MoveObject.Y-ActiveMouseY,3)).toString();													
 													}
+												delete PartJSON.PNCOperations;	
 												}
 						
 											}
@@ -1027,7 +1032,8 @@ function DeleteObject()
 	{
 		for (var i = 0; i<SelectedObjects.Items.length; i++)
 		{
-		PartJSON.Operations.splice(SelectedObjects.Items[i]-i,1);								
+		PartJSON.Operations.splice(SelectedObjects.Items[i]-i,1);
+		delete PartJSON.PNCOperations;	
 		}
 	}
 	
@@ -1039,8 +1045,9 @@ function DeleteObject()
 		var CurrentIndex = SelectedObjects.Items[i]-i;	
 		var ConnVectors = FindConnedVector(PartJSON.Vectors[CurrentIndex],[CurrentIndex]);
 
+		
 		PartJSON.Vectors.splice(CurrentIndex,1);
-
+		delete PartJSON.PNCVectors;
 			//var TrueStartVector = ConnVectors.Start;
 			//var TrueEndVector = ConnVectors.End;
 
@@ -2012,8 +2019,7 @@ function EvalOpVisibility(CondText,ItemID,ItemType)
 
 function CalcInputValue(InputValue,ItemID,ItemType,IsCondition)
 {
-
-var InputStr = InputValue.toString();
+	var InputStr = InputValue.toString();
 
 	if (InputStr.indexOf(';') > -1) {InputStr = InputStr.substring(0,InputStr.indexOf(';'));} 
 
@@ -2052,24 +2058,6 @@ var InputStr = InputValue.toString();
 
 //var VariableList = ["X","Y","PartLength","PartWidth","PartThick","Width","Dia","Qty","Spacing","AutoSpacing","MaxSpacing(300)","MaxSpacing(400)","PartLengthCentre","PartWidthCentre"];
 
-
-function GetMatThickFromName(MatName)
-{
-var NewText = '';
-
-   for (var i = 0; i < MatName.length; i++) 
-   {
-	    //alert(MatName[i]);	
-	   
-	    if ( !isNaN(parseInt(MatName[i])) | MatName[i] == '.' & NewText.length > 0)
-	    {NewText = NewText+MatName[i];}
-		else
-		{
-			if (NewText.length > 1) {break;} else {NewText = '';}
-		}
-   }
-	return parseFloat(NewText);
-}
 
 function CreateEvalParams(InputValue,ItemID,ItemType) //,ParamIDs = []
 {	
@@ -2663,6 +2651,7 @@ var YClick = SelectBox.StartY; */
 				}
 				//alert(LoopI);
 				PartJSON.Vectors[SelectedObjects.Items[LoopI]].Edge = EdgeIndType;
+				delete PartJSON.PNCVectors;
 				
 				if (VectType == 'Line') 
 				{
@@ -3058,14 +3047,14 @@ PartJSON.Vectors[VectorID].EY = OrigSY;
 	}
 }
 
-function ReOrientateVectors()
+function ReOrientateVectors(DeleteEdgingFirst)
 {
 
 	FindFirstVector();
 	
 	//FindReversedVector();
 	
-	FindOutOrOrderVectors();
+	FindOutOrOrderVectors(DeleteEdgingFirst);
 
 	
 	var LineDiv = document.getElementById(document.getElementById("selectedline").innerHTML);
@@ -3080,7 +3069,6 @@ function ReOrientateVectors()
 	ChangeCheckBoxValue(RightedgeTick.id,'None');
 	ChangeCheckBoxValue(TopedgeTick.id,'None');
 	ChangeCheckBoxValue(BottomedgeTick.id,'None');
-	
 	
 	if (IsClockwise() == true & CheckShapedClosed() == true)
 	{
@@ -3100,12 +3088,14 @@ function ReOrientateVectors()
 	
 }
 
-function FindOutOrOrderVectors()
+function FindOutOrOrderVectors(DeleteEdgingFirst)
 {
+	
 	for (var LoopI = 0; LoopI<PartJSON.Vectors.length; LoopI++)
 	{
-	PartJSON.Vectors[LoopI].Edge = 'N';	
-	ConnVectors = FindConnedVector(PartJSON.Vectors[LoopI],[LoopI]);
+		if (DeleteEdgingFirst) {PartJSON.Vectors[LoopI].Edge = 'N';}
+		
+		ConnVectors = FindConnedVector(PartJSON.Vectors[LoopI],[LoopI]);
 					//alert(LoopI + " " + ConnVectors.StartRev);
 	
 		if (ConnVectors.End > -1 & LoopI < PartJSON.Vectors.length-1)
@@ -3485,14 +3475,19 @@ var InvalidOp = false;
 						var InsertXPos = CalcInputValue(round(XPos,3));
 						var InsertYPos = CalcInputValue(round(YPos,3));
 						PartJSON.Operations.push({ "Type" : "Hole" , "Face" : ""+ViewFace+"" , "X" : ""+InsertXPos+"" , "Y" : ""+InsertYPos+"" , "Width" : "5" , "Depth" : "10" });
+						delete PartJSON.PNCOperations;
 						break;
 		case 'LineBore':
 						PartJSON.Operations.push({ "Type" : "LineBore" , "Face" : ""+ViewFace+"" , "X" : ""+InsertXPos+"" , "Y" : ""+InsertYPos+"" , "Angle" : round(LineAngle,3) , "Qty" : RepeatQty , "Spacing" : "32" , "Width" : "5" , "Depth" : "10" });
+						delete PartJSON.PNCOperations;
 						break; 
 		case 'Rebate':
 						var InsertLengthPos = CalcInputValue(round(LineLength,3));
 						if (CheckOperationAllowed(InsertXPos,InsertYPos,InsertLengthPos,10,round(LineAngle,3)*degrees,10) == true)
-						{PartJSON.Operations.push({ "Type" : "Rebate" , "Face" : ""+ViewFace+"" , "X" : ""+InsertXPos+"" , "Y" : ""+InsertYPos+"" , "Angle"  : round(LineAngle,3) , "Length" : ""+InsertLengthPos+""  , "Width" : "10" , "Depth" : "10" });}		
+						{
+							PartJSON.Operations.push({ "Type" : "Rebate" , "Face" : ""+ViewFace+"" , "X" : ""+InsertXPos+"" , "Y" : ""+InsertYPos+"" , "Angle"  : round(LineAngle,3) , "Length" : ""+InsertLengthPos+""  , "Width" : "10" , "Depth" : "10" });
+							delete PartJSON.PNCOperations;
+						}		
 						else {popup("Invalid position! Operation too close to Edgebanding!",120,350,1);InvalidOp = true;}
 						break;
 		case 'Route':
@@ -3502,7 +3497,10 @@ var InvalidOp = false;
 						if (InsertWidthPos < 0) {InsertWidthPos = Math.abs(InsertWidthPos); InsertXPos = XPos; }
 						
 						if (CheckOperationAllowed(InsertXPos,InsertYPos,InsertLengthPos,InsertWidthPos,90*degrees,10) == true)
-						{PartJSON.Operations.push({ "Type" : "Route" , "Face" : ""+ViewFace+"" , "X" : ""+InsertXPos+"" , "Y" : ""+InsertYPos+"" , "Angle"  : 90 , "Length" : ""+InsertLengthPos+"" , "Width" : ""+InsertWidthPos+"" , "Depth" : "10" });}		
+						{
+							PartJSON.Operations.push({ "Type" : "Route" , "Face" : ""+ViewFace+"" , "X" : ""+InsertXPos+"" , "Y" : ""+InsertYPos+"" , "Angle"  : 90 , "Length" : ""+InsertLengthPos+"" , "Width" : ""+InsertWidthPos+"" , "Depth" : "10" });
+							delete PartJSON.PNCOperations;
+						}		
 						else {popup("Invalid position! Operation too close to Edgebanding!",120,350,1);InvalidOp = true;}
 						break;
 		case 'CornerRadius':
@@ -3574,6 +3572,7 @@ var InvalidOp = false;
 					
 							if (InsertVectPos > -1)
 							{
+							delete PartJSON.PNCVectors;	
 							PartJSON.Vectors.splice(InsertVectPos,0,{ "Type" : "Arc" , "SX" : ""+TangentialText+CalcInputValue(StartX)+"" , "SY" : ""+TangentialText+CalcInputValue(StartY)+"" , "EX"  : ""+TangentialText+CalcInputValue(EndX)+"" , "EY" : ""+TangentialText+CalcInputValue(EndY)+"", "CX"  : ""+CalcInputValue(CenX)+"" , "CY" : ""+CalcInputValue(CenY)+"", "Radius" : ""+CalcInputValue(UserRad)+"" , "CCW" : ArcIsCC ,   "Edge" : "N"  }); 
 							SetVectorAutoParams(InsertVectPos);
 							}
@@ -3600,11 +3599,11 @@ var InvalidOp = false;
 						
 						
 						//document.getElementById("TestP").innerHTML = " Calc=" + (StartAngle-EndAngle)*Rad + " StartAngle=" + StartAngle*Rad + " EndAngle=" + EndAngle*Rad + " ArcIsCC=" + ArcIsCC;
-		
+						delete PartJSON.PNCVectors;
 						PartJSON.Vectors.push({ "Type" : "Arc" , "SX" : ""+CalcInputValue(StartX)+"" , "SY" : ""+CalcInputValue(StartY)+"" , "EX"  : ""+CalcInputValue(EndX)+"" , "EY" : ""+CalcInputValue(EndY)+"", "CX"  : ""+CalcInputValue(CenX)+"" , "CY" : ""+CalcInputValue(CenY)+"", "Radius" : ""+CalcInputValue(round(ArcRadius,3))+"" , "CCW" : ArcIsCC ,  "Edge" : "N"  })
 						SetVectorAutoParams(PartJSON.Vectors.length-1);
 						ToolPointClicks = [];
-						ReOrientateVectors();
+						ReOrientateVectors(true);
 						
 						break;
 		default :
@@ -3645,6 +3644,7 @@ var InvalidOp = false;
 							
 				}
 			//alert(InsertVectPos);
+			delete PartJSON.PNCVectors;
 			PartJSON.Vectors.splice(InsertVectPos,0,{ "Type" : "Line" , "SX" : ""+CalcInputValue(round(ToolPointClicks[0].X,3))+"" , "SY" : ""+CalcInputValue(round(ToolPointClicks[0].Y,3))+"" , "EX"  : ""+CalcInputValue(round(XPos,3))+"" , "EY" : ""+CalcInputValue(round(YPos,3))+"", "Edge" : "N"  });		
 			//if (document.activeElement.id == "LengthInput") {document.getElementById("XPosInput").focus();}
 			SetVectorAutoParams(InsertVectPos);
@@ -3653,7 +3653,7 @@ var InvalidOp = false;
 			//alert(IsClockwise());
 			if (ToolsSelection =='ChainLine' & ConnVectors.End == -1) {ToolPointClicks[0].X = XPos; ToolPointClicks[0].Y = YPos;} else {ToolPointClicks = [];}
 			
-			ReOrientateVectors();
+			ReOrientateVectors(true);
 						
 			}
 			break;	
@@ -4455,7 +4455,7 @@ var PanelType = document.getElementById("PanelType"+LineNumber).value;
   if (SavePartType != 'Library Part') {var PartType = SavePartType;} else {var PartType = '';}
   if (SavePartType == 'Type') {var PartType = PanelType; }
 
-  xhttp.open("POST","", true);
+  xhttp.open("POST",AjaxRequestsURL, true);
   xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 	if (SaveType == 'Save')
 	{	  
@@ -4485,17 +4485,25 @@ function EvalParamVisibility(LineNodeJSON,Index)
 		for (var i = 0; i<LineNodeJSON.Parameters.length; i++)
 		{
 			var ArrOfStrs = LineNodeJSON.Parameters[i].Value.split(",");
-			if (ArrOfStrs[0].search(/[a-zA-Z]/) > -1) { var FinalValue = "'"+ArrOfStrs[0]+"'";} else {FinalValue = ArrOfStrs[0];}
+			//if (ArrOfStrs[0].search(/[a-zA-Z]/) > -1) { var FinalValue = "'"+ArrOfStrs[0]+"'";} else {FinalValue = ArrOfStrs[0];}
+
+
+			if (!isNaN(ArrOfStrs[0])) {FinalValue = ArrOfStrs[0];}
+			else if (PartJSON.Parameters[i].IsEquation) { var FinalValue = ParseVarCalc(ArrOfStrs[0],null,'Parameter');}
+			else { var FinalValue = "'"+ArrOfStrs[0]+"'";}	
 			
-			EvalString = EvalString + "var " + LineNodeJSON.Parameters[i].ParamName + "=" + FinalValue + ";";
+			
+			EvalString = EvalString + "var " + LineNodeJSON.Parameters[i].ParamName + "=" + FinalValue + ";\n";	
 		}
 		
+		//if (LineNodeJSON.Parameters[Index].ParamName == 'Hinge3Dist' ) {}
+
 		EvalString = EvalString + CondText; 
 
 
 		try { var OutputValue = eval(EvalString);} catch(err) {var OutputValue = true;}
 		
-		//alert(EvalString+" Result="+OutputValue);	
+		//if (LineNodeJSON.Parameters[Index].ParamName == 'Hinge3Dist' ) {alert(EvalString+"\n Result="+eval(EvalString));}	
 	}
 	else {var OutputValue = true;}
 	
@@ -5168,7 +5176,7 @@ var LoggedOnToken = document.getElementById("Token").value;
   };
   
  
-  xhttp.open("POST","", true);
+  xhttp.open("POST",AjaxRequestsURL, true);
   xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
   xhttp.send("SaveLibImage="+SaveType+"\nImageName="+encodeURIComponent(ImageName)+"\nLoggedOn="+encodeURIComponent(LoggedOnCustomer)+"\nToken="+encodeURIComponent(LoggedOnToken)+"\nBase64IconText="+encodeURIComponent(IconText) );
 	
@@ -5239,7 +5247,7 @@ var LoggedOnToken = document.getElementById("Token").value;
     }
   };
   
-  xhttp.open("POST","", true);
+  xhttp.open("POST",AjaxRequestsURL, true);
   xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
   xhttp.send("GetLibImages=Yes\nLoggedOn="+encodeURIComponent(LoggedOnCustomer)+"\nToken="+encodeURIComponent(LoggedOnToken));
 	
@@ -5269,7 +5277,7 @@ var LoggedOnToken = document.getElementById("Token").value;
     }
   };
   
-  xhttp.open("POST","", true);
+  xhttp.open("POST",AjaxRequestsURL, true);
   xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
   xhttp.send("GetLibParts=Yes\nLoggedOn="+encodeURIComponent(LoggedOnCustomer)+"\nToken="+encodeURIComponent(LoggedOnToken));
 	
