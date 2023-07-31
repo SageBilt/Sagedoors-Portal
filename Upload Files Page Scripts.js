@@ -309,14 +309,14 @@ function BuildRelNewItemsList(ThickText)
 	for (var i=0; i<Materials.length;i++) 
 	{
 
-		if (Materials[i].Name.indexOf("36") == -1 & Materials[i].Name.indexOf("60") == -1)
+		//if (Materials[i].Name.indexOf("36") == -1 & Materials[i].Name.indexOf("60") == -1)
+		//{
+		ListMatThick = GetMatThickFromName(Materials[i].Name);
+		if (ListMatThick > ItemMatThick-1 & ListMatThick < ItemMatThick+1)
 		{
-			ListMatThick = GetMatThickFromName(Materials[i].Name);
-			if (ListMatThick > ItemMatThick-1 & ListMatThick < ItemMatThick+1)
-			{
-			FiltMatList.push({ "Name" : ""+Materials[i].Name+"" , "colour" : ""+Materials[i].colour+""});
-			}
+		FiltMatList.push({ "Name" : ""+Materials[i].Name+"" , "colour" : ""+Materials[i].colour+""});
 		}
+		//}
 	}
 	return FiltMatList
 	

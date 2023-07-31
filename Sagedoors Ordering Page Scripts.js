@@ -609,7 +609,7 @@ function LoadExistLinesData()
 		document.getElementById("Width"+LineNo).setAttribute('disabled','disabled');
 		document.getElementById("UnitRef"+LineNo).setAttribute('disabled','disabled');
 		document.getElementById("CopyLine"+LineNo).setAttribute('hidden','hidden');
-		
+		document.getElementById("EditLine"+LineNo).setAttribute('hidden','hidden');
 		}
 		
 		//ExistLinesData.PanelLines[i].PopupMsg
@@ -647,6 +647,7 @@ function LoadExistLinesData()
 			case 16: EdgeCheckBoxValue ='R5 Both Sides'; break;
 			case 17: EdgeCheckBoxValue ='9.5mm Ogee'; break;
 			case 18: EdgeCheckBoxValue ='6.3mm Ogee'; break;
+			case 19: EdgeCheckBoxValue ='R1.5 Face Aris Back'; break;
 			default: EdgeCheckBoxValue ='None';		
 			}	
 
@@ -2513,7 +2514,7 @@ var PNCPartID = document.getElementById("PNCPartID"+LineNumber).value;
 	{
 		if (PanelType == 'Roller Surround' )
 		{
-			if (PNCPartID = "")
+			if (PNCPartID == "")
 			{
 			document.getElementById("Description"+LineNumber).value = "Roller Door Surround"; 
 			ChangeDesc(LineDivID);
@@ -5580,7 +5581,7 @@ ev.preventDefault();
 								if (AbsTopPos < ChildBot & AbsLeftPos > ChildRight & AbsRightPos > ChildLeft & AbsBotPos > ChildTop & ChildRight > MinLeft) 
 								{
 									MinLeft = ChildRight;
-									popup('Note: all grain matching is cut on our CNC with a 9mm tool, so side-by-side grain matching will not line up perfectly with vertical parts in the same group. Contact us if this will cause any issues',200,400,1);
+									//popup('Note: all grain matching is cut on our CNC with a 9mm tool, so side-by-side grain matching will not line up perfectly with vertical parts in the same group. Contact us if this will cause any issues',200,400,1);
 								}
 								if (AbsLeftPos < ChildRight & AbsBotPos > ChildTop & AbsRightPos > ChildLeft & ChildBot > MinTop) {MinTop = ChildBot;}
 								//if (AbsTopPos > ChildBot & AbsLeftPos > ChildRight & AbsRightPos > ChildLeft & ChildBot > MinTop) {MinTop = ChildBot;}
