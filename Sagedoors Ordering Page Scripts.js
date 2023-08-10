@@ -43,23 +43,23 @@ var HDFDoorSpecData = [
 {"Profile" : "ALASKA" , "ProfileMargin" : 0 , "Frame" : false , "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 42 , "MaxEdge" : 0 , "IsFixedSpacing" : false, "UserSpacing" : true, "HalfSpacingSideMargin" : true, "Width" : 26} },
 {"Profile" : "ANNAPOLIS" , "ProfileMargin" : 18 , "Frame" : true, "GlassFrame" : false},
 {"Profile" : "ARIZONA" , "ProfileMargin" : 60 , "Frame" : true, "GlassFrame" : true},
-{"Profile" : "ASPEN" , "ProfileMargin" : 0 , "Frame" : false , "GlassFrame" : false , "VGrooves" : {"MaxScallopWidth" : 39, "MaxMaxScallopWidth" : 42 , "IsFixedSpacing" : false, "FlatWidth" : 3, "MinFlatWidth" : 3, "ScallopToolRad" : 35} },
+{"Profile" : "ASPEN" , "ProfileMargin" : 0 , "Frame" : false , "GlassFrame" : false , "VGrooves" : {"MaxScallopWidth" : 32, "MaxMaxScallopWidth" : 32 , "IsFixedSpacing" : false, "FlatWidth" : 3, "MinFlatWidth" : 3, "ScallopToolRad" : 35} },
 {"Profile" : "BARNSLEY" , "ProfileMargin" : 18 , "Frame" : true, "GlassFrame" : false},
 {"Profile" : "CALIFORNIA" , "ProfileMargin" : 0 , "Frame" : false , "GlassFrame" : false , "VGrooves" : {"MaxScallopWidth" : 39, "MaxMaxScallopWidth" : 42 , "IsFixedSpacing" : false, "FlatWidth" : 3, "MinFlatWidth" : 3, "ScallopToolRad" : 35} },
 {"Profile" : "CAROLINA" , "ProfileMargin" : 18 , "Frame" : true, "GlassFrame" : false},
-{"Profile" : "CHICAGO" , "ProfileMargin" : 0 , "Frame" : false, "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 13 ,"GrooveWidth" : 6.4 ,"GrooveDepth" : 1.5 , "UserSpacing" : true} },
+{"Profile" : "CHICAGO" , "ProfileMargin" : 0 , "Frame" : false, "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 13 ,"GrooveWidth" : 6.4 ,"GrooveDepth" : 1.5 , "UserSpacing" : true, "ToggleStartFinishOnLow" : true} },
 {"Profile" : "COLORADO" , "ProfileMargin" : 0 , "Frame" : false, "GlassFrame" : false},
 {"Profile" : "DAKOTA" , "ProfileMargin" : 60 , "Frame" : true , "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 85 , "MaxEdge" : 0 , "IsFixedSpacing" : false , "ExtendThroughFrame" : true} },
 {"Profile" : "FLORIDA" , "ProfileMargin" : 60 , "Frame" : true, "GlassFrame" : true},
 {"Profile" : "GEORGIA" , "ProfileMargin" : 10 , "Frame" : true, "GlassFrame" : false},
 {"Profile" : "HAWAII" , "ProfileMargin" : 0 , "Frame" : false, "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 22 , "MaxEdge" : 0 , "IsFixedSpacing" : false , "FixedSideMargin" : 13 } },
-{"Profile" : "ILLINOIS" , "ProfileMargin" : 0 , "Frame" : false, "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 31 ,"GrooveWidth" : 6.4 ,"GrooveDepth" : 5 , "UserSpacing" : true} },
+{"Profile" : "ILLINOIS" , "ProfileMargin" : 0 , "Frame" : false, "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 31 ,"GrooveWidth" : 6.4 ,"GrooveDepth" : 5 , "UserSpacing" : true, "ToggleStartFinishOnLow" : true} },
 {"Profile" : "IOWA" , "ProfileMargin" : 0 , "Frame" : false , "GlassFrame" : false , "VGrooves" : {"MaxScallopWidth" : 8, "MaxMaxScallopWidth" : 9 , "IsFixedSpacing" : false, "FlatWidth" : 15, "MinFlatWidth" : 3, "ScallopToolRad" : 4.75, "HalfSpacingSideMargin" : true} },
 {"Profile" : "KANSAS" , "ProfileMargin" : 0 , "Frame" : false, "GlassFrame" : false , "VGrooves" : {"MinSpacing" : 60 , "IsFixedSpacing" : false , "FixedSideMargin" : 32 , "Width" : 60} },
 {"Profile" : "KENDAL" , "ProfileMargin" : 60 , "Frame" : true, "GlassFrame" : false},
 {"Profile" : "KENTUCKY" , "ProfileMargin" : 60 , "Frame" : true, "GlassFrame" : true, "UserPocketDepth" : 6 },
-{"Profile" : "LAUREL" , "ProfileMargin" : 0 , "Frame" : false , "GlassFrame" : false , "TEL" : 43 ,"VGrooves" : {"MaxSpacing" : 42 , "MaxEdge" : 0 , "IsFixedSpacing" : false, "UserSpacing" : true, "HalfSpacingSideMargin" : true, "Width" : 26} },
-{"Profile" : "LINCOLN" , "ProfileMargin" : 0 , "Frame" : false, "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 31 ,"GrooveWidth" : 6.4 ,"GrooveDepth" : 5 , "UserSpacing" : true} },
+{"Profile" : "LAUREL" , "ProfileMargin" : 0 , "Frame" : false , "GlassFrame" : false , "TEL" : 43 ,"VGrooves" : {"MaxSpacing" : 38 , "MaxEdge" : 0 , "IsFixedSpacing" : false, "UserSpacing" : true, "HalfSpacingSideMargin" : true, "Width" : 22} },
+{"Profile" : "LINCOLN" , "ProfileMargin" : 0 , "Frame" : false, "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 31 ,"GrooveWidth" : 6.4 ,"GrooveDepth" : 4 , "UserSpacing" : true} },
 {"Profile" : "LOUISIANA" , "ProfileMargin" : 10 , "Frame" : true, "GlassFrame" : false},
 {"Profile" : "MARYLAND" , "ProfileMargin" : 18 , "Frame" : true, "GlassFrame" : false},
 {"Profile" : "MIAMI" , "ProfileMargin" : 0 , "Frame" : false, "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 11 , "MaxEdge" : 0 , "IsFixedSpacing" : false , "UserSpacing" : true, "FixedSideMargin" : -0.5 } },
@@ -2015,12 +2015,13 @@ var LineNumber = LineDiv.getAttribute("data-LineNumber");
 var PanelType = document.getElementById("PanelType"+LineNumber).value;	
 var itemMaterial = document.getElementById("Material"+LineNumber);
 var PartEditButton = document.getElementById("EditLine"+LineNumber);
-if(ShowPartEditor == true) {PartEditButton.removeAttribute("hidden");}
 var PanelTypeNode = document.getElementById("PanelType"+LineNumber);
 var LineDesc = document.getElementById("Description"+LineNumber);
 var AddInfo = document.getElementById("AddInfo"+LineNumber);
 var PNCPartID = document.getElementById("PNCPartID"+LineNumber).value;
 //alert(PanelTypes[FindItem(PanelTypeNode.value,PanelTypes,"Name")].Icon);
+
+if(ShowPartEditor == true & PNCPartID == "") {PartEditButton.removeAttribute("hidden");} 
 
 var IconBase64Text = PanelTypes[FindItem(PanelTypeNode.value,PanelTypes,"Name")].Icon;
 PanelTypeNode.style.backgroundImage = "url('data:image/png;base64,"+IconBase64Text+"')";  

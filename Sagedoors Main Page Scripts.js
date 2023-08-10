@@ -224,7 +224,10 @@ var RowWasInserted = false;
 				switch (DataArray[i].Type)
 				{
 				case '.pnc' : var ImageClass = "TRows CVFileImage FileImageSmall"; var OrderType = "PNC"; break; 
-				case '.sdf' : var ImageClass = "TRows MicroFileImage FileImageSmall"; var OrderType = "SDF"; break; 
+				case '.sdf' : var ImageClass = "TRows MicroFileImage FileImageSmall"; var OrderType = "SDF"; break;
+				case '.opt' : var ImageClass = "TRows MozFileImage FileImageSmall"; var OrderType = "Moziak"; break;
+				case '.db' : var ImageClass = "TRows MozFileImage FileImageSmall"; var OrderType = "Moziak"; break;
+				case '.xml' : var ImageClass = "TRows MozFileImage FileImageSmall"; var OrderType = "Moziak"; break; 				
 				default : var ImageClass = "TRows"; var OrderType = "Manual"; break; 
 				}	
 				
@@ -242,7 +245,11 @@ var RowWasInserted = false;
 						
 						DataDiv.appendChild(CheckBoxCntrl);
 						break;
-				case 2 : DataDiv.setAttribute("style","width:70px;"); DataDiv.className = ImageClass; DataDiv.innerHTML = OrderType;break;
+				case 2 : DataDiv.setAttribute("style","width:70px;"); 
+						DataDiv.className = ImageClass; 
+						DataDiv.innerHTML = OrderType;
+							if (OrderType == "Moziak") {DataDiv.style.textAlign = "right";} else {DataDiv.style.textAlign = "center";}
+						break;
 				case 3 : DataDiv.setAttribute("style","width:70px;"); DataDiv.innerHTML = DataArray[i].RefNo; break;
 				case 4 : DataDiv.setAttribute("style","width:100px;");DataDiv.innerHTML = DataArray[i].CreateDate; break;
 				case 5 : DataDiv.setAttribute("style","width:130px;"); DataDiv.innerHTML = DataArray[i].CreatedBy; break;

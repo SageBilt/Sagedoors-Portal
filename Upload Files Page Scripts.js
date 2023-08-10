@@ -2,6 +2,43 @@ const FileUploadURL = "https://remote.sagemfg.co.nz:8443/?script=Sagedoors%20Por
 
 var ServerResponseType = "";
 var ProcFileName = "";
+var UploadedFiles = "";
+
+function SelectFileType(DivID)
+{
+var UploadFileInput = document.getElementById("fileElem"); 
+var DropZoneText = document.getElementById("DropZoneText");
+var HelpDocLink = document.getElementById("HelpDocLink"); 
+
+
+
+	switch (DivID)
+	{
+	  case "PNCFileOption" : 
+	  						UploadFileInput.accept = ".pnc";
+							DropZoneText.innerHTML = "Drag your PNC file to this <i>drop zone</i> or click to browse files";
+							document.getElementById("PNCHelpDocLink").style.display = "initial";
+							//HelpDocLink.href = "https://nextcloud.sagemfg.co.nz/s/RoGp7JpK7ESBMbe";
+							//HelpDocLink.innerHTML = "Click here for documentation on how to create PNC files"; 				
+							break;
+	  case "SDFFileOption" : 	
+	  						UploadFileInput.accept = ".sdf"; 
+							DropZoneText.innerHTML = "Drag your SDF file to this <i>drop zone</i> or click to browse files";
+							break;
+	  case "MoziakFilesOption" : 
+	  						UploadFileInput.accept = ".opt,.db"; 
+							UploadFileInput.setAttribute("multiple","multiple");
+							DropZoneText.innerHTML = "Drag your Moziak files to this <i>drop zone</i> or click to browse files";
+							document.getElementById("MOZHelpDocLink").style.display = "initial"; 
+							//HelpDocLink.href = "https://nextcloud.sagemfg.co.nz/s/26wg37fCYKY8giB";
+							//HelpDocLink.innerHTML = "Click here for documentation on how to find your Mozaik files"; 						
+							break;
+	}	
+	document.getElementById("DropZone").style.display = "block";
+	document.getElementById("FileTypesDiv").style.display = "none";
+	
+	
+}
 
 function dragenter(e) {
   e.stopPropagation();
@@ -20,7 +57,7 @@ function drop(e) {
   const dt = e.dataTransfer;
   const files = dt.files;
   
-  UploadFile(files[0])
+  UploadFile(files)
   
 }
 
@@ -30,17 +67,34 @@ var xhttp = new XMLHttpRequest();
 var fd = new FormData();
 var LoggedOnCustomer = document.getElementById("Login").value;
 var LoggedOnToken = document.getElementById("Token").value;	
-var FileExt = file.name.split('.').pop();
+var FileExt = '';
+var FileNameDiv = document.getElementById("FileNameDiv");
 
-  document.getElementById("FileNameDiv").style.display = "initial"; 
-  document.getElementById("FileNamePar").innerHTML = file.name;
+  document.getElementById("FileNameDiv").style.display = "initial";
+
+
   
- 
+  for (var x=0; x<file.length;x++) 
+  {
+	FileExt = file[x].name.split('.').pop();
+
+	var FileNameh6 = document.createElement("h6");
+	FileNameh6.innerHTML = file[x].name;
+	FileNameh6.setAttribute("style","margin-top:0px;margin-bottom:0px");
+	
+	FileNameDiv.appendChild(FileNameh6);
+	if (UploadedFiles == "") {UploadedFiles = file[x].name;} else {UploadedFiles = UploadedFiles + ";" + file[x].name;}
+	
+  } 
+  //  document.getElementById("FileNamePar").innerHTML = file[0].name;
+
+
   
   switch (FileExt)
   {
 	case "pnc" : document.getElementById("fileTypeImage").setAttribute("class", "UploadFileImage CVFileImage"); break;
 	case "sdf" : document.getElementById("fileTypeImage").setAttribute("class", "UploadFileImage MicroFileImage"); break;
+	default: document.getElementById("fileTypeImage").setAttribute("class", "UploadFileImage MozFileImage");
   }
 
   
@@ -64,14 +118,19 @@ var FileExt = file.name.split('.').pop();
   xhttp.open("PUT",FileUploadURL, true);
   fd.append("LoggedOn",encodeURIComponent(LoggedOnCustomer));
   fd.append("Token",encodeURIComponent(LoggedOnToken));
-  fd.append('UploadedJobFile', file);  
+  for (var x=0; x<file.length;x++) 
+  {
+	fd.append('UploadedJobFile', file[x]); 
+  }
+ 
   xhttp.send(fd);
  
 
 
   document.getElementById("DropZone").style.display = "none";
   document.getElementById("UploadProgressDiv").style.display = "initial";
-  document.getElementById("UploadProgressText").innerHTML = "Please wait while your file is being processed.";   
+  document.getElementById("UploadProgressText").innerHTML = "Please wait while your file is being processed.";
+  HideHelpDocLinks();
 }
 
 
@@ -96,6 +155,12 @@ var LoggedOnToken = document.getElementById("Token").value;
   
 }
 
+function HideHelpDocLinks()
+{
+	var LinkElems = document.getElementById("HelpDocDiv").querySelectorAll('a');
+	LinkElems.forEach((Element) => {Element.style.display = "none";});
+}
+
 function ProcessServerResponse(RespText)
 {	
 	try
@@ -104,10 +169,13 @@ function ProcessServerResponse(RespText)
 	ServerResponseType = RespJSON.ResponseType;
 	
 	if (RespJSON.hasOwnProperty("FileName")) {ProcFileName = RespJSON.FileName;}
-	
+	//alert(ProcFileName);
+	//var FileExt = ProcFileName.name.split('.').pop();
+	HideHelpDocLinks();
 
 		switch (ServerResponseType)
 		{
+
 			case  "SubMaterials" :
 			ProcessSubResponse(RespJSON.PNCMaterials,750,'Materials',true);
 			document.getElementById("ItemsSubHeader").innerHTML = "Please select a substitution material for each material in your file. Or alternatively mark for deletion from the file."
@@ -122,6 +190,8 @@ function ProcessServerResponse(RespText)
 			document.getElementById("SubItemName").innerHTML = "Tool name in file to substitute";
 			document.getElementById("NewItemName").innerHTML = "Sage Doors Tool";
 			document.getElementById("ContinueButtonBar").style.display = "block";
+			document.getElementById("ToolsHelpDocLink").style.display = "initial";	
+
 			break;
 			case  "InvalidEdgeBandThickness" :
 			document.getElementById("ErrorMsgContainer").style.display = "block";
@@ -129,7 +199,6 @@ function ProcessServerResponse(RespText)
 			break;
 			case  "OtherOptions" :
 			document.getElementById("OtherOptions").style.display = "block";
-			//document.getElementById("FinishButtonBar").style.display = "block";
 			document.getElementById("ContinueButtonBar").style.display = "block";
 			break;			
 		}
@@ -248,8 +317,9 @@ NewItem.name = "NewItem"+counter ;
 NewItem.className = "ItemSublines";
 NewItem.setAttribute("style","font-size:0.75em;user-select: none;cursor:context-menu");
 NewItem.setAttribute("data-AssocInputID","NewItem"+counter);
-NewItem.setAttribute("readonly","readonly");
+//NewItem.setAttribute("readonly","readonly");
 NewItem.setAttribute("onmouseup","ShowCustomDropDown(this,"+Picklist+");");
+NewItem.setAttribute("oninput","KeyDownShowCustomDropDown(this,"+Picklist+")");
 NewItem.setAttribute("onchange","");
 
 var NewItemDropButton = document.createElement("input");
@@ -366,9 +436,8 @@ var ShowProgressDiv = false;
 	{
 		case  "SubMaterials" :
 			if (CheckAllItemSubAnswered())
-			{
-			var OrigFileName = document.getElementById("FileNamePar").innerHTML;	
-			ServerRequest("ProcFileName="+ProcFileName+"\nOrigFileName="+OrigFileName+"\nSubMatResult="+encodeURIComponent(JSON.stringify(CreateNewSubListJSON()))); 
+			{	
+			ServerRequest("ProcFileName="+ProcFileName+"\nUploadedFiles="+UploadedFiles+"\nSubMatResult="+encodeURIComponent(JSON.stringify(CreateNewSubListJSON()))); 
 			document.getElementById("UploadProgressText").innerHTML = "Updating material information.";
 			ShowProgressDiv = true;	
 			}
@@ -377,15 +446,16 @@ var ShowProgressDiv = false;
 		case  "SubTools" :
 			if (CheckAllItemSubAnswered())
 			{			
-			ServerRequest("ProcFileName="+ProcFileName+"\nSubToolResult="+encodeURIComponent(JSON.stringify(CreateNewSubListJSON())));
+			ServerRequest("ProcFileName="+ProcFileName+"\nUploadedFiles="+UploadedFiles+"\nSubToolResult="+encodeURIComponent(JSON.stringify(CreateNewSubListJSON())));
 			document.getElementById("UploadProgressText").innerHTML = "Updating tool information.";
 			ShowProgressDiv = true;	
+			HideHelpDocLinks();
 			}
 			else {alert("You have not provided substitutions or deletetions for all tools!");}
 		break;
 		case  "OtherOptions" :
 		document.getElementById("UploadProgressText").innerHTML = "Loading Data!";	
-		document.getElementById("UpdoadFileName").value = document.getElementById("FileNamePar").innerHTML;
+		document.getElementById("UpdoadFileName").value = UploadedFiles;
 		document.getElementById("ProcFileName").value = ProcFileName;
 		document.getElementById("CreateQuoteOrder").value = "Create Quote/Order";
 		document.getElementById("UploadFileForm").submit();
@@ -399,34 +469,9 @@ var ShowProgressDiv = false;
 	{
 	document.getElementById("ItemsSubContainer").style.display = "none";
 	document.getElementById("ContinueButtonBar").style.display = "none";
-	document.getElementById("FinishButtonBar").style.display = "none";
 	document.getElementById("OtherOptions").style.display = "none";
 	document.getElementById("UploadProgressDiv").style.display = "initial";	
 	RemoveItemSubLines();
 	}
 	
 }
-
-/* function SubmitFile(ButtonElem)
-{
-	var OptionsParams = "";
-	
-	OptionsParams = "\nPHandles="+document.getElementById("PHandles").checked;
-	OptionsParams = OptionsParams + "\nAEdges="+document.getElementById("AEdges").checked;
-	OptionsParams = OptionsParams + "\nBuildupP="+document.getElementById("BuildupP").checked;
-	OptionsParams = OptionsParams + "\nGlassF="+document.getElementById("GlassF").checked;
-	OptionsParams = OptionsParams + "\nGrainM="+document.getElementById("GrainM").checked;
-	OptionsParams = OptionsParams + "\nNonStdBand="+document.getElementById("NonStdBand").checked;
-	OptionsParams = OptionsParams + "\nEdgeCutouts="+document.getElementById("EdgeCutouts").checked;
-	OptionsParams = OptionsParams + "\nAEdgesBand="+document.getElementById("AEdgesBand").checked;
-
-	document.getElementById("UploadProgressText").innerHTML = "Processing your order. Please wait.";
-	document.getElementById("UploadProgressDiv").style.display = "initial";
-    document.getElementById("FinishButtonBar").style.display = "none";
-    document.getElementById("OtherOptions").style.display = "none";	
-	
-	var OrigFileName = document.getElementById("FileNamePar").innerHTML;
-	
-	ServerRequest("ProcFileName="+encodeURIComponent(ProcFileName)+"\n"+ButtonElem.id+"=Yes\nOrigFileName="+OrigFileName+OptionsParams);
-	
-} */
