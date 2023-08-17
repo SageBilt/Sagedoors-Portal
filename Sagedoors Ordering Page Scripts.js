@@ -224,7 +224,7 @@ Description.setAttribute("style","width:145px;left:454px;cursor:context-menu");
 Description.setAttribute("data-AssocInputID","Description"+counter);
 //Description.setAttribute("readonly","readonly");
 Description.setAttribute("onmouseup","SelectLine(this.parentNode.id);HideDropDown(event,''); ");
-Description.setAttribute("onchange","ChangeDesc(this.parentNode.id);ChangeBanding(this.parentNode.id);CheckIlegalChar(this);SelectLine(this.parentNode.id);Calculations(this.parentNode.id);CheckForGlassFrame(this);");
+Description.setAttribute("onchange","ChangeDesc(this.parentNode.id);ChangeBanding(this.parentNode.id);CheckIlegalChar(this);SelectLine(this.parentNode.id);Calculations(this.parentNode.id);CheckForUserComments(this);");
 Description.setAttribute("title","You can select from the dropdown box or free type your part name here");
 Description.setAttribute("autocomplete","off");
 Description.setAttribute("onkeydown","ForceOnChangeOnEnter(this,event);");
@@ -348,11 +348,11 @@ AddINfo.type = "text" ;
 var StyleAtt = document.createAttribute("style"); StyleAtt.value="width:120px;left:902px;"; AddINfo.setAttributeNode(StyleAtt);
 var ClassAtt = document.createAttribute("class"); ClassAtt.value="Inputlines"; AddINfo.setAttributeNode(ClassAtt);
 var onmousedownAtt = document.createAttribute("onmouseup"); onmousedownAtt.value="SelectLine(this.parentNode.id);";AddINfo.setAttributeNode(onmousedownAtt); 
-//AddINfo.setAttribute("onchange", "CheckForGlassFrame(this);");
-//var onChangeAtt = document.createAttribute("onchange"); onChangeAtt .value="CheckForGlassFrame(this);"; AddINfo.setAttributeNode(onChangeAtt);
+//AddINfo.setAttribute("onchange", "CheckForUserComments(this);");
+//var onChangeAtt = document.createAttribute("onchange"); onChangeAtt .value="CheckForUserComments(this);"; AddINfo.setAttributeNode(onChangeAtt);
 var TitleAtt = document.createAttribute("title"); TitleAtt.value="Any additional information that you might need to communicate to Sage Doors or yourself";AddINfo.setAttributeNode(TitleAtt);
 //var PatternAtt = document.createAttribute("pattern");  PatternAtt.value="[abc]"; AddINfo.setAttributeNode(PatternAtt);
-var ChangeAtt = document.createAttribute("oninput"); ChangeAtt.value="CheckIlegalChar(this);RestrictNumberChar(this,14);CheckForGlassFrame(this);"; AddINfo.setAttributeNode(ChangeAtt);
+var ChangeAtt = document.createAttribute("oninput"); ChangeAtt.value="CheckIlegalChar(this);RestrictNumberChar(this,14);CheckForUserComments(this);"; AddINfo.setAttributeNode(ChangeAtt);
 
 
 
@@ -671,34 +671,42 @@ function LoadExistLinesData()
 }
 
 
-function CheckForGlassFrame(Elem)  
+function CheckForUserComments(Elem)  
 { 
 //alert(Elem.id.search("Description")); 
 	if (Elem.id.search("Description") > -1 & Elem.value != 'Glass Frame' | Elem.id.search("Description") == -1)
 	{
 		if(Elem.value.toUpperCase().search("FRAME") > -1 )  
 		{
-		popup("Writing 'Frame' here will not work if you want a glass frame. Please select 'Glass Frame' under the 'Type' dropdown insead.",200,350,1);  
+		popup("Writing 'Frame' here will not work if you want a glass frame. Please select 'Glass Frame' under the 'Type' dropdown instead.",200,350,1);  
 		Elem.value = null;
 		Elem.focus();  
 		}
 		if(Elem.value.toUpperCase().search("GLASS") > -1 )  
 		{
-		popup("Writing 'Glass' here will not work if you want a glass frame. Please select 'Glass Frame' under the 'Type' dropdown insead.",200,350,1);  
+		popup("Writing 'Glass' here will not work if you want a glass frame. Please select 'Glass Frame' under the 'Type' dropdown instead.",200,350,1);  
 		Elem.value = null;
 		Elem.focus();  
 		}  
 	}  
+
+	if(Elem.value.toUpperCase().search("GRAIN") > -1 )  
+	{
+	popup("Writing 'Grain' here will not work if you want to grain match your parts. Please us the grain matching editor instead.",200,350,1);  
+	Elem.value = null;
+	Elem.focus();  
+	}
+
 }
 
-function HDFGlassFramedAllowed(LineMaterial)
+/*function HDFGlassFramedAllowed(LineMaterial)
 {
 	var ProfileName = GetHDFProfileName(LineMaterial);
 	var HHDItemIndex = FindItem(ProfileName,HDFDoorSpecData,'Profile');
 	
 	if (HHDItemIndex > -1) {return HDFDoorSpecData[HHDItemIndex].GlassFrame}
 	else {return false}
-}
+}*/
 
 function BuildRelMaterialsList(LineDivID)
 {
@@ -708,63 +716,42 @@ var PanelType = document.getElementById("PanelType"+LineNumber).value;
 var PNCPartID = document.getElementById("PNCPartID"+LineNumber).value;
 var FiltMatList	= [];
 
-	if (PNCPartID > 0) /*Only allow selection of same material family*/
+
+	for (var i=0; i<Materials.length;i++) 
 	{
-
-		/*var ExistingMat = document.getElementById("Material"+LineNumber).value;
-		var FamilyName = GetMaterialNamePart(ExistingMat);
-			
-		for (var i=0; i<Materials.length;i++) 
+		if (Materials[i].GlassFrame != 'Only Glass Frame' | PanelType == 'Glass Frame')
 		{
+			if (PNCPartID > 0) /*Only allow selection of same material family*/
+			{
+				var MatThick = GetMatThickFromName(Materials[i].Name);
+				if (MatThick > ExistMatThick-1 & MatThick < ExistMatThick+1)
+				{ FiltMatList.push({ "Name" : ""+Materials[i].Name+"" , "colour" : ""+Materials[i].colour+"" }); }
+			}
+			else
+			{
+				switch (PanelType)
+				{
+					case 'Profile Handle' : 
+							if (Materials[i].NoProfileHandle != 'Yes' & Materials[i].Name.indexOf("36") == -1 & Materials[i].Name.indexOf("60") == -1 )	
+							{ FiltMatList.push({ "Name" : ""+Materials[i].Name+"" , "colour" : ""+Materials[i].colour+"" }); }
+							break;
+					case 'Glass Frame' : 
+							if (Materials[i].GlassFrame == 'Only Glass Frame' | Materials[i].GlassFrame == '') // && Materials[i].Name.indexOf('(POCKET BACK)') == -1 
+							{ FiltMatList.push({ "Name" : ""+Materials[i].Name+"" , "colour" : ""+Materials[i].colour+"" }); }
+							break;
+					case 'Optidoor' :
+							if (Materials[i].Name.indexOf(HDFPrefix) > -1)
+							{ FiltMatList.push({ "Name" : ""+Materials[i].Name+"" , "colour" : ""+Materials[i].colour+"" }); }
+							break;
 
-			if (Materials[i].Name.indexOf(FamilyName) > -1)	
-			{ FiltMatList.push({ "Name" : ""+Materials[i].Name+"" , "colour" : ""+Materials[i].colour+"" }); }
-		}
-		return FiltMatList	*/
-		var ExistMatThick = GetMatThickFromName(document.getElementById("Material"+LineNumber).value);
-
-		for (var i=0; i<Materials.length;i++) 
-		{
-			var MatThick = GetMatThickFromName(Materials[i].Name);
-			if (MatThick > ExistMatThick-1 & MatThick < ExistMatThick+1)
-			{ FiltMatList.push({ "Name" : ""+Materials[i].Name+"" , "colour" : ""+Materials[i].colour+"" }); }
-		}
-		return FiltMatList
+		
+					default : FiltMatList.push({ "Name" : ""+Materials[i].Name+"" , "colour" : ""+Materials[i].colour+"" });
+				}
+			}
+		}		
 	}
-	else
-	{
+	return FiltMatList
 
-		switch (PanelType)
-		{
-			case 'Profile Handle' : 
-				for (var i=0; i<Materials.length;i++) 
-				{
-
-					if (Materials[i].NoProfileHandle != 'Yes' & Materials[i].Name.indexOf("36") == -1 & Materials[i].Name.indexOf("60") == -1)	
-					{ FiltMatList.push({ "Name" : ""+Materials[i].Name+"" , "colour" : ""+Materials[i].colour+"" }); }
-				}
-				return FiltMatList;
-			case 'Glass Frame' : 
-				for (var i=0; i<Materials.length;i++) 
-				{
-					if (Materials[i].Name.indexOf(HDFPrefix) > -1 & HDFGlassFramedAllowed(Materials[i].Name) & Materials[i].Name.indexOf('(POCKET BACK)') == -1  | Materials[i].Name.indexOf(HDFPrefix) == -1)
-					{ FiltMatList.push({ "Name" : ""+Materials[i].Name+"" , "colour" : ""+Materials[i].colour+"" }); }
-				}
-				return FiltMatList
-			case 'Optidoor' :
-				for (var i=0; i<Materials.length;i++) 
-				{
-					if (Materials[i].Name.indexOf(HDFPrefix) > -1)
-					{ FiltMatList.push({ "Name" : ""+Materials[i].Name+"" , "colour" : ""+Materials[i].colour+"" }); }
-				}
-				return FiltMatList
-
-
-
-			default : return Materials
-		}
-
-	}
 }
 
 function CheckMaterial(LineDivID)
@@ -2060,7 +2047,11 @@ if (IconBase64Text != "") {PanelTypeNode.className = "Inputlines LeftIcon";} els
 		ChangeDesc(LineDivID);
 		}
 
-		if (itemMaterial.value.indexOf(HDFPrefix) > -1 & !HDFGlassFramedAllowed(itemMaterial.value) | itemMaterial.value.indexOf('(POCKET BACK)') > -1) {itemMaterial.value = null;} 
+		var MatIndex = FindItem(itemMaterial.value,Materials,"Name");
+		if (MatIndex > -1)
+		{
+			if (Materials[MatIndex].GlassFrame == 'No Glass Frame' ) {itemMaterial.value = null;} //| itemMaterial.value.indexOf('(POCKET BACK)') > -1
+		}
 	break;	
 	/*case 'Optidoor'  :
 		if (itemMaterial.value.indexOf(HDFPrefix) == -1) 
@@ -4132,7 +4123,7 @@ function DrawPreview(canvasId,canvas2Id,LineDivID)
 					PocketXPos = FrameMargin+AdjXPos+VGrooveFixedSideMargin;
 					}
 
-					if (Framed) 
+					if (Framed & PocketHeight > 10 & PocketWidth > 10) 
 					{
 						if (PanelType == 'Glass Frame' )
 						{
@@ -4167,7 +4158,7 @@ function DrawPreview(canvasId,canvas2Id,LineDivID)
 					
 					
 					//"VGrooves" : [{"MaxSpacing" : 0 , "MaxEdge" : 0 , "IsFixedSpacing" : false}] },
-					if (VGrooves != undefined)
+					if (VGrooves != undefined & PocketHeight > 10 & PocketWidth > 10)
 					{
 					MaxSpacing = VGrooves.MaxSpacing;
 					MinSpacing = VGrooves.MinSpacing;
@@ -4478,6 +4469,10 @@ CurrentOrderLeadTime = StdLeadTime;
 		if (document.getElementById("Leftedge"+r).value == '45Profile' || document.getElementById("Rightedge"+r).value == '45Profile'
 		|| document.getElementById("Topedge"+r).value == '45Profile' || document.getElementById("Bottomedge"+r).value == '45Profile')
 		{CurrentOrderLeadTime = MitreHandlesLeadTime}
+
+		if (document.getElementById("Leftedge"+r).value == 'AngleEdge' || document.getElementById("Rightedge"+r).value == 'AngleEdge'
+		|| document.getElementById("Topedge"+r).value == 'AngleEdge' || document.getElementById("Bottomedge"+r).value == 'AngleEdge')
+		{CurrentOrderLeadTime = AngleEdgesLeadTime}	
 	
 		if (document.getElementById("PanelType"+r).value == 'Builtup Panel') {CurrentOrderLeadTime = BuildupPanelLeadTime}  
 		if (document.getElementById("PanelType"+r).value == 'Glass Frame') {CurrentOrderLeadTime = GlassFrameLeadTime}  

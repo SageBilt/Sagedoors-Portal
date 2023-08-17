@@ -1,4 +1,6 @@
-const FileUploadURL = "https://remote.sagemfg.co.nz:8443/?script=Sagedoors%20Portal%20Upload%20Files";
+//const FileUploadURL = "https://remote.sagemfg.co.nz:8443/?script=Sagedoors%20Portal%20Upload%20Files";
+const FileUploadURL = "https://portal.sagemfg.co.nz";
+//const FileUploadURL = "https://remote.sagemfg.co.nz:8443/?script=Sagedoors%20Portal%20Upload%20Files%20Beta";
 
 var ServerResponseType = "";
 var ProcFileName = "";
@@ -151,6 +153,7 @@ var LoggedOnToken = document.getElementById("Token").value;
 
   xhttp.open("POST",FileUploadURL, true);
   xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+  
   xhttp.send(Params+"\nLoggedOn="+encodeURIComponent(LoggedOnCustomer)+"\nToken="+encodeURIComponent(LoggedOnToken));
   
 }
