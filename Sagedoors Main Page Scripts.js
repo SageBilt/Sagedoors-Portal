@@ -220,14 +220,20 @@ var RowWasInserted = false;
 	//alert(DataArray[i].CreatedBy.indexOf(FilterText) + " " + DataArray[i].CreatedBy + " " + FilterText);
 			if (FilterText == "" | FilterText == undefined | FilterText == null | DataArray[i].RefNo.toUpperCase().indexOf(FilterText) > -1 | DataArray[i].CreatedBy.toUpperCase().indexOf(FilterText) > -1 
 			| DataArray[i].JobDesc.toUpperCase().indexOf(FilterText) > -1 | DataArray[i].JobRef.toUpperCase().indexOf(FilterText) > -1 | DataArray[i].DeliveryAddress.toUpperCase().indexOf(FilterText) > -1)
-			{
+			{	
+
 				switch (DataArray[i].Type)
 				{
 				case '.pnc' : var ImageClass = "TRows CVFileImage FileImageSmall"; var OrderType = "PNC"; break; 
 				case '.sdf' : var ImageClass = "TRows MicroFileImage FileImageSmall"; var OrderType = "SDF"; break;
 				case '.opt' : var ImageClass = "TRows MozFileImage FileImageSmall"; var OrderType = "Moziak"; break;
 				case '.db' : var ImageClass = "TRows MozFileImage FileImageSmall"; var OrderType = "Moziak"; break;
-				case '.xml' : var ImageClass = "TRows MozFileImage FileImageSmall"; var OrderType = "Moziak"; break; 				
+				case '.xml' : var ImageClass = "TRows MozFileImage FileImageSmall"; var OrderType = "Moziak"; break; 
+				case '.xls' : var ImageClass = "TRows ExcelCSVFileImage FileImageSmall"; var OrderType = "Excel"; break; 
+				case '.xlsx' : var ImageClass = "TRows ExcelCSVFileImage FileImageSmall"; var OrderType = "Excel"; break;
+				case '.csv' : var ImageClass = "TRows ExcelCSVFileImage FileImageSmall"; var OrderType = "CSV"; break;
+				case '.ods' : var ImageClass = "TRows ExcelCSVFileImage FileImageSmall"; var OrderType = "Excel"; break;
+
 				default : var ImageClass = "TRows"; var OrderType = "Manual"; break; 
 				}	
 				

@@ -1,6 +1,6 @@
 //const FileUploadURL = "https://remote.sagemfg.co.nz:8443/?script=Sagedoors%20Portal%20Upload%20Files";
-const FileUploadURL = "https://portal.sagemfg.co.nz";
-//const FileUploadURL = "https://remote.sagemfg.co.nz:8443/?script=Sagedoors%20Portal%20Upload%20Files%20Beta";
+//const FileUploadURL = "https://portal.sagemfg.co.nz";
+const FileUploadURL = "https://remote.sagemfg.co.nz:8443/?script=Sagedoors%20Portal%20Upload%20Files%20Beta";
 
 var ServerResponseType = "";
 var ProcFileName = "";
@@ -19,9 +19,7 @@ var HelpDocLink = document.getElementById("HelpDocLink");
 	  case "PNCFileOption" : 
 	  						UploadFileInput.accept = ".pnc";
 							DropZoneText.innerHTML = "Drag your PNC file to this <i>drop zone</i> or click to browse files";
-							document.getElementById("PNCHelpDocLink").style.display = "initial";
-							//HelpDocLink.href = "https://nextcloud.sagemfg.co.nz/s/RoGp7JpK7ESBMbe";
-							//HelpDocLink.innerHTML = "Click here for documentation on how to create PNC files"; 				
+							document.getElementById("PNCHelpDocLink").style.display = "initial";				
 							break;
 	  case "SDFFileOption" : 	
 	  						UploadFileInput.accept = ".sdf"; 
@@ -31,10 +29,14 @@ var HelpDocLink = document.getElementById("HelpDocLink");
 	  						UploadFileInput.accept = ".opt,.db"; 
 							UploadFileInput.setAttribute("multiple","multiple");
 							DropZoneText.innerHTML = "Drag your Moziak files to this <i>drop zone</i> or click to browse files";
-							document.getElementById("MOZHelpDocLink").style.display = "initial"; 
-							//HelpDocLink.href = "https://nextcloud.sagemfg.co.nz/s/26wg37fCYKY8giB";
-							//HelpDocLink.innerHTML = "Click here for documentation on how to find your Mozaik files"; 						
+							document.getElementById("MOZHelpDocLink").style.display = "initial"; 					
 							break;
+	  case "ExcelCSVFilesOption" : 
+							UploadFileInput.accept = ".xls,.xlsx,.csv,.ods"; 
+							//UploadFileInput.setAttribute("multiple","multiple");
+							DropZoneText.innerHTML = "Drag your Excel/CSV file to this <i>drop zone</i> or click to browse files";
+							document.getElementById("XLSCSVHelpDocLink").style.display = "initial";						
+							break;					
 	}	
 	document.getElementById("DropZone").style.display = "block";
 	document.getElementById("FileTypesDiv").style.display = "none";
@@ -89,13 +91,14 @@ var FileNameDiv = document.getElementById("FileNameDiv");
 	
   } 
   //  document.getElementById("FileNamePar").innerHTML = file[0].name;
-
-
   
   switch (FileExt)
   {
 	case "pnc" : document.getElementById("fileTypeImage").setAttribute("class", "UploadFileImage CVFileImage"); break;
 	case "sdf" : document.getElementById("fileTypeImage").setAttribute("class", "UploadFileImage MicroFileImage"); break;
+	case "xls" : document.getElementById("fileTypeImage").setAttribute("class", "UploadFileImage ExcelCSVFileImage"); break;
+	case "xlsx" : document.getElementById("fileTypeImage").setAttribute("class", "UploadFileImage ExcelCSVFileImage"); break;
+	case "csv" : document.getElementById("fileTypeImage").setAttribute("class", "UploadFileImage ExcelCSVFileImage"); break;
 	default: document.getElementById("fileTypeImage").setAttribute("class", "UploadFileImage MozFileImage");
   }
 
@@ -203,7 +206,11 @@ function ProcessServerResponse(RespText)
 			case  "OtherOptions" :
 			document.getElementById("OtherOptions").style.display = "block";
 			document.getElementById("ContinueButtonBar").style.display = "block";
-			break;			
+			break;
+			case  "Error" :
+			document.getElementById("ErrorMsg").style.display = "initial";
+			document.getElementById("ErrorH4Text").innerHTML = RespJSON.ErrorText;
+			break;					
 		}
 		
 	document.getElementById("UploadProgressDiv").style.display = "none";	
@@ -212,6 +219,7 @@ function ProcessServerResponse(RespText)
 	{
 		document.getElementById("UploadProgressDiv").style.display = "none";
 		document.getElementById("ErrorMsg").style.display = "initial";
+		document.getElementById("ErrorH4Text").innerHTML = "Something went wrong! Please contact us on 0800 50 SAGE for assistance.";
 		//alert(RespText);
 	}
 	
@@ -385,7 +393,7 @@ function BuildRelNewItemsList(ThickText)
 		//if (Materials[i].Name.indexOf("36") == -1 & Materials[i].Name.indexOf("60") == -1)
 		//{
 		ListMatThick = GetMatThickFromName(Materials[i].Name);
-		if (ListMatThick > ItemMatThick-1 & ListMatThick < ItemMatThick+1)
+		if (ListMatThick > ItemMatThick-1 & ListMatThick < ItemMatThick+1 | isNaN(ItemMatThick))
 		{
 		FiltMatList.push({ "Name" : ""+Materials[i].Name+"" , "colour" : ""+Materials[i].colour+""});
 		}
