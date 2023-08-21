@@ -1,6 +1,6 @@
 //const FileUploadURL = "https://remote.sagemfg.co.nz:8443/?script=Sagedoors%20Portal%20Upload%20Files";
-//const FileUploadURL = "https://portal.sagemfg.co.nz";
-const FileUploadURL = "https://remote.sagemfg.co.nz:8443/?script=Sagedoors%20Portal%20Upload%20Files%20Beta";
+const FileUploadURL = "https://portal.sagemfg.co.nz";
+//const FileUploadURL = "https://remote.sagemfg.co.nz:8443/?script=Sagedoors%20Portal%20Upload%20Files%20Beta";
 
 var ServerResponseType = "";
 var ProcFileName = "";
