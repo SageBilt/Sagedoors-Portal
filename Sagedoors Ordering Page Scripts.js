@@ -5949,6 +5949,8 @@ function GrainMatchWindow(WinHieght,WinWidth) {
     var HiddenDIv = document.getElementById("hiddenDiv2");
 	var frm = document.getElementById('Mainform');
 
+	if (WinHieght > window.innerHeight) {WinHieght = window.innerHeight-100;}
+
 
 	if (HiddenDIv.childNodes.length == 0 && document.getElementById("Orderlines").childNodes.length > 0 ) 
 	{
