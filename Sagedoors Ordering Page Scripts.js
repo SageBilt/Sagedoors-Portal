@@ -728,7 +728,6 @@ var FiltMatList	= [];
 			{
 				var MatThick = GetMatThickFromName(Materials[i].Name);
 				var ExistMatThick = GetMatThickFromName(itemMaterial);
-				console.log(ExistMatThick);
 				if (MatThick <= ExistMatThick-1 | MatThick >= ExistMatThick+1)
 				{ AllowThickness = false;}
 			}

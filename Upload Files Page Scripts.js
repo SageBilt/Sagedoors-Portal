@@ -393,7 +393,7 @@ function BuildRelNewItemsList(ThickText)
 		//if (Materials[i].Name.indexOf("36") == -1 & Materials[i].Name.indexOf("60") == -1)
 		//{
 		ListMatThick = GetMatThickFromName(Materials[i].Name);
-		if (ListMatThick > ItemMatThick-1 & ListMatThick < ItemMatThick+1 | isNaN(ItemMatThick))
+		if (ListMatThick > ItemMatThick-1 & ListMatThick < ItemMatThick+1 | isNaN(ItemMatThick) | ListMatThick > 30 & ItemMatThick > 30)
 		{
 		FiltMatList.push({ "Name" : ""+Materials[i].Name+"" , "colour" : ""+Materials[i].colour+""});
 		}
