@@ -722,14 +722,18 @@ var FiltMatList	= [];
 	{
 		if (Materials[i].GlassFrame != 'Only Glass Frame' | PanelType == 'Glass Frame')
 		{
+			var AllowThickness = true;
+
 			if (PNCPartID > 0) /*Only allow selection of same material family*/
 			{
 				var MatThick = GetMatThickFromName(Materials[i].Name);
 				var ExistMatThick = GetMatThickFromName(itemMaterial);
-				if (MatThick > ExistMatThick-1 & MatThick < ExistMatThick+1)
-				{ FiltMatList.push({ "Name" : ""+Materials[i].Name+"" , "colour" : ""+Materials[i].colour+"" }); }
+				console.log(ExistMatThick);
+				if (MatThick <= ExistMatThick-1 | MatThick >= ExistMatThick+1)
+				{ AllowThickness = false;}
 			}
-			else
+	
+			if (AllowThickness)
 			{
 				switch (PanelType)
 				{
@@ -750,6 +754,7 @@ var FiltMatList	= [];
 					default : FiltMatList.push({ "Name" : ""+Materials[i].Name+"" , "colour" : ""+Materials[i].colour+"" });
 				}
 			}
+	
 		}		
 	}
 	return FiltMatList
