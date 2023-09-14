@@ -609,7 +609,7 @@ function LoadExistLinesData()
 		document.getElementById("Width"+LineNo).setAttribute('disabled','disabled');
 		document.getElementById("UnitRef"+LineNo).setAttribute('disabled','disabled');
 		document.getElementById("CopyLine"+LineNo).setAttribute('hidden','hidden');
-		document.getElementById("EditLine"+LineNo).setAttribute('hidden','hidden');
+		//document.getElementById("EditLine"+LineNo).setAttribute('hidden','hidden');
 		}
 		
 		//ExistLinesData.PanelLines[i].PopupMsg
@@ -714,6 +714,7 @@ var LineDiv = document.getElementById(LineDivID);
 var LineNumber = LineDiv.getAttribute("data-LineNumber");		
 var PanelType = document.getElementById("PanelType"+LineNumber).value;
 var PNCPartID = document.getElementById("PNCPartID"+LineNumber).value;
+var itemMaterial = document.getElementById("Material"+LineNumber).value;
 var FiltMatList	= [];
 
 
@@ -724,6 +725,7 @@ var FiltMatList	= [];
 			if (PNCPartID > 0) /*Only allow selection of same material family*/
 			{
 				var MatThick = GetMatThickFromName(Materials[i].Name);
+				var ExistMatThick = GetMatThickFromName(itemMaterial);
 				if (MatThick > ExistMatThick-1 & MatThick < ExistMatThick+1)
 				{ FiltMatList.push({ "Name" : ""+Materials[i].Name+"" , "colour" : ""+Materials[i].colour+"" }); }
 			}
@@ -3427,8 +3429,9 @@ function DrawPreview(canvasId,canvas2Id,LineDivID)
 									Edge.stroke();
 									break;
 						case 'LineBore':
-									var LineAngle = (PartJSON.Operations[i].Angle*degrees)-1.5708;						
-										for (var ii = 0; ii<CalcOutputValue(PartJSON.Operations[i].Qty); ii++)
+									var LineAngle = (PartJSON.Operations[i].Angle*degrees)-1.5708;	
+										var OpQtyValue = CalcOutputValue(PartJSON.Operations[i].Qty);					
+										for (var ii = 0; ii<OpQtyValue; ii++)
 										{
 										if (DrawingFace == OpFace)	
 											{ var HoleX = OpX - (((Math.sin(LineAngle)*CalcOutputValue(PartJSON.Operations[i].Spacing))*ii)*ViewRatio);}
