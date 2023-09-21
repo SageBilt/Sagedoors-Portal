@@ -185,7 +185,7 @@ var CanvasObject = document.getElementById("CanvasBorder");
 													{
 													var OpLength = CalcOutputValue(PartJSON.Operations[SelectedObjects.Items[i]].Length);
 													var OpDepth = CalcOutputValue(PartJSON.Operations[SelectedObjects.Items[i]].Depth);
-													var OpAngle = PartJSON.Operations[SelectedObjects.Items[i]].Angle*degrees;
+													var OpAngle = CalcOutputValue(PartJSON.Operations[SelectedObjects.Items[i]].Angle)*degrees;
 													var OpWidth = CalcOutputValue(PartJSON.Operations[SelectedObjects.Items[i]].Width); 	
 													var	NewXPos = parseFloat(CalcOutputValue(PartJSON.Operations[SelectedObjects.Items[i]].X))-round(MoveObject.X-ActiveMouseX,3);
 													var	NewYPos = parseFloat(CalcOutputValue(PartJSON.Operations[SelectedObjects.Items[i]].Y))-round(MoveObject.Y-ActiveMouseY,3);
@@ -1358,7 +1358,7 @@ var OrigValue = '';
 	if (InputElem.id == 'VisibleInput') {var IsCondition = true;} else {var IsCondition = false;}
 
 	var CalcValue = CalcInputValue(InputElem.value,0,ModeSelection,IsCondition);
-	//alert(CalcValue);
+	//console.log(CalcValue);
 	if (CalcValue != 'Error')
 	{
 	InputElem.style.backgroundColor = "initial";	
@@ -1375,7 +1375,7 @@ var OrigValue = '';
 				if (InputElem.id == 'WidthInput') {var OpWidth = ParseVarCalc(InputElem.value,SelectedObjects.Items[0],ModeSelection); OrigValue = GetVarText(PartJSON.Operations[SelectedObjects.Items[0]].Width);} else {var OpWidth = CalcOutputValue(PartJSON.Operations[SelectedObjects.Items[0]].Width);}
 				if (InputElem.id == 'LengthInput') {var OpLength = ParseVarCalc(InputElem.value,SelectedObjects.Items[0],ModeSelection); OrigValue = GetVarText(PartJSON.Operations[SelectedObjects.Items[0]].Length);} else {var OpLength = CalcOutputValue(PartJSON.Operations[SelectedObjects.Items[0]].Length);}
 				if (InputElem.id == 'DepthInput') {var OpDepth = ParseVarCalc(InputElem.value,SelectedObjects.Items[0],ModeSelection); OrigValue = GetVarText(PartJSON.Operations[SelectedObjects.Items[0]].Depth);} else {var OpDepth = CalcOutputValue(PartJSON.Operations[SelectedObjects.Items[0]].Depth);}
-				if (InputElem.id == 'AngleInput') {var OpAngle = InputElem.value; OrigValue = GetVarText(PartJSON.Operations[SelectedObjects.Items[0]].Angle);} else {var OpAngle = PartJSON.Operations[SelectedObjects.Items[0]].Angle*degrees;}				
+				if (InputElem.id == 'AngleInput') {var OpAngle = ParseVarCalc(InputElem.value,SelectedObjects.Items[0],ModeSelection); OrigValue = GetVarText(PartJSON.Operations[SelectedObjects.Items[0]].Angle);} else {var OpAngle = CalcOutputValue(PartJSON.Operations[SelectedObjects.Items[0]].Depth)*degrees;}				
 				
 				
 				if (CheckOperationAllowed(OpX,OpY,OpLength,OpWidth,OpAngle,OpDepth) == false) {popup("Invalid position! Operation too close to Edgebanding!",120,350,1); OkToChange = false;}
@@ -1401,7 +1401,7 @@ var OrigValue = '';
 					case 'WidthInput': PartJSON.Operations[SelectedObjects.Items[0]].Width = CalcValue; break;
 					case 'DepthInput': PartJSON.Operations[SelectedObjects.Items[0]].Depth = CalcValue; break;
 					case 'LengthInput': PartJSON.Operations[SelectedObjects.Items[0]].Length = CalcValue; break;
-					case 'AngleInput': PartJSON.Operations[SelectedObjects.Items[0]].Angle = parseFloat(InputElem.value); break;
+					case 'AngleInput': PartJSON.Operations[SelectedObjects.Items[0]].Angle = CalcValue; break; //parseFloat(InputElem.value);
 					case 'QtyInput': PartJSON.Operations[SelectedObjects.Items[0]].Qty = CalcValue; break;
 					case 'SpacingInput': PartJSON.Operations[SelectedObjects.Items[0]].Spacing = CalcValue; break;
 					}
@@ -1606,7 +1606,7 @@ var OrigValue = '';
 								var OpWidth = CalcOutputValue(PartJSON.Operations[SelectedObjects.Items[i]].Width);
 								var OpLength = CalcOutputValue(PartJSON.Operations[SelectedObjects.Items[i]].Length);
 								var OpDepth = CalcOutputValue(PartJSON.Operations[SelectedObjects.Items[i]].Depth);
-								var OpAngle = PartJSON.Operations[SelectedObjects.Items[i]].Angle*degrees;				
+								var OpAngle = CalcOutputValue(PartJSON.Operations[SelectedObjects.Items[i]].Angle)*degrees;				
 					
 								if (CheckOperationAllowed(OpX,OpY,OpLength,OpWidth,OpAngle,OpDepth) == false) {popup("Invalid position! Operation too close to Edgebanding!",120,350,1);}
 								else {PartJSON.Operations[SelectedObjects.Items[i]].X = (parseFloat(CalcOutputValue(PartJSON.Operations[SelectedObjects.Items[i]].X)) - (SelRecXRef-parseFloat(CalcValue))).toString();}
@@ -1639,7 +1639,7 @@ var OrigValue = '';
 								var OpWidth = CalcOutputValue(PartJSON.Operations[SelectedObjects.Items[i]].Width);
 								var OpLength = CalcOutputValue(PartJSON.Operations[SelectedObjects.Items[i]].Length);
 								var OpDepth = CalcOutputValue(PartJSON.Operations[SelectedObjects.Items[i]].Depth);
-								var OpAngle = PartJSON.Operations[SelectedObjects.Items[i]].Angle*degrees;				
+								var OpAngle = CalcOutputValue(PartJSON.Operations[SelectedObjects.Items[i]].Angle)*degrees;				
 					
 								if (CheckOperationAllowed(OpX,OpY,OpLength,OpWidth,OpAngle,OpDepth) == false) {popup("Invalid position! Operation too close to Edgebanding!",120,350,1);}
 								else {PartJSON.Operations[SelectedObjects.Items[i]].Y = (parseFloat(CalcOutputValue(PartJSON.Operations[SelectedObjects.Items[i]].Y)) - (SelRecYRef-parseFloat(CalcValue))).toString();}
@@ -1674,7 +1674,7 @@ var OrigValue = '';
 		BuildSnapPoints();
 		
 		//if (event.key == "Enter") {document.getElementById("XPosInputCaption").focus();}
-		ShowInputs();
+		ShowInputs();RecalcAllPartObj
 		
 		DrawPreview('PartEditCanvas','PreviewBox2',document.getElementById("selectedline").innerHTML);
 	}
@@ -1701,9 +1701,11 @@ function RecalcAllPartObj()
 				case 'LineBore':
 						PartJSON.Operations[i].Qty = CalcInputValue(PartJSON.Operations[i].Qty,i,'Operations');
 						PartJSON.Operations[i].Spacing = CalcInputValue(PartJSON.Operations[i].Spacing,i,'Operations');
+						PartJSON.Operations[i].Angle = CalcInputValue(PartJSON.Operations[i].Angle,i,'Operations');
 						break;
 				default:	
 						PartJSON.Operations[i].Length = CalcInputValue(PartJSON.Operations[i].Length,i,'Operations');
+						PartJSON.Operations[i].Angle = CalcInputValue(PartJSON.Operations[i].Angle,i,'Operations');
 						break;
 				}
 
@@ -2112,7 +2114,7 @@ function CreateEvalParams(InputValue,ItemID,ItemType) //,ParamIDs = []
 		
 		if (PartJSON.Operations[ItemID].Type != 'Hole')
 		{
-		var Angle = PartJSON.Operations[ItemID].Angle;
+		var Angle = CalcOutputValue(PartJSON.Operations[ItemID].Angle);
 		//var Angle = CalcInputValue(PartJSON.Operations[ItemID].Angle,ItemID,null);
 		EvalString = EvalString + "var Angle = "+Angle+";";
 		if (Angle >= 45 & Angle <= 135 | Angle >= -135 & Angle <= -45 | Angle >= 225 & Angle <= 315 ) {var OALength = PartLength-(Y*2); var OpDir = 'Virt';} else {var OALength = PartWidth-(X*2); OpDir = 'Hor';}
@@ -2316,13 +2318,13 @@ if (event.ctrlKey == false & ToolsSelection != 'CornerRadius') {ClearSelectObjec
 							break;
 				case 'LineBore':
 							OpLength = Math.round(CalcOutputValue(PartJSON.Operations[i].Spacing)*(CalcOutputValue(PartJSON.Operations[i].Qty)-1))+OpWidth;
-							LineAngle = (PartJSON.Operations[i].Angle*degrees);
+							LineAngle = CalcOutputValue(PartJSON.Operations[i].Angle)*degrees;
 							OpX = OpX-(Math.cos(LineAngle)*(OpWidth/2))-(Math.sin(LineAngle)*(OpWidth/2));
 							OpY = OpY+(Math.cos(LineAngle)*(OpWidth/2))-(Math.sin(LineAngle)*(OpWidth/2));
 							break;
 				default:	
 							OpLength = CalcOutputValue(PartJSON.Operations[i].Length);
-							LineAngle = (PartJSON.Operations[i].Angle*degrees);
+							LineAngle = CalcOutputValue(PartJSON.Operations[i].Angle)*degrees;
 							break;
 				}
 				
@@ -2498,13 +2500,13 @@ function FindSelectObjRec()
 						break;
 			case 'LineBore':
 						OpLength = Math.round(CalcOutputValue(PartJSON.Operations[SelObjectID].Spacing)*(CalcOutputValue(PartJSON.Operations[SelObjectID].Qty)-1))+OpWidth;
-						LineAngle = (PartJSON.Operations[SelObjectID].Angle*degrees);
+						LineAngle = CalcOutputValue(PartJSON.Operations[SelObjectID].Angle)*degrees;
 						OpX = OpX-(Math.cos(LineAngle)*(OpWidth/2))-(Math.sin(LineAngle)*(OpWidth/2));
 						OpY = OpY+(Math.cos(LineAngle)*(OpWidth/2))-(Math.sin(LineAngle)*(OpWidth/2));
 						break;
 			default:	
 						OpLength = CalcOutputValue(PartJSON.Operations[SelObjectID].Length);
-						LineAngle = (PartJSON.Operations[SelObjectID].Angle*degrees);
+						LineAngle = CalcOutputValue(PartJSON.Operations[SelObjectID].Angle)*degrees;
 						break;
 			}
 			
@@ -2817,7 +2819,7 @@ if (Type != 'None')
 		RoutingCount += 1;
 		var OpX = CalcOutputValue(PartJSON.Operations[inc].X);
 		var OpY = CalcOutputValue(PartJSON.Operations[inc].Y);
-		var OpAngle = PartJSON.Operations[inc].Angle*degrees;
+		var OpAngle = CalcOutputValue(PartJSON.Operations[inc].Angle)*degrees;
 		var OpLength = CalcOutputValue(PartJSON.Operations[inc].Length);
 		var OpWidth = CalcOutputValue(PartJSON.Operations[inc].Width);
 		var OpDepth = CalcOutputValue(PartJSON.Operations[inc].Depth);
@@ -3842,7 +3844,7 @@ SnapPoints = [];
 								SnapPoints.push({ "X" : OpX , "Y" : OpY });
 								break;
 				case 'LineBore':
-								var LineAngle = (PartJSON.Operations[i].Angle*degrees)+1.5708;						
+								var LineAngle = (CalcOutputValue(PartJSON.Operations[i].Angle)*degrees)+1.5708;						
 									for (var ii = 0; ii<CalcOutputValue(PartJSON.Operations[i].Qty); ii++)
 									{
 									var HoleX = OpX + ((Math.sin(LineAngle)*CalcOutputValue(PartJSON.Operations[i].Spacing))*ii);
@@ -3851,7 +3853,7 @@ SnapPoints = [];
 									}
 								break;		
 				default:
-								var LineAngle = (PartJSON.Operations[i].Angle*degrees)+1.5708;
+								var LineAngle = (CalcOutputValue(PartJSON.Operations[i].Angle)*degrees)+1.5708;
 								var OpLength = CalcOutputValue(PartJSON.Operations[i].Length);
 								SnapPoints.push({ "X" : OpX , "Y" : OpY });
 								var WidthCalX = Math.round(Math.sin(LineAngle-1.5708)*OpWidth);

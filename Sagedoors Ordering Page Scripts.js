@@ -3433,7 +3433,7 @@ function DrawPreview(canvasId,canvas2Id,LineDivID)
 									Edge.stroke();
 									break;
 						case 'LineBore':
-									var LineAngle = (PartJSON.Operations[i].Angle*degrees)-1.5708;	
+									var LineAngle = (CalcOutputValue(PartJSON.Operations[i].Angle)*degrees)-1.5708;	
 										var OpQtyValue = CalcOutputValue(PartJSON.Operations[i].Qty);					
 										for (var ii = 0; ii<OpQtyValue; ii++)
 										{
@@ -3448,7 +3448,7 @@ function DrawPreview(canvasId,canvas2Id,LineDivID)
 										}
 									break;
 						default:
-									var LineAngle = (PartJSON.Operations[i].Angle*degrees)-1.5708;
+									var LineAngle = (CalcOutputValue(PartJSON.Operations[i].Angle)*degrees)-1.5708;
 									var OpLength = Math.round(CalcOutputValue(PartJSON.Operations[i].Length)*ViewRatio);
 									Edge.beginPath();
 									Edge.moveTo(OpX,OpY);
