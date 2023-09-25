@@ -2702,6 +2702,7 @@ function GetHDFProfileName(MatName)
 {
 var NewText = '';
 var PrefixLength = 0;
+var FlexiPos = MatName.indexOf('FLEXI PANEL');
 
 	if (MatName.substr(0,HDFPrefix.length+3) == HDFPrefix+' 1F') {PrefixLength = HDFPrefix.length+5;}
 	else if (MatName.substr(0,HDFPrefix.length) == HDFPrefix)  {PrefixLength = HDFPrefix.length+2;}
@@ -2712,7 +2713,7 @@ var PrefixLength = 0;
 		{
 			//alert(MatName[i]);	
 		   
-			if ( !isNaN(parseInt(MatName[i])) )
+			if ( !isNaN(parseInt(MatName[i])) || FlexiPos > -1 & i == FlexiPos)
 			{
 			NewText = NewText.substr(0,NewText.length-1);
 			break;
