@@ -49,7 +49,7 @@ var HDFDoorSpecData = [
 {"Profile" : "CAROLINA" , "ProfileMargin" : 18 , "Frame" : true, "GlassFrame" : false},
 {"Profile" : "CHICAGO" , "ProfileMargin" : 0 , "Frame" : false, "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 13 ,"GrooveWidth" : 6.4 ,"GrooveDepth" : 1.5 , "UserSpacing" : true, "ToggleStartFinishOnLow" : true} },
 {"Profile" : "COLORADO" , "ProfileMargin" : 0 , "Frame" : false, "GlassFrame" : false},
-{"Profile" : "DAKOTA" , "ProfileMargin" : 60 , "Frame" : true , "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 85 , "MaxEdge" : 0 , "IsFixedSpacing" : false , "ExtendThroughFrame" : true} },
+{"Profile" : "DAKOTA" , "ProfileMargin" : 60 , "Frame" : true , "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 71 , "MaxEdge" : 75 , "IsFixedSpacing" : true , "ExtendThroughFrame" : true} },
 {"Profile" : "FLORIDA" , "ProfileMargin" : 60 , "Frame" : true, "GlassFrame" : true},
 {"Profile" : "GEORGIA" , "ProfileMargin" : 10 , "Frame" : true, "GlassFrame" : false},
 {"Profile" : "HAWAII" , "ProfileMargin" : 0 , "Frame" : false, "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 22 , "MaxEdge" : 0 , "IsFixedSpacing" : false , "FixedSideMargin" : 13 } },
@@ -57,7 +57,7 @@ var HDFDoorSpecData = [
 {"Profile" : "IOWA" , "ProfileMargin" : 0 , "Frame" : false , "GlassFrame" : false , "VGrooves" : {"MaxScallopWidth" : 8, "MaxMaxScallopWidth" : 9 , "IsFixedSpacing" : false, "FlatWidth" : 15, "MinFlatWidth" : 3, "ScallopToolRad" : 4.75, "HalfSpacingSideMargin" : true} },
 {"Profile" : "KANSAS" , "ProfileMargin" : 0 , "Frame" : false, "GlassFrame" : false , "VGrooves" : {"MinSpacing" : 60 , "IsFixedSpacing" : false , "FixedSideMargin" : 32 , "Width" : 60} },
 {"Profile" : "KENDAL" , "ProfileMargin" : 60 , "Frame" : true, "GlassFrame" : false},
-{"Profile" : "KENTUCKY" , "ProfileMargin" : 60 , "Frame" : true, "GlassFrame" : true, "UserPocketDepth" : 6 },
+{"Profile" : "KENTUCKY" , "ProfileMargin" : 60 , "Frame" : true, "GlassFrame" : true, "UserPocketDepth" : 6, "MaxUserPocketDepth" : 12 },
 {"Profile" : "LAUREL" , "ProfileMargin" : 0 , "Frame" : false , "GlassFrame" : false , "TEL" : 43 ,"VGrooves" : {"MaxSpacing" : 38 , "MaxEdge" : 0 , "IsFixedSpacing" : false, "UserSpacing" : true, "HalfSpacingSideMargin" : true, "Width" : 22} },
 {"Profile" : "LINCOLN" , "ProfileMargin" : 0 , "Frame" : false, "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 31 ,"GrooveWidth" : 6.4 ,"GrooveDepth" : 4 , "UserSpacing" : true} },
 {"Profile" : "LOUISIANA" , "ProfileMargin" : 10 , "Frame" : true, "GlassFrame" : false},
@@ -82,7 +82,7 @@ var HDFDoorSpecData = [
 {"Profile" : "TEXAS" , "ProfileMargin" : 0 , "Frame" : false, "GlassFrame" : false},
 {"Profile" : "TURNBERRY" , "ProfileMargin" : 0 , "Frame" : false, "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 22 , "MaxEdge" : 0 , "IsFixedSpacing" : false , "FixedSideMargin" : 13 } },
 {"Profile" : "UTAH" , "ProfileMargin" : 60 , "Frame" : true, "GlassFrame" : false},
-{"Profile" : "WASHINGTON" , "ProfileMargin" : 60 , "Frame" : true, "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 85 , "MaxEdge" : 0 , "IsFixedSpacing" : false} },
+{"Profile" : "WASHINGTON" , "ProfileMargin" : 60 , "Frame" : true, "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 71 , "MaxEdge" : 75 , "IsFixedSpacing" : true} },
 {"Profile" : "WISCONSIN" , "ProfileMargin" : 60 , "Frame" : true, "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 71 , "MaxEdge" : 75 , "IsFixedSpacing" : true , "ExtendThroughFrame" : true} }
 ];
 
@@ -4810,7 +4810,28 @@ var SizeOk = false;
 							}
 						}
 					}
-					break;						
+					break;
+	case "PKDepth"	:
+					SizeOk = true;
+					var LineDiv = document.getElementById(LineID);
+					var LineNumber = LineDiv.getAttribute("data-LineNumber");	
+					var itemMaterial = document.getElementById("Material"+LineNumber).value;	
+					var ProfileName = GetHDFProfileName(itemMaterial);
+					var HHDItemIndex = FindItem(ProfileName,HDFDoorSpecData,'Profile');
+					if (HHDItemIndex > -1)
+					{
+						var MaxUserPocketDepth = HDFDoorSpecData[HHDItemIndex].MaxUserPocketDepth;
+						if (MaxUserPocketDepth != undefined)
+						{
+							if (NewValue > MaxUserPocketDepth)
+							{
+							popup("Pocket depth cannot be more than "+MaxUserPocketDepth+"mm!",200,400,1);
+							document.getElementById(BoxID).value = MaxUserPocketDepth;
+							SizeOk = false;
+							}
+						}
+					}
+					break;							
 	/* case "ProfileQty": 
 		SizeOk = true;
 		break;
