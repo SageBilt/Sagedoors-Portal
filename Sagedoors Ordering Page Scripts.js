@@ -47,19 +47,21 @@ var HDFDoorSpecData = [
 {"Profile" : "BARNSLEY" , "ProfileMargin" : 18 , "Frame" : true, "GlassFrame" : false},
 {"Profile" : "CALIFORNIA" , "ProfileMargin" : 0 , "Frame" : false , "GlassFrame" : false , "VGrooves" : {"MaxScallopWidth" : 39, "MaxMaxScallopWidth" : 42 , "IsFixedSpacing" : false, "FlatWidth" : 3, "MinFlatWidth" : 3, "ScallopToolRad" : 35} },
 {"Profile" : "CAROLINA" , "ProfileMargin" : 18 , "Frame" : true, "GlassFrame" : false},
-{"Profile" : "CHICAGO" , "ProfileMargin" : 0 , "Frame" : false, "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 13 ,"GrooveWidth" : 6.4 ,"GrooveDepth" : 1.5 , "UserSpacing" : true, "ToggleStartFinishOnLow" : true} },
+{"Profile" : "CHICAGO" , "ProfileMargin" : 0 , "Frame" : false, "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 13 ,"GrooveWidth" : 6.4 ,"GrooveDepth" : 1.5,"MinGrooveWidth" : 6.4,"MaxGrooveDepth" : 15, "UserSpacing" : true, "ToggleStartFinishOnLow" : true} },
 {"Profile" : "COLORADO" , "ProfileMargin" : 0 , "Frame" : false, "GlassFrame" : false},
 {"Profile" : "DAKOTA" , "ProfileMargin" : 60 , "Frame" : true , "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 71 , "MaxEdge" : 75 , "IsFixedSpacing" : true , "ExtendThroughFrame" : true} },
+{"Profile" : "DELAWARE" , "ProfileMargin" : 0 , "Frame" : false, "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 40 , "MaxEdge" : 0 , "IsFixedSpacing" : false , "FixedSideMargin" : 0.01 } },
 {"Profile" : "FLORIDA" , "ProfileMargin" : 60 , "Frame" : true, "GlassFrame" : true},
 {"Profile" : "GEORGIA" , "ProfileMargin" : 10 , "Frame" : true, "GlassFrame" : false},
 {"Profile" : "HAWAII" , "ProfileMargin" : 0 , "Frame" : false, "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 22 , "MaxEdge" : 0 , "IsFixedSpacing" : false , "FixedSideMargin" : 13 } },
-{"Profile" : "ILLINOIS" , "ProfileMargin" : 0 , "Frame" : false, "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 31 ,"GrooveWidth" : 6.4 ,"GrooveDepth" : 5 , "UserSpacing" : true, "ToggleStartFinishOnLow" : true} },
-{"Profile" : "IOWA" , "ProfileMargin" : 0 , "Frame" : false , "GlassFrame" : false , "VGrooves" : {"MaxScallopWidth" : 8, "MaxMaxScallopWidth" : 9 , "IsFixedSpacing" : false, "FlatWidth" : 15, "MinFlatWidth" : 3, "ScallopToolRad" : 4.75, "HalfSpacingSideMargin" : true} },
+{"Profile" : "ILLINOIS" , "ProfileMargin" : 0 , "Frame" : false, "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 31 ,"GrooveWidth" : 6.4 ,"GrooveDepth" : 5,"MinGrooveWidth" : 6.4,"MaxGrooveDepth" : 15, "UserSpacing" : true, "ToggleStartFinishOnLow" : true} },
+{"Profile" : "IOWA" , "ProfileMargin" : 0 , "Frame" : false , "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 24 , "MaxEdge" : 0 , "IsFixedSpacing" : false, "UserSpacing" : true, "HalfSpacingSideMargin" : true, "MaxScallopWidth" : 9, "MaxMaxScallopWidth" : 9, "ScallopToolRad" : 4.75 } },
+//{"Profile" : "IOWA" , "ProfileMargin" : 0 , "Frame" : false , "GlassFrame" : false , "VGrooves" : {"MaxScallopWidth" : 9, "MaxMaxScallopWidth" : 9 , "IsFixedSpacing" : false, "FlatWidth" : 15, "MinFlatWidth" : 3, "ScallopToolRad" : 4.75, "HalfSpacingSideMargin" : true} },
 {"Profile" : "KANSAS" , "ProfileMargin" : 0 , "Frame" : false, "GlassFrame" : false , "VGrooves" : {"MinSpacing" : 60 , "IsFixedSpacing" : false , "FixedSideMargin" : 32 , "Width" : 60} },
 {"Profile" : "KENDAL" , "ProfileMargin" : 60 , "Frame" : true, "GlassFrame" : false},
 {"Profile" : "KENTUCKY" , "ProfileMargin" : 60 , "Frame" : true, "GlassFrame" : true, "UserPocketDepth" : 6, "MaxUserPocketDepth" : 12 },
 {"Profile" : "LAUREL" , "ProfileMargin" : 0 , "Frame" : false , "GlassFrame" : false , "TEL" : 43 ,"VGrooves" : {"MaxSpacing" : 38 , "MaxEdge" : 0 , "IsFixedSpacing" : false, "UserSpacing" : true, "HalfSpacingSideMargin" : true, "Width" : 22} },
-{"Profile" : "LINCOLN" , "ProfileMargin" : 0 , "Frame" : false, "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 31 ,"GrooveWidth" : 6.4 ,"GrooveDepth" : 4 , "UserSpacing" : true} },
+{"Profile" : "LINCOLN" , "ProfileMargin" : 0 , "Frame" : false, "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 31 ,"GrooveWidth" : 6.4 ,"GrooveDepth" : 4 ,"MinGrooveWidth" : 6.4,"MaxGrooveDepth" : 15 , "UserSpacing" : true} },
 {"Profile" : "LOUISIANA" , "ProfileMargin" : 10 , "Frame" : true, "GlassFrame" : false},
 {"Profile" : "MARYLAND" , "ProfileMargin" : 18 , "Frame" : true, "GlassFrame" : false},
 {"Profile" : "MIAMI" , "ProfileMargin" : 0 , "Frame" : false, "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 11 , "MaxEdge" : 0 , "IsFixedSpacing" : false , "UserSpacing" : true, "FixedSideMargin" : -0.5 } },
@@ -951,8 +953,9 @@ var WasChanged = false;
 
 		if (PNCPartID > 0 & PartJSON.hasOwnProperty("Vectors") & WasChanged) 
 		{
-			
-			if (PartJSON.Vectors.length > 0) {delete PartJSON.PNCVectors; document.getElementById("LineJSON"+LineNumber).value = JSON.stringify(PartJSON);}
+			//if (PartJSON.Vectors.length > 0) {
+			delete PartJSON.PNCVectors; document.getElementById("LineJSON"+LineNumber).value = JSON.stringify(PartJSON);
+			alert(document.getElementById("LineJSON"+LineNumber).value);
 		}		
 	}
 		
@@ -2278,13 +2281,13 @@ if (LengthNode > 0 && WidthNode > 0 && itemMaterial != "")
 
 	document.getElementById("LinePrice"+LineNumber).value = PartPrice.toFixed(2); 
 
-	if (LineMaterial.indexOf(HDFPrefix) > -1 ) {var IsHDFMaterial = true} else {var IsHDFMaterial = false}
 
 	for (var r = 1; r<counter; r++) 
 	{
 		var LineItemQty = parseFloat(document.getElementById("Qty"+r).value);
 		LineMaterial = document.getElementById("Material"+r).value;
 		var MatThick = GetMatThickFromName(LineMaterial);
+		if (LineMaterial.indexOf(HDFPrefix) > -1 ) {var IsHDFMaterial = true} else {var IsHDFMaterial = false}
 
 		if ( document.getElementById("Length"+r).value > 0 && document.getElementById("Width"+r).value > 0 ) 
 		{
@@ -2454,7 +2457,7 @@ if (LengthNode > 0 && WidthNode > 0 && itemMaterial != "")
 
 
 //SetLeadTime();
-ExcDate();
+ExcDate(SetManDate());
 Checkdate(document.getElementById('Dispdate').value,false);
 //ExcDate();
 
@@ -4201,13 +4204,19 @@ function DrawPreview(canvasId,canvas2Id,LineDivID)
 							GrooveWidth = parseFloat(GetExtraParValue("GrooveW",LineDivID));
 							if (isNaN(GrooveWidth)) {GrooveWidth = parseFloat(document.getElementById("GrooveW").value);}
 						}
+						
 							
-							
-						if (MaxScallopWidth > 0 | GrooveWidth > 0)
+						if (MaxScallopWidth > 0 &  FlatWidth > 0| GrooveWidth > 0)
 						{
 														
 							if (MaxScallopWidth > 0) 
 							{
+								/*
+								VGrooveSpacing = (PocketWidth-0.01)/(1+Math.floor((PocketWidth-0.01)/MaxSpacing));
+								if (VGrooves.HalfSpacingSideMargin) {VGrooveQty = Math.floor((PocketWidth-0.01)/MaxSpacing)+1;}
+								else {VGrooveQty = Math.floor((PocketWidth-0.01)/MaxSpacing);}
+								*/
+
 								if (VGrooves.HalfSpacingSideMargin) 
 								{
 								VGrooveQty = 2+Math.floor((PocketWidth-0.01 - FlatWidth)/(MaxScallopWidth+FlatWidth));
@@ -4227,21 +4236,13 @@ function DrawPreview(canvasId,canvas2Id,LineDivID)
 								DrawWidth = GrooveWidth;							
 							}
 
-					
-							
-							if (MaxScallopWidth > 0)
-							{
-							var ScallopToolRad = VGrooves.ScallopToolRad;	
-							var ScallopDepth = ScallopToolRad-Math.pow((Math.pow(ScallopToolRad,2)-Math.pow(DrawWidth/2,2)),0.5)+0.5; 	
-							document.getElementById("ScallopDepthCalcDiv").style.display = "inherit";
-							document.getElementById("ScallopDepthCalc").innerHTML = round(ScallopDepth, 1);
-							}
-							
-							
+
 							//if (!isNaN(VGrooveSpacing)) {document.getElementById("VGSpacingCalc").innerHTML = round(VGrooveSpacing, 1);}
 						}
 						else
 						{	
+							if (MaxScallopWidth > 0) {DrawWidth = MaxScallopWidth;}
+
 							if (IsFixedSpacing) 
 							{	
 							VGrooveSpacing = MaxSpacing;	
@@ -4285,9 +4286,16 @@ function DrawPreview(canvasId,canvas2Id,LineDivID)
 							document.getElementById("FlatWidthCalc").innerHTML = round(VGrooveSpacing-DrawWidth, 1);
 							}
 						}
+
+						if (MaxScallopWidth > 0)
+						{
+						var ScallopToolRad = VGrooves.ScallopToolRad;	
+						var ScallopDepth = ScallopToolRad-Math.pow((Math.pow(ScallopToolRad,2)-Math.pow(DrawWidth/2,2)),0.5)+0.5; 	
+						document.getElementById("ScallopDepthCalcDiv").style.display = "inherit";
+						document.getElementById("ScallopDepthCalc").innerHTML = round(ScallopDepth, 1);
+						}
 						
-						
-						
+					
 
 						VGrooveSideMargin = ((PocketWidth - (VGrooveSpacing*(VGrooveQty-1)))/2) + PocketXPos;
 
@@ -4412,18 +4420,23 @@ function Checkdate(InputDate,ShowErrorMsg)
 {
 var NewD = new Date(InputDate);
 var today = new Date();
-var FirstManDate = new Date();
+var ManDate = SetManDate() ;
 
-	//alert(today.getMonth());
-	if (today.getMonth() == 11 && today.getDate() > 20 || today.getMonth() == 0 && today.getDate() < 13 ) //For end of year closedown
+
+	if (NewD.getMonth() == 11 && NewD.getDate() > EndOfYearEndDay || NewD.getMonth() == 0 && NewD.getDate() < NewYearStartDay ) //For end of year closedown
 	{
-		//alert(Date.parse(NewD) + " " +Date.parse(Setdate()));
-	var NewYear = new Date().getFullYear() + 1;	
-			if (Date.parse(NewD) < Date.parse(Setdate()) ) 
-			{ 
-				if (ShowErrorMsg == true) { popup("You cannot choose a date less than the "+(15+CurrentOrderLeadTime)+"th or January "+NewYear+"!",150,350,1); } 
-				ExcDate(); 
-			}	
+		//alert(Date.parse(NewD) + " " +Date.parse(ManDate));
+		//var NewYear = new Date().getFullYear() + 1;	
+		if (Date.parse(NewD) < Date.parse(ManDate) ) 
+		{ 
+			if (ShowErrorMsg == true) { popup("You cannot choose a date less than the "+(NewYearStartDay+CurrentOrderLeadTime)+"th or January "+NewYear+"!",150,350,1); } 
+			
+		}
+		else
+		{
+			if (ShowErrorMsg == true) { popup("Invalid selection! The date choosen is during our end of year shut down period.",150,350,1); } 
+		}	
+		ExcDate(ManDate); 
 	}
 	else
 	{
@@ -4432,7 +4445,7 @@ var FirstManDate = new Date();
 		{
 			if (NewD.getDay() == 6 || NewD.getDay() == 0) { popup("You can only select a weekday!",150,350,1);ExcDate(); }
 			else 
-			{ if (NewD < Setdate()) { popup("You cannot choose a date less than "+CurrentOrderLeadTime+" working days from today's date!",150,350,1); ExcDate(); } }
+			{ if (NewD < ManDate) { popup("You cannot choose a date less than "+CurrentOrderLeadTime+" working days from today's date!",150,350,1); ExcDate(); } }
 		}
 		else
 		{ */
@@ -4441,21 +4454,21 @@ var FirstManDate = new Date();
 				if (NewD.getDay() == 6 || NewD.getDay() == 0) 
 				{ 
 					if (ShowErrorMsg == true) { popup("You can only select a weekday!",150,350,1); }
-					ExcDate(); 
+					ExcDate(ManDate); 
 				}
 				else 
 				{ 
-					if (NewD < Setdate()) 
+					if (NewD < ManDate) 
 					{ 
 						if (ShowErrorMsg == true) { popup("You cannot choose a date less than "+CurrentOrderLeadTime+" working days from today's date!",150,350,1); } 
-						ExcDate();
+						ExcDate(ManDate);
 					} 
 				}	
 			}
 			else
 			{
 				if (ShowErrorMsg == true) { popup("This value must be a date in the following format (yyyy-mm-dd).",150,350,1); }
-				ExcDate(); 
+				ExcDate(ManDate); 
 			}		
 		//}
 	}
@@ -4483,13 +4496,27 @@ CurrentOrderLeadTime = StdLeadTime;
 		{CurrentOrderLeadTime = AngleEdgesLeadTime}	
 	
 		if (document.getElementById("PanelType"+r).value == 'Builtup Panel') {CurrentOrderLeadTime = BuildupPanelLeadTime}  
-		if (document.getElementById("PanelType"+r).value == 'Glass Frame') {CurrentOrderLeadTime = GlassFrameLeadTime}  
+		if (document.getElementById("PanelType"+r).value == 'Glass Frame' & !IsHDFFramedDoor(LineMaterial)) {CurrentOrderLeadTime = GlassFrameLeadTime}  
 		if (LineMaterial.indexOf("NON-STOCK") > -1 ) {CurrentOrderLeadTime = NonStockLeadTime} 
+
 
 	}
 }
 
-function Setdate()
+function CalcFirstManDate(StartDate,UpperLim,OutputDate)
+{
+	//console.log("StartDate="+StartDate+" UpperLim="+UpperLim);
+	for (var r = StartDate; r<=UpperLim; r++) 
+	{
+		OutputDate.setDate(r);
+		var CurrentDay = OutputDate.getDay();
+
+		if (CurrentDay == 0 | CurrentDay == 6) {UpperLim+=1;}
+	}
+	return OutputDate 
+}
+
+function SetManDate()
 {
 SetLeadTime();	
 var today = new Date();
@@ -4498,13 +4525,34 @@ var AddDays = 0;
 var AddWeekendDays = (Math.floor(CurrentOrderLeadTime/5)*2);
 var FirstWeekendDays = today.getDay()+CurrentOrderLeadTime;
 
-	if (today.getDay() == 0 ) {AddDays = 1;}
+//console.log("today.getDay() "+today.getDay());
+//console.log("AddWeekendDays "+AddWeekendDays);
+//console.log("FirstWeekendDays "+FirstWeekendDays);
+
+	FirstManDate.setMonth(today.getMonth());
+	FirstManDate.setHours(0);
+
+	var CurrentDate = today.getDate();
+
+	FirstManDate = CalcFirstManDate(CurrentDate,CurrentDate+CurrentOrderLeadTime,FirstManDate);
+
+	if (today.getMonth() == 11 && FirstManDate.getDate() > EndOfYearEndDay || today.getMonth() == 0 && CurrentDate < NewYearStartDay )
+	{
+	FirstManDate.setMonth(0);	
+	CurrentDate = NewYearStartDay;
+	FirstManDate = CalcFirstManDate(CurrentDate,CurrentDate+CurrentOrderLeadTime,FirstManDate);	
+	}
+
+	return FirstManDate
+
+
+	/*if (today.getDay() == 0 ) {AddDays = 1;}
 
 	if ( FirstWeekendDays > 5) {AddDays = AddDays+2;}
 
 	if (AddWeekendDays < 0 ) {AddWeekendDays = 0;}	
 	
-	//alert("FirstWeekendDays="+FirstWeekendDays+" AddDays="+AddDays+" AddWeekendDays="+AddWeekendDays);
+	//console.log("FirstWeekendDays="+FirstWeekendDays+" AddDays="+AddDays+" AddWeekendDays="+AddWeekendDays);
 		
 	FirstManDate.setDate(today.getDate()+CurrentOrderLeadTime+AddDays+AddWeekendDays);
 
@@ -4529,7 +4577,7 @@ var FirstWeekendDays = today.getDay()+CurrentOrderLeadTime;
 		FirstManDate.setMonth(0);		
 		}
 		
-		//alert(FirstManDate);
+		//alert(FirstManDate);*/
  
 
 /* switch(today.getDay())
@@ -4546,19 +4594,20 @@ case 6: FirstManDate.setDate(today.getDate()+6);break;
 //var Month = "0"+(FirstManDate.getMonth()+1);
 //alert(FirstManDate.getFullYear()+"-"+Month.slice(Month.length-2,Month.length)+"-"+Day.slice(Day.length-2,Day.length));
 //return FirstManDate.getFullYear()+"-"+Month.slice(Month.length-2,Month.length)+"-"+Day.slice(Day.length-2,Day.length);
-return FirstManDate
 }
 
-function ExcDate()
+function ExcDate(ManDate)
 {
-var Day = "0"+Setdate().getDate();
-var Month = "0"+(Setdate().getMonth()+1);
-var today = new Date();
 
-	if (today.getMonth() == 11 && today.getDate() > 20 || today.getMonth() == 0 && today.getDate() < 13 )
-	{ var Year = new Date().getFullYear() + 1; } else { var Year = new Date().getFullYear(); }
+var Day = "0"+ManDate.getDate();
+var Month = "0"+(ManDate.getMonth()+1);
+var Year = new Date().getFullYear();
+//var today = new Date();
+
+	//if (today.getMonth() == 11 && today.getDate() > 20 || today.getMonth() == 0 && today.getDate() < 13 )
+	//{ var Year = new Date().getFullYear() + 1; } else { var Year = new Date().getFullYear(); }
 		
-//alert(Setdate().getFullYear()+"-"+Month.slice(Month.length-2,Month.length)+"-"+Day.slice(Day.length-2,Day.length));
+//alert(SetManDate().getFullYear()+"-"+Month.slice(Month.length-2,Month.length)+"-"+Day.slice(Day.length-2,Day.length));
 document.getElementById("Dispdate").value = Year+"-"+Month.slice(Month.length-2,Month.length)+"-"+Day.slice(Day.length-2,Day.length);
 }
 
@@ -4707,14 +4756,79 @@ function HDFExtraLengthChange(InputBox,e)
 	}
 }
 
+function GetObjPropValueByText(obj,proptext) 
+{
+	var props = proptext.split('.'); // Split the string into an array of property names
+	var value = obj; // Start with the object itself
+
+		for (var i = 0; i < props.length; i++) {
+
+			if (value && value.hasOwnProperty(props[i])) {
+				value = value[props[i]]; // Access the next nested property
+			} else {
+				value = undefined; // Property not found
+				break;
+			}
+		}
+	return value;
+}
+
+function GetLineHDFProfileIndex(LineID)
+{
+	var LineDiv = document.getElementById(LineID);
+	var LineNumber = LineDiv.getAttribute("data-LineNumber");	
+	var itemMaterial = document.getElementById("Material"+LineNumber).value;	
+	var ProfileName = GetHDFProfileName(itemMaterial);
+	return FindItem(ProfileName,HDFDoorSpecData,'Profile');
+}
+
+function HDFParamValueOK(LineID,Input,NewValue,PropText,CheckGreatThan,PromptVarName) 
+{
+	var Result = true;
+
+	var HHDItemIndex = GetLineHDFProfileIndex(LineID);
+	if (HHDItemIndex > -1)
+	{
+		var CheckValue = GetObjPropValueByText(HDFDoorSpecData[HHDItemIndex],PropText);
+		Result = HDFCheckSize(CheckValue,CheckValue,NewValue,Input,CheckGreatThan,PromptVarName);
+	}
+
+	return Result;	
+}
+
+function HDFCheckSize(SizeCheckValue,FailCheckValue,NewValue,Input,CheckGreatThan,PromptVarName)
+{
+	var Result = true;
+
+	if (SizeCheckValue != undefined)
+	{
+		if (CheckGreatThan) {
+			if (NewValue > SizeCheckValue)
+			{
+			popup(PromptVarName+" cannot be more than "+SizeCheckValue+"mm!",200,400,1);
+			Input.value = FailCheckValue;
+			Result = false;
+			}
+		}
+		else {
+			if (NewValue < SizeCheckValue)
+			{
+			popup(PromptVarName+" cannot be less than "+SizeCheckValue+"mm!",200,400,1);
+			Input.value = FailCheckValue;
+			Result = false;
+			}
+		}
+	}
+
+	return Result;
+}
+
 function CheckExtraPar(BoxID,IsValidInput)
 {
 var LineID = document.getElementById("selectedline").innerHTML;
 var BoxElem = document.getElementById(BoxID);
 var NewValue = BoxElem.value;
 var SizeOk = false;
-
-
 
 	switch(BoxID)
 	{
@@ -4747,11 +4861,7 @@ var SizeOk = false;
 					break;
 	case "VGSpacing":
 					SizeOk = true;
-					var LineDiv = document.getElementById(LineID);
-					var LineNumber = LineDiv.getAttribute("data-LineNumber");	
-					var itemMaterial = document.getElementById("Material"+LineNumber).value;	
-					var ProfileName = GetHDFProfileName(itemMaterial);
-					var HHDItemIndex = FindItem(ProfileName,HDFDoorSpecData,'Profile');
+					var HHDItemIndex = GetLineHDFProfileIndex(LineID);
 					if (HHDItemIndex > -1)
 					{
 						var UserSpacing = HDFDoorSpecData[HHDItemIndex].VGrooves.UserSpacing;
@@ -4770,68 +4880,21 @@ var SizeOk = false;
 					}
 					break;
 	case "FlatW":
-					SizeOk = true;
-					var LineDiv = document.getElementById(LineID);
-					var LineNumber = LineDiv.getAttribute("data-LineNumber");	
-					var itemMaterial = document.getElementById("Material"+LineNumber).value;	
-					var ProfileName = GetHDFProfileName(itemMaterial);
-					var HHDItemIndex = FindItem(ProfileName,HDFDoorSpecData,'Profile');
-					if (HHDItemIndex > -1)
-					{
-						var MinFlatWidth = HDFDoorSpecData[HHDItemIndex].VGrooves.MinFlatWidth;
-						if (MinFlatWidth != undefined)
-						{
-							if (NewValue < MinFlatWidth)
-							{
-							popup("Flat Width cannot be less than "+MinFlatWidth+"mm!",200,400,1);
-							document.getElementById(BoxID).value = MinFlatWidth;
-							SizeOk = false;
-							}
-						}
-					}
+					SizeOk = HDFParamValueOK(LineID,document.getElementById(BoxID),NewValue,'VGrooves.MinFlatWidth',false,'Flat Width');
 					break;
 	case "MaxScallopW":
-					SizeOk = true;
-					var LineDiv = document.getElementById(LineID);
-					var LineNumber = LineDiv.getAttribute("data-LineNumber");	
-					var itemMaterial = document.getElementById("Material"+LineNumber).value;	
-					var ProfileName = GetHDFProfileName(itemMaterial);
-					var HHDItemIndex = FindItem(ProfileName,HDFDoorSpecData,'Profile');
-					if (HHDItemIndex > -1)
-					{
-						var MaxMaxScallopWidth = HDFDoorSpecData[HHDItemIndex].VGrooves.MaxMaxScallopWidth;
-						if (MaxMaxScallopWidth != undefined)
-						{
-							if (NewValue > MaxMaxScallopWidth)
-							{
-							popup("Max Scallop Width cannot be more than "+MaxMaxScallopWidth+"mm!",200,400,1);
-							document.getElementById(BoxID).value = MaxMaxScallopWidth;
-							SizeOk = false;
-							}
-						}
-					}
+					SizeOk = HDFParamValueOK(LineID,document.getElementById(BoxID),NewValue,'VGrooves.MaxMaxScallopWidth',true,'Max Scallop Width'); 
 					break;
 	case "PKDepth"	:
-					SizeOk = true;
-					var LineDiv = document.getElementById(LineID);
-					var LineNumber = LineDiv.getAttribute("data-LineNumber");	
-					var itemMaterial = document.getElementById("Material"+LineNumber).value;	
-					var ProfileName = GetHDFProfileName(itemMaterial);
-					var HHDItemIndex = FindItem(ProfileName,HDFDoorSpecData,'Profile');
-					if (HHDItemIndex > -1)
-					{
-						var MaxUserPocketDepth = HDFDoorSpecData[HHDItemIndex].MaxUserPocketDepth;
-						if (MaxUserPocketDepth != undefined)
-						{
-							if (NewValue > MaxUserPocketDepth)
-							{
-							popup("Pocket depth cannot be more than "+MaxUserPocketDepth+"mm!",200,400,1);
-							document.getElementById(BoxID).value = MaxUserPocketDepth;
-							SizeOk = false;
-							}
-						}
-					}
-					break;							
+					SizeOk = HDFParamValueOK(LineID,document.getElementById(BoxID),NewValue,'MaxUserPocketDepth',true,'Pocket Depth'); 
+					break;
+	case "GrooveW"	:
+					SizeOk = HDFParamValueOK(LineID,document.getElementById(BoxID),NewValue,'VGrooves.MinGrooveWidth',false,'Groove Width'); 
+					break;					
+	case "GrooveD"	:
+					SizeOk = HDFParamValueOK(LineID,document.getElementById(BoxID),NewValue,'VGrooves.MaxGrooveDepth',true,'Groove Depth'); 
+					break;						
+
 	/* case "ProfileQty": 
 		SizeOk = true;
 		break;
@@ -5042,7 +5105,7 @@ function CheckFreight()
 			if ( FindItem(document.getElementById("Suberbinput").value,Suberbdirectory,"Suberb") > -1 )
 			{
 			document.getElementById("Cityinput").value = Suberbdirectory[FindItem(document.getElementById("Suberbinput").value,Suberbdirectory,"Suberb")].City;
-			} else { popup("This suburb is not valid for frieght calculation. Make sure you select a suburb from the dropdown list!",200,400,1); document.getElementById("Suberbinput").value = ""; }
+			} else { popup("This suburb is not valid for freight calculation. Make sure you select a suburb from the dropdown list!",200,400,1); document.getElementById("Suberbinput").value = ""; }
 
 		}
 		else 
