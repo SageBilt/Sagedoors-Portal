@@ -955,7 +955,7 @@ var WasChanged = false;
 		{
 			//if (PartJSON.Vectors.length > 0) {
 			delete PartJSON.PNCVectors; document.getElementById("LineJSON"+LineNumber).value = JSON.stringify(PartJSON);
-			alert(document.getElementById("LineJSON"+LineNumber).value);
+			//alert(document.getElementById("LineJSON"+LineNumber).value);
 		}		
 	}
 		
