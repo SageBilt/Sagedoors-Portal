@@ -4206,7 +4206,7 @@ function DrawPreview(canvasId,canvas2Id,LineDivID)
 						}
 						
 							
-						if (MaxScallopWidth > 0 &  FlatWidth > 0| GrooveWidth > 0)
+						if (MaxScallopWidth > 0 & FlatWidth > 0 | GrooveWidth > 0)
 						{
 														
 							if (MaxScallopWidth > 0) 
@@ -4503,14 +4503,16 @@ CurrentOrderLeadTime = StdLeadTime;
 	}
 }
 
-function CalcFirstManDate(StartDate,UpperLim,OutputDate)
+function CalcFirstManDate(StartDate,UpperLim,OutputDate,CurrentMonth)
 {
 	//console.log("StartDate="+StartDate+" UpperLim="+UpperLim);
 	for (var r = StartDate; r<=UpperLim; r++) 
 	{
+		OutputDate.setMonth(CurrentMonth);
 		OutputDate.setDate(r);
 		var CurrentDay = OutputDate.getDay();
-
+		//console.log(CurrentDay);
+		//console.log(OutputDate);
 		if (CurrentDay == 0 | CurrentDay == 6) {UpperLim+=1;}
 	}
 	return OutputDate 
@@ -4524,23 +4526,25 @@ var FirstManDate = new Date();
 var AddDays = 0;
 var AddWeekendDays = (Math.floor(CurrentOrderLeadTime/5)*2);
 var FirstWeekendDays = today.getDay()+CurrentOrderLeadTime;
+var CurrentMonth = today.getMonth();
 
 //console.log("today.getDay() "+today.getDay());
 //console.log("AddWeekendDays "+AddWeekendDays);
 //console.log("FirstWeekendDays "+FirstWeekendDays);
 
-	FirstManDate.setMonth(today.getMonth());
+	FirstManDate.setMonth(CurrentMonth);
 	FirstManDate.setHours(0);
 
 	var CurrentDate = today.getDate();
 
-	FirstManDate = CalcFirstManDate(CurrentDate,CurrentDate+CurrentOrderLeadTime,FirstManDate);
+	FirstManDate = CalcFirstManDate(CurrentDate,CurrentDate+CurrentOrderLeadTime,FirstManDate,CurrentMonth);
 
+	
 	if (today.getMonth() == 11 && FirstManDate.getDate() > EndOfYearEndDay || today.getMonth() == 0 && CurrentDate < NewYearStartDay )
 	{
 	FirstManDate.setMonth(0);	
 	CurrentDate = NewYearStartDay;
-	FirstManDate = CalcFirstManDate(CurrentDate,CurrentDate+CurrentOrderLeadTime,FirstManDate);	
+	FirstManDate = CalcFirstManDate(CurrentDate,CurrentDate+CurrentOrderLeadTime,FirstManDate,0);	
 	}
 
 	return FirstManDate
