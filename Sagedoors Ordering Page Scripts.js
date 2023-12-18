@@ -4503,12 +4503,12 @@ CurrentOrderLeadTime = StdLeadTime;
 	}
 }
 
-function CalcFirstManDate(StartDate,UpperLim,OutputDate,CurrentMonth)
+function CalcFirstManDate(StartDate,UpperLim,OutputDate,CurrentMonth,CurrentYear)
 {
-	//console.log("StartDate="+StartDate+" UpperLim="+UpperLim);
+	//console.log("StartDate="+StartDate+" UpperLim="+UpperLim+" CurrentYear="+CurrentYear);
 	for (var r = StartDate; r<=UpperLim; r++) 
 	{
-		OutputDate.setMonth(CurrentMonth);
+		OutputDate.setFullYear(CurrentYear,CurrentMonth);
 		OutputDate.setDate(r);
 		var CurrentDay = OutputDate.getDay();
 		//console.log(CurrentDay);
@@ -4537,14 +4537,14 @@ var CurrentMonth = today.getMonth();
 
 	var CurrentDate = today.getDate();
 
-	FirstManDate = CalcFirstManDate(CurrentDate,CurrentDate+CurrentOrderLeadTime,FirstManDate,CurrentMonth);
+	FirstManDate = CalcFirstManDate(CurrentDate,CurrentDate+CurrentOrderLeadTime,FirstManDate,CurrentMonth,today.getFullYear());
 
 	
 	if (today.getMonth() == 11 && FirstManDate.getDate() > EndOfYearEndDay || today.getMonth() == 0 && CurrentDate < NewYearStartDay )
 	{
-	FirstManDate.setMonth(0);	
+	FirstManDate.setFullYear(today.getFullYear()+1,0);	
 	CurrentDate = NewYearStartDay;
-	FirstManDate = CalcFirstManDate(CurrentDate,CurrentDate+CurrentOrderLeadTime,FirstManDate,0);	
+	FirstManDate = CalcFirstManDate(CurrentDate,CurrentDate+CurrentOrderLeadTime,FirstManDate,0,today.getFullYear()+1);	
 	}
 
 	return FirstManDate
@@ -4605,7 +4605,7 @@ function ExcDate(ManDate)
 
 var Day = "0"+ManDate.getDate();
 var Month = "0"+(ManDate.getMonth()+1);
-var Year = new Date().getFullYear();
+var Year = ManDate.getFullYear();
 //var today = new Date();
 
 	//if (today.getMonth() == 11 && today.getDate() > 20 || today.getMonth() == 0 && today.getDate() < 13 )
