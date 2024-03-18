@@ -24,6 +24,7 @@ var HelpDocLink = document.getElementById("HelpDocLink");
 	  case "SDFFileOption" : 	
 	  						UploadFileInput.accept = ".sdf"; 
 							DropZoneText.innerHTML = "Drag your SDF file to this <i>drop zone</i> or click to browse files";
+							document.getElementById("SDFHelpDocLink").style.display = "initial";
 							break;
 	  case "MoziakFilesOption" : 
 	  						UploadFileInput.accept = ".opt,.db"; 
