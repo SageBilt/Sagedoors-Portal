@@ -541,6 +541,8 @@ function LoadExistLinesData()
 	var EdgeValue = 0;
 	var EdgeIDName = '';
 	var InvalidHDFEdges = false;
+	//var OnlyChangeIcon = true;
+	//var DontUpdateJSON = true;
 	
 	if (ExistLinesData.hasOwnProperty("Address1")) {document.getElementById("Address").value=atob(ExistLinesData.Address1);}
 	if (ExistLinesData.hasOwnProperty("City")) {document.getElementById("Cityinput").value=atob(ExistLinesData.City);}	
@@ -560,6 +562,15 @@ function LoadExistLinesData()
 		UpdoadFileNameElem.value = ExistLinesData.UploadedFileName;
 		UpdoadFileNameElem.name = UpdoadFileNameElem.id; 
 		SetLinesReadOnly();
+
+		// var FileExt = decodeURI(ExistLinesData.UploadedFileName).split('.').pop();
+
+		// if (FileExt == "xls" || FileExt == "xlsx"  || FileExt == "csv" )
+		// {
+		// 	console.log(FileExt);
+		// 	OnlyChangeIcon = false;
+		// 	DontUpdateJSON = false;		
+		// }
 	}
 	if (ExistLinesData.hasOwnProperty("ProcFileName")) 
 	{
@@ -569,7 +580,7 @@ function LoadExistLinesData()
 	}	
 	if (ExistLinesData.hasOwnProperty("OrderNumber")) 
 	{
-		var OrderNumberElem = document.getElementById("OrderNumber").name
+		var OrderNumberElem = document.getElementById("OrderNumber").name;
 		OrderNumberElem.value = ExistLinesData.OrderNumber;
 		OrderNumberElem.name = OrderNumberElem.id;
 	}
@@ -1377,7 +1388,7 @@ var LitPartListArr;
 			if (LibPartID > -1) {var PartListArr = LibParts;LitPartListArr = 'LibParts';ArrIndex = LibPartID; }
 		}
 	}
-	
+
 
 	if (ArrIndex > -1)
 	{
@@ -2294,10 +2305,10 @@ if (LengthNode > 0 && WidthNode > 0 && itemMaterial != "")
 			
 			if (LineMaterial.indexOf("NON-STOCK") > -1 ) 
 			{
-				if (NonStockColour.length == 0 ) { NonStockColour.push( {"MatName" : LineMaterial , "SheetCost" : Materials[FindItem(LineMaterial,Materials,"Name")].SheetCost , "SmallParts" : 0 , "BigParts" : 0 , "BigPartsCost" : 0 } ); NonStockCharge = 125; }				
-				//if (NonStockColour.length == 0 ) { NonStockColour.push( { "MatName" : LineMaterial } ) }				
+				//if (NonStockColour.length == 0 ) { NonStockColour.push( {"MatName" : LineMaterial , "SheetCost" : Materials[FindItem(LineMaterial,Materials,"Name")].SheetCost , "SmallParts" : 0 , "BigParts" : 0 , "BigPartsCost" : 0 } ); NonStockCharge = 125; }				
+					
 				if ( FindItem(LineMaterial,NonStockColour,"MatName") == -1 )
-				{ NonStockColour.push( {"MatName" : LineMaterial , "SheetCost" : Materials[FindItem(LineMaterial,Materials,"Name")].SheetCost , "SmallParts" : 0 , "BigParts" : 0 , "BigPartsCost" : 0 } ); NonStockCharge = NonStockCharge + 100; }
+				{ NonStockColour.push( {"MatName" : LineMaterial , "SheetCost" : Materials[FindItem(LineMaterial,Materials,"Name")].SheetCost , "SmallParts" : 0 , "BigParts" : 0 , "BigPartsCost" : 0 } ); NonStockCharge = NonStockCharge + 125; }
 				
 				//NonStockColour = true;
 				SheetCost = Materials[FindItem(LineMaterial,Materials,"Name")].SheetCost;
