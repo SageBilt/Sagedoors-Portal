@@ -675,7 +675,8 @@ function LoadExistLinesData()
 
 
 	 SetPanelType("LineDiv"+LineNo);
-	 Calculations("LineDiv"+LineNo);	
+	 Calculations("LineDiv"+LineNo);
+	 CheckMaterial("LineDiv"+LineNo);	
 	}
 	
 	
@@ -2255,21 +2256,29 @@ if (LengthNode > 0 && WidthNode > 0 && itemMaterial != "")
 	WidthIndex = (Math.ceil((WidthNode+49)/50))-2;
 	if (LengthIndex < 0) {LengthIndex = 0;}
 	if (WidthIndex < 0) {WidthIndex = 0;}
-	Lenghtrounded = roundedsizes[LengthIndex].ReCalcValue;
-	Widthrounded = roundedsizes[WidthIndex].ReCalcValue;
-	EdgeTapeLength = adjustededgetape[LengthIndex].ReCalcValue;
-	EdgeTapeWidth = adjustededgetape[WidthIndex].ReCalcValue;
-	CuttingCostLength = adjustedcuttingcost[LengthIndex].ReCalcValue;
-	CuttingCostWidth = adjustedcuttingcost[WidthIndex].ReCalcValue;
+	Lenghtrounded = LengthIndex < roundedsizes.length ? roundedsizes[LengthIndex].ReCalcValue : 10000;
+	Widthrounded = WidthIndex < roundedsizes.length ? roundedsizes[WidthIndex].ReCalcValue : 10000;
+	EdgeTapeLength = LengthIndex < adjustededgetape.length ? adjustededgetape[LengthIndex].ReCalcValue : 10000;
+	EdgeTapeWidth = WidthIndex < adjustededgetape.length ? adjustededgetape[WidthIndex].ReCalcValue : 10000;
+	CuttingCostLength = LengthIndex < adjustedcuttingcost.length ? adjustedcuttingcost[LengthIndex].ReCalcValue : 10000;
+	CuttingCostWidth = WidthIndex < adjustedcuttingcost.length ? adjustedcuttingcost[WidthIndex].ReCalcValue : 10000;
+	
+    let AdjustedsizeLength = 0;
+    let AdjustedsizeWidth = 0;	
+	
 	if (Materials[MatIndex].Name.search("24MDF") > -1 || Materials[MatIndex].Name.search("25MDF") > -1 || Materials[MatIndex].Name.search("30MDF") > -1 || Materials[MatIndex].Name.search("32MDF") > -1
 	|| Materials[MatIndex].Name.search("32MRC2") > -1)
 	{
-	AdjustedPartArea = ((adjustedsizes24mm[LengthIndex].ReCalcValue)/1000)*((adjustedsizes24mm[WidthIndex].ReCalcValue)/1000);
+        AdjustedsizeLength = LengthIndex < adjustedsizes24mm.length ? adjustedsizes24mm[LengthIndex].ReCalcValue : 10000;
+        AdjustedsizeWidth = WidthIndex < adjustedsizes24mm.length ? adjustedsizes24mm[WidthIndex].ReCalcValue : 10000; 
 	}
 	else
 	{
-	AdjustedPartArea = ((adjustedsizes[LengthIndex].ReCalcValue)/1000)*((adjustedsizes[WidthIndex].ReCalcValue)/1000);
+        AdjustedsizeLength = LengthIndex < adjustedsizes.length ? adjustedsizes[LengthIndex].ReCalcValue : 10000;
+        AdjustedsizeWidth = WidthIndex < adjustedsizes.length ? adjustedsizes[WidthIndex].ReCalcValue : 10000; 
 	}
+
+	AdjustedPartArea = ((AdjustedsizeLength)/1000)*((AdjustedsizeWidth)/1000);
 
 	PartPrice = itemQty*(ProfileHandleCost+AngleEdgeCost+LongSHSurcharge+parseFloat(((SheetCost/SheetArea*(AdjustedPartArea)*SheetMargin+(ProcessCost+(Lenghtrounded+Widthrounded)*0.001*CuttingCostPerM*2*CuttingCostLength*CuttingCostWidth)+(((LeftEdge*Lenghtrounded+RightEdge*Lenghtrounded+TopEdge*Widthrounded+BottomEdge*Widthrounded)*0.001*EdgetapeCostPerM)+(LeftEdge*EdgeTapeLength+RightEdge*EdgeTapeLength+TopEdge*EdgeTapeWidth+BottomEdge*EdgeTapeWidth)+(LeftEdge+RightEdge+TopEdge+BottomEdge)*EdgetapeCostPerPiece))*1.25).toFixed(2)));
 	if (PanelType == 'Glass Frame' ) { PartPrice = PartPrice + (itemQty*80) ; } 
