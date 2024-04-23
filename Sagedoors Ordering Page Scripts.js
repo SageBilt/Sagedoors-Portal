@@ -2552,7 +2552,7 @@ var PNCPartID = document.getElementById("PNCPartID"+LineNumber).value;
 
 	document.getElementById("GlassFrameMarginsDiv").style.display = "none";	
 
-	if (PanelType == 'Glass Frame' & itemMaterial.indexOf(HDFPrefix) == -1)
+	if (PanelType == 'Glass Frame' && (itemMaterial.indexOf(HDFPrefix) == -1 | itemMaterial.indexOf("OPTIDOOR TEXAS") > -1))
 	{
 		var MatThick = GetMatThickFromName(itemMaterial);
 		document.getElementById("GlassFrameMarginsDiv").style.display = "inherit";	
@@ -2631,7 +2631,7 @@ var PNCPartID = document.getElementById("PNCPartID"+LineNumber).value;
 	document.getElementById("FlatWidthCalcDiv").style.display = "none";
 	document.getElementById("ScallopDepthCalcDiv").style.display = "none";
 	
-	if (itemMaterial.indexOf(HDFPrefix) > -1) 
+	if (itemMaterial.indexOf(HDFPrefix) > -1 && itemMaterial.indexOf("OPTIDOOR TEXAS") == -1) 
 	{
 		var ProfileName = GetHDFProfileName(itemMaterial);
 		var ELvalue = 0;
@@ -4024,7 +4024,7 @@ function DrawPreview(canvasId,canvas2Id,LineDivID)
 		}
 		
 		/*HDF operations*/
-		if (itemMaterial.indexOf(HDFPrefix) > -1) 
+		if (itemMaterial.indexOf(HDFPrefix) > -1 && itemMaterial.indexOf("OPTIDOOR TEXAS") == -1) 
 		{
 		//RecHeight=myRound(LengthNode*ViewRatio);
 		//RecWidth=myRound(WidthNode*ViewRatio);	
