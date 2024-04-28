@@ -541,8 +541,9 @@ function LoadExistLinesData()
 	var EdgeValue = 0;
 	var EdgeIDName = '';
 	var InvalidHDFEdges = false;
-	//var OnlyChangeIcon = true;
-	//var DontUpdateJSON = true;
+	var OnlyChangeIcon = true;
+	var DontUpdateJSON = true;
+	//var DontOverrideSize = false;
 	
 	if (ExistLinesData.hasOwnProperty("Address1")) {document.getElementById("Address").value=atob(ExistLinesData.Address1);}
 	if (ExistLinesData.hasOwnProperty("City")) {document.getElementById("Cityinput").value=atob(ExistLinesData.City);}	
@@ -569,7 +570,8 @@ function LoadExistLinesData()
 		// {
 		// 	console.log(FileExt);
 		// 	OnlyChangeIcon = false;
-		// 	DontUpdateJSON = false;		
+		// 	DontUpdateJSON = false;	
+		// 	//DontOverrideSize = true;	
 		// }
 	}
 	if (ExistLinesData.hasOwnProperty("ProcFileName")) 
@@ -600,7 +602,7 @@ function LoadExistLinesData()
 		document.getElementById("Material"+LineNo).value=ExistLinesData.PanelLines[i].Material;
 		document.getElementById("Description"+LineNo).value=atob(ExistLinesData.PanelLines[i].Description);
 		document.getElementById("Qty"+LineNo).value=ExistLinesData.PanelLines[i].Qty;
-		ChangeDesc("LineDiv"+LineNo,true,true);
+		ChangeDesc("LineDiv"+LineNo,OnlyChangeIcon,DontUpdateJSON);
 		
 		document.getElementById("Length"+LineNo).value=ExistLinesData.PanelLines[i].Length;
 		document.getElementById("Width"+LineNo).value=ExistLinesData.PanelLines[i].Width;
@@ -1373,33 +1375,33 @@ var LitPartListArr;
 	var LineJSON = document.getElementById("LineJSON"+LineNumber).value;
 	if (LineJSON != '') {PartJSON = JSON.parse(LineJSON);} else {PartJSON = {"Operations" :[] , "Vectors" :[] , "Parameters" : [] };} 
 
-
-	if (PanelTypes[TypeID].hasOwnProperty("Parts") ) {var TypePartID = FindItem(DescNode.value,PanelTypes[TypeID].Parts,"Name");}
-	else {var TypePartID = -1;}
-
-	
-	if (TypePartID > -1) {var PartListArr = PanelTypes[TypeID].Parts;LitPartListArr = 'PanelTypes['+TypeID+'].Parts';ArrIndex = TypePartID; }
-	else
+	LibPartID = FindItem(DescNode.value,LibParts,"Name");
+	if (LibPartID > -1) {var PartListArr = LibParts;LitPartListArr = 'LibParts';ArrIndex = LibPartID; }
+	else 
 	{
-		DescTypeID = FindItem(DescNode.value,DescTypes,"Name");
-		if (DescTypeID > -1) {var PartListArr = DescTypes;LitPartListArr = 'DescTypes';ArrIndex = DescTypeID; }
+		if (PanelTypes[TypeID].hasOwnProperty("Parts") ) {var TypePartID = FindItem(DescNode.value,PanelTypes[TypeID].Parts,"Name");}
+		else {var TypePartID = -1;}
+	
+		
+		if (TypePartID > -1) {var PartListArr = PanelTypes[TypeID].Parts;LitPartListArr = 'PanelTypes['+TypeID+'].Parts';ArrIndex = TypePartID; }
 		else
 		{
-			LibPartID = FindItem(DescNode.value,LibParts,"Name");
-			if (LibPartID > -1) {var PartListArr = LibParts;LitPartListArr = 'LibParts';ArrIndex = LibPartID; }
+			DescTypeID = FindItem(DescNode.value,DescTypes,"Name");
+			if (DescTypeID > -1) {var PartListArr = DescTypes;LitPartListArr = 'DescTypes';ArrIndex = DescTypeID; }
 		}
 	}
 
 
 	if (ArrIndex > -1)
 	{
-	var IconBase64Text = "";
-	var LengthNode = document.getElementById("Length"+LineNumber);
-	var WidthNode = document.getElementById("Width"+LineNumber);
+		var IconBase64Text = "";
+		var LengthNode = document.getElementById("Length"+LineNumber);
+		var WidthNode = document.getElementById("Width"+LineNumber);
 
 		if (DontUpdateJSON == null | DontUpdateJSON == false)
 		{
-		
+			console.log(DescNode.value," LibPartID=",LibPartID," TypePartID=",TypePartID);
+
 			if ((LibPartID > -1 | TypePartID > -1) & ArrIndex > -1)
 			{
 				if (LengthNode.value == "" & WidthNode.value == "" & PartListArr[ArrIndex].Length != undefined & PartListArr[ArrIndex].Width != undefined) 

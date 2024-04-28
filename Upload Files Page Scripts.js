@@ -334,6 +334,12 @@ NewItem.setAttribute("onmouseup","ShowCustomDropDown(this,"+Picklist+");");
 NewItem.setAttribute("oninput","KeyDownShowCustomDropDown(this,"+Picklist+")");
 NewItem.setAttribute("onchange","");
 
+let MatIndex = FindItem(NewItemName.toUpperCase(),Materials,"Name");
+//console.log(NewItemName.toUpperCase()," MatIndex=",MatIndex);
+if (MatIndex > -1) {
+NewItem.value = Materials[MatIndex].Name;
+}
+
 var NewItemDropButton = document.createElement("input");
 NewItemDropButton.id = "NewItemDropButton"+counter;
 NewItemDropButton.className = "ItemSublines RightDropDownButton";

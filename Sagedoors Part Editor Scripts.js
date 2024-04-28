@@ -5283,14 +5283,26 @@ var LoggedOnToken = document.getElementById("Token").value;
   {	  
     if (this.readyState == 4 && this.status == 200) 
 	{
-//alert(this.responseText);
+		var OnlyChangeIcon = true;
+		var DontUpdateJSON = true;
+		var UpdoadFileName = document.getElementById("UpdoadFileName").value;
+
+		var FileExt = decodeURI(UpdoadFileName).split('.').pop();
+
+		if (FileExt == "xls" || FileExt == "xlsx"  || FileExt == "csv" || FileExt == "ods")
+		{
+			//console.log(FileExt);
+			OnlyChangeIcon = false;
+			DontUpdateJSON = false;		
+		}
+
 		var LibPartslistJSON = JSON.parse(this.responseText);	
 		LibParts = LibPartslistJSON.LibPartsList; 
 		var OrderLines = document.getElementById("Orderlines");
 		
 			for (var x=0; x<OrderLines.childElementCount;x++) 
 			{
-			ChangeDesc(OrderLines.children[x].id,true,true);
+			ChangeDesc(OrderLines.children[x].id,OnlyChangeIcon,DontUpdateJSON);
 			}
 	
     }
