@@ -2746,23 +2746,11 @@ var YClick = SelectBox.StartY; */
 	ClearSelectObjects();
 }
 
-function CheckOperationAllowed(OpX,OpY,OpLength,OpWidth,OpAngle,OpDepth)
+function OperationToBandEdgeCheck(LeftEdge,RightEdge,TopEdge,BotEdge,OpRec,ThroughOp,OpFace)
 {
-var Result = true;	
-var LineDiv = document.getElementById(document.getElementById("selectedline").innerHTML);
-var LineNumber = LineDiv.getAttribute("data-LineNumber");
-var itemMaterial = document.getElementById("Material"+LineNumber).value;
-var MaterialThick = GetMatThickFromName(itemMaterial);
-var LeftedgeNode = document.getElementById("Leftedge"+LineNumber);
-var RightedgeNode = document.getElementById("Rightedge"+LineNumber);
-var TopedgeNode = document.getElementById("Topedge"+LineNumber);
-var BotedgeNode = document.getElementById("Bottomedge"+LineNumber);
-if (OpDepth >= MaterialThick) {var ThroughOp = true;} else {var ThroughOp = false;}
-		
-	var OpRec = BuildObjRecPoints(OpX,OpY,OpLength,OpWidth,OpAngle);
-	//alert(" X=" + OpRec.X + " SY=" + OpRec.Y + " Height=" + OpRec.Height + " Width=" + OpRec.Width)	
+	var Result = true;	
 
-		if (LeftedgeNode.value != 'None' & ViewFace == 'Front' | RightedgeNode.value != 'None' & ViewFace == 'Back')
+		if (LeftEdge & OpFace == 'Front' | RightEdge & OpFace == 'Back')
 		{
 			if (ThroughOp) 
 			{
@@ -2774,7 +2762,7 @@ if (OpDepth >= MaterialThick) {var ThroughOp = true;} else {var ThroughOp = fals
 				if (OpRec.X < 20 & OpRec.Y < 50 | OpRec.X < 20 & OpRec.Y+OpRec.Height > PartLength-50 | OpRec.X < 5) {Result = false;}	
 			}
 		}
-		if (RightedgeNode.value != 'None' & ViewFace == 'Front' | LeftedgeNode.value != 'None' & ViewFace == 'Back')
+		if (RightEdge & OpFace == 'Front' | LeftEdge & OpFace == 'Back')
 		{
 			if (ThroughOp) 
 			{
@@ -2784,13 +2772,9 @@ if (OpDepth >= MaterialThick) {var ThroughOp = true;} else {var ThroughOp = fals
 			else
 			{
 				if (OpRec.X+OpRec.Width > PartWidth-20 & OpRec.Y < 50 | OpRec.X+OpRec.Width > PartWidth-20 & OpRec.Y+OpRec.Height > PartLength-50 | OpRec.X+OpRec.Width > PartWidth-5) {Result = false;}		
-				// console.log("X=" + OpRec.X);
-				// console.log("Y=" + OpRec.Y);
-				// console.log("Height=" + OpRec.Height);
-				// console.log("Width=" + OpRec.Width);
 			}
 		}
-		if (TopedgeNode.value != 'None')
+		if (TopEdge)
 		{
 
 			if (ThroughOp) 
@@ -2803,7 +2787,7 @@ if (OpDepth >= MaterialThick) {var ThroughOp = true;} else {var ThroughOp = fals
 				if (OpRec.Y+OpRec.Height > PartLength-20 & OpRec.X < 50 | OpRec.Y+OpRec.Height > PartLength-20 & OpRec.X+OpRec.Width > PartWidth-50 | OpRec.Y+OpRec.Height > PartLength-5) {Result = false;}		
 			}
 		}
-		if (BotedgeNode.value != 'None')
+		if (BotEdge)
 		{
 			if (ThroughOp) 
 			{
@@ -2816,12 +2800,33 @@ if (OpDepth >= MaterialThick) {var ThroughOp = true;} else {var ThroughOp = fals
 			}
 		}
 		
+		console.log("X=" + OpRec.X);
+		console.log("Y=" + OpRec.Y);
+		console.log("Height=" + OpRec.Height);
+		console.log("Width=" + OpRec.Width);
 		return Result;
+}
+
+function CheckOperationAllowed(OpX,OpY,OpLength,OpWidth,OpAngle,OpDepth)
+{	
+var LineDiv = document.getElementById(document.getElementById("selectedline").innerHTML);
+var LineNumber = LineDiv.getAttribute("data-LineNumber");
+var itemMaterial = document.getElementById("Material"+LineNumber).value;
+var MaterialThick = GetMatThickFromName(itemMaterial);
+var Leftedge= document.getElementById("Leftedge"+LineNumber).value != 'None';
+var Rightedge = document.getElementById("Rightedge"+LineNumber).value != 'None';
+var Topedge = document.getElementById("Topedge"+LineNumber).value != 'None';
+var Botedge = document.getElementById("Bottomedge"+LineNumber).value != 'None';
+if (OpDepth >= MaterialThick) {var ThroughOp = true;} else {var ThroughOp = false;}
+
+var OpRec = BuildObjRecPoints(OpX,OpY,OpLength,OpWidth,OpAngle);
+
+	return OperationToBandEdgeCheck(Leftedge,Rightedge,Topedge,Botedge,OpRec,ThroughOp,ViewFace);
 }
 
 function CheckBandAllowed(LineDiv,Edge,Type)
 {
-var Result = true;
+var Result = true;	
 var LineNumber = LineDiv.getAttribute("data-LineNumber");
 var itemMaterial = document.getElementById("Material"+LineNumber).value;
 var MaterialThick = GetMatThickFromName(itemMaterial);
@@ -2843,64 +2848,72 @@ if (Type != 'None')
 		var OpFace = PartJSON.Operations[inc].Face;
 		if (OpDepth >= MaterialThick) {var ThroughOp = true;} else {var ThroughOp = false;}
 		
+		var Leftedge = Edge == 'Left';
+		var Rightedge = Edge == 'Right';
+		var Topedge = Edge == 'Top';
+		var Botedge = Edge == 'Bottom';
+
 				
 		var OpRec = BuildObjRecPoints(OpX,OpY,OpLength,OpWidth,OpAngle);
-			
-		//alert(" RecX=" + round(OpRec.X,1) + " RecY="+ round(OpRec.Y,1) + " BoxHeight="+ round(OpRec.Height,1) + " BoxWidth="+round(OpRec.Width,1));	
 
-			if (Edge == 'Left' & OpFace == 'Front' | Edge == 'Right' & OpFace == 'Back')
-			{
-				if (ThroughOp) 
-				{
-					if (OpRec.X < 50 & OpRec.Height > 300 | OpRec.X < 50 & OpRec.Height/PartLength > 0.5) {Result = false;}
-					if (OpRec.X < 20 ) {Result = false;}
-				}
-				else
-				{
-					if (OpRec.X < 20 & OpRec.Y < 50 | OpRec.X < 20 & OpRec.Y+OpRec.Height > PartLength-50 | OpRec.X < 5) {Result = false;}		
-				}
-			}
-			 if (Edge == 'Right' & OpFace == 'Front' | Edge == 'Left' & OpFace == 'Back')
-			{
-				if (ThroughOp) 
-				{
-					if (OpRec.X+OpRec.Width > PartWidth-50 & OpRec.Height > 300 | OpRec.X+OpRec.Width > PartWidth-50 & OpRec.Height/PartLength > 0.5) {Result = false;}
-					if (OpRec.X+OpRec.Width > PartWidth-20 ) {Result = false;}
-				}
-				else
-				{
-					if (OpRec.X+OpRec.Width > PartWidth-20 & OpRec.Y < 50 | OpRec.X+OpRec.Width > PartWidth-20 & OpRec.Y+OpRec.Height <= PartLength-50 | OpRec.X+OpRec.Width > PartWidth-5) {Result = false;}		
-				}
-			}
-			if (Edge == 'Top')
-			{
-				if (ThroughOp) 
-				{
-					if (OpRec.Y+OpRec.Height > PartLength-50 & OpRec.Width > 300 | OpRec.Y+OpRec.Height > PartLength-50 & OpRec.Width/PartWidth > 0.5) {Result = false;}
-					if (OpRec.Y+OpRec.Height > PartLength-20 ) {Result = false;}
-				}
-				else
-				{
-					if (OpRec.Y+OpRec.Height > PartLength-20 & OpRec.X < 50 | OpRec.Y+OpRec.Height > PartLength-20 & OpRec.X+OpRec.Width > PartWidth-50 | OpRec.Y+OpRec.Height > PartLength-5) {Result = false;}		
-				}
-			}
-			if (Edge == 'Bottom')
-			{
-				if (ThroughOp) 
-				{
-					if (OpRec.Y < 20 & OpRec.Width > 300 | OpRec.Y < 20 & OpRec.Width/PartWidth > 0.5) {Result = false;}
-					if (OpRec.Y < 50 ) {Result = false;}
-				}
-				else
-				{
-					if (OpRec.Y < 20 & OpRec.X < 50 | OpRec.Y < 20 & OpRec.X+OpRec.Width > PartWidth-50 | OpRec.Y < 5) {Result = false;}		
-				}
-			} 
+		Result = OperationToBandEdgeCheck(Leftedge,Rightedge,Topedge,Botedge,ThroughOp,OpFace);
+
+		if (!Result) {return Result;}
+			
+	// 	//alert(" RecX=" + round(OpRec.X,1) + " RecY="+ round(OpRec.Y,1) + " BoxHeight="+ round(OpRec.Height,1) + " BoxWidth="+round(OpRec.Width,1));	
+
+	// 		if (Edge == 'Left' & OpFace == 'Front' | Edge == 'Right' & OpFace == 'Back')
+	// 		{
+	// 			if (ThroughOp) 
+	// 			{
+	// 				if (OpRec.X < 50 & OpRec.Height > 300 | OpRec.X < 50 & OpRec.Height/PartLength > 0.5) {Result = false;}
+	// 				if (OpRec.X < 20 ) {Result = false;}
+	// 			}
+	// 			else
+	// 			{
+	// 				if (OpRec.X < 20 & OpRec.Y < 50 | OpRec.X < 20 & OpRec.Y+OpRec.Height > PartLength-50 | OpRec.X < 5) {Result = false;}		
+	// 			}
+	// 		}
+	// 		 if (Edge == 'Right' & OpFace == 'Front' | Edge == 'Left' & OpFace == 'Back')
+	// 		{
+	// 			if (ThroughOp) 
+	// 			{
+	// 				if (OpRec.X+OpRec.Width > PartWidth-50 & OpRec.Height > 300 | OpRec.X+OpRec.Width > PartWidth-50 & OpRec.Height/PartLength > 0.5) {Result = false;}
+	// 				if (OpRec.X+OpRec.Width > PartWidth-20 ) {Result = false;}
+	// 			}
+	// 			else
+	// 			{
+	// 				if (OpRec.X+OpRec.Width > PartWidth-20 & OpRec.Y < 50 | OpRec.X+OpRec.Width > PartWidth-20 & OpRec.Y+OpRec.Height <= PartLength-50 | OpRec.X+OpRec.Width > PartWidth-5) {Result = false;}		
+	// 			}
+	// 		}
+	// 		if (Edge == 'Top')
+	// 		{
+	// 			if (ThroughOp) 
+	// 			{
+	// 				if (OpRec.Y+OpRec.Height > PartLength-50 & OpRec.Width > 300 | OpRec.Y+OpRec.Height > PartLength-50 & OpRec.Width/PartWidth > 0.5) {Result = false;}
+	// 				if (OpRec.Y+OpRec.Height > PartLength-20 ) {Result = false;}
+	// 			}
+	// 			else
+	// 			{
+	// 				if (OpRec.Y+OpRec.Height > PartLength-20 & OpRec.X < 50 | OpRec.Y+OpRec.Height > PartLength-20 & OpRec.X+OpRec.Width > PartWidth-50 | OpRec.Y+OpRec.Height > PartLength-5) {Result = false;}		
+	// 			}
+	// 		}
+	// 		if (Edge == 'Bottom')
+	// 		{
+	// 			if (ThroughOp) 
+	// 			{
+	// 				if (OpRec.Y < 20 & OpRec.Width > 300 | OpRec.Y < 20 & OpRec.Width/PartWidth > 0.5) {Result = false;}
+	// 				if (OpRec.Y < 50 ) {Result = false;}
+	// 			}
+	// 			else
+	// 			{
+	// 				if (OpRec.Y < 20 & OpRec.X < 50 | OpRec.Y < 20 & OpRec.X+OpRec.Width > PartWidth-50 | OpRec.Y < 5) {Result = false;}		
+	// 			}
+	// 		} 
 		}
-		//alert(RoutingCount);
 	}
 
-	//if (PartJSON.Operations.length == 0 | RoutingCount == 0) {Result = true;} 
+	// //if (PartJSON.Operations.length == 0 | RoutingCount == 0) {Result = true;} 
 }
 	return Result;
 }

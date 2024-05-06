@@ -614,6 +614,8 @@ function LoadExistLinesData()
 		var GrainMatchGroup = GetExtraParValue("GrainMatchGroup",document.getElementById("LineDiv"+LineNo).id);
 
 		if (GrainMatchGroup > 0) {document.getElementById("AddInfo"+LineNo).placeholder = "Group " + GrainMatchGroup;}
+
+		console.log(document.getElementById("ExtraPar"+LineNo).value);
 		
 		if (parseInt(ExistLinesData.PanelLines[i].PNCPartID) > 0) 
 		{
@@ -791,9 +793,10 @@ var MatIndex = FindItem(itemMaterial,Materials,"Name");
 	{
 		var PopUpMessage = Materials[MatIndex].PopupMessage;
 		
-		if( Materials[MatIndex].Grained == 'True') {var IsGrained = true;} else {var IsGrained = false;}
+		var IsGrained = Materials[MatIndex].Grained == 'True';
+		var IsHDFMaterial = itemMaterial.indexOf(HDFPrefix) > -1;
 		
-		if ( !IsGrained ) {RemoveGrainMatchParams(LineDivID);}
+		if ( !IsGrained && !IsHDFMaterial ) {RemoveGrainMatchParams(LineDivID);}
 
 		if (itemMaterial.indexOf("36") > -1 | itemMaterial.indexOf("60") > -1) //Is a builtup panel
 		{ 
@@ -1027,20 +1030,20 @@ if (BandChangeOK == true)
 		document.getElementById(ItemID).className = "checkboxTick";	
 		SetEdgeType = 'LaserEdge';
 
-		if ( TopedgeNode.value == 'SpecialEdge') { TopedgeNode.value = SetEdgeType; TopedgeTickNode.className = "checkboxTick";}
-		if ( BotedgeNode.value == 'SpecialEdge') { BotedgeNode.value = SetEdgeType; BottomedgeTickNode.className = "checkboxTick";}
-		if ( LeftedgeNode.value == 'SpecialEdge') { LeftedgeNode.value = SetEdgeType; LeftedgeTickNode.className = "checkboxTick";}
-		if ( RightedgeNode.value == 'SpecialEdge') { RightedgeNode.value = SetEdgeType; RightedgeTickNode.className = "checkboxTick";}		
+		// if ( TopedgeNode.value == 'SpecialEdge') { TopedgeNode.value = SetEdgeType; TopedgeTickNode.className = "checkboxTick";}
+		// if ( BotedgeNode.value == 'SpecialEdge') { BotedgeNode.value = SetEdgeType; BottomedgeTickNode.className = "checkboxTick";}
+		// if ( LeftedgeNode.value == 'SpecialEdge') { LeftedgeNode.value = SetEdgeType; LeftedgeTickNode.className = "checkboxTick";}
+		// if ( RightedgeNode.value == 'SpecialEdge') { RightedgeNode.value = SetEdgeType; RightedgeTickNode.className = "checkboxTick";}		
 		//}
 		break;
 	case 'SpecialEdge':
 			document.getElementById(ItemID).className = "checkboxSpecial";	
 			SetEdgeType = 'SpecialEdge';
 
-			if ( TopedgeNode.value == 'LaserEdge') { TopedgeNode.value = SetEdgeType; TopedgeTickNode.className = "checkboxSpecial";}
-			if ( BotedgeNode.value == 'LaserEdge') { BotedgeNode.value = SetEdgeType; BottomedgeTickNode.className = "checkboxSpecial";}
-			if ( LeftedgeNode.value == 'LaserEdge') { LeftedgeNode.value = SetEdgeType; LeftedgeTickNode.className = "checkboxSpecial";}
-			if ( RightedgeNode.value == 'LaserEdge') { RightedgeNode.value = SetEdgeType; RightedgeTickNode.className = "checkboxSpecial";}
+			// if ( TopedgeNode.value == 'LaserEdge') { TopedgeNode.value = SetEdgeType; TopedgeTickNode.className = "checkboxSpecial";}
+			// if ( BotedgeNode.value == 'LaserEdge') { BotedgeNode.value = SetEdgeType; BottomedgeTickNode.className = "checkboxSpecial";}
+			// if ( LeftedgeNode.value == 'LaserEdge') { LeftedgeNode.value = SetEdgeType; LeftedgeTickNode.className = "checkboxSpecial";}
+			// if ( RightedgeNode.value == 'LaserEdge') { RightedgeNode.value = SetEdgeType; RightedgeTickNode.className = "checkboxSpecial";}
 
 			break;
 	case 'None':
@@ -1400,7 +1403,7 @@ var LitPartListArr;
 
 		if (DontUpdateJSON == null | DontUpdateJSON == false)
 		{
-			console.log(DescNode.value," LibPartID=",LibPartID," TypePartID=",TypePartID);
+			//console.log(DescNode.value," LibPartID=",LibPartID," TypePartID=",TypePartID);
 
 			if ((LibPartID > -1 | TypePartID > -1) & ArrIndex > -1)
 			{
@@ -4961,7 +4964,7 @@ var SizeOk = false;
 
 	if ( SizeOk == true ) 
 	{	
-	//alert(NewString);
+	//console.log(NewString);
 	UpdateExtraPar(BoxID,NewString,LineID);
 		if (BoxID == "Return") {ChangeBanding(document.getElementById('selectedline').innerHTML);}
 								
@@ -4995,7 +4998,6 @@ ExtraParamNodeval = ExtraParamNode.value;
 		ExtraParamNode.value = ExtraParamNodeval+NewString+";";
 		}
 		
-		//alert(ExtraParamNode.value);
 	}
 }
 
@@ -5032,6 +5034,7 @@ var ParamPos = ExtraParamNode.value.indexOf(Parameter);
 var Shortstring = ExtraParamNode.value.slice(ParamPos,ExtraParamNode.value.length);
 var CarPos = Shortstring.indexOf(";");
 var Result = Shortstring.slice(Parameter.length+1,CarPos);
+//console.log(Parameter," ",Result," ",ExtraParamNode.value);
 return Result
 }
 
@@ -5780,7 +5783,8 @@ var GroupsList = [];
 
 	for (var r = 1; r<counter; r++) 
 	{
-	var ThisGroupNumber = GetExtraParValue("GrainMatchGroup",document.getElementById("LineDiv"+r).id)
+	var ThisGroupNumber = GetExtraParValue("GrainMatchGroup",document.getElementById("LineDiv"+r).id);
+	console.log(ThisGroupNumber);
 		if (ThisGroupNumber	> 1)
 		{
 			if (FindItemInArray(GroupsList,ThisGroupNumber) == -1 ) 
