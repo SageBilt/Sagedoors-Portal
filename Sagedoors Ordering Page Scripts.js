@@ -51,6 +51,7 @@ var HDFDoorSpecData = [
 {"Profile" : "COLORADO" , "ProfileMargin" : 0 , "Frame" : false, "GlassFrame" : false},
 {"Profile" : "DAKOTA" , "ProfileMargin" : 60 , "Frame" : true , "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 71 , "MaxEdge" : 75 , "IsFixedSpacing" : true , "ExtendThroughFrame" : true} },
 {"Profile" : "DELAWARE" , "ProfileMargin" : 0 , "Frame" : false, "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 40 , "MaxEdge" : 0 , "IsFixedSpacing" : false , "FixedSideMargin" : 0.01 } },
+{"Profile" : "DETRIOT" , "ProfileMargin" : 63 , "Frame" : true, "GlassFrame" : true},
 {"Profile" : "FLORIDA" , "ProfileMargin" : 60 , "Frame" : true, "GlassFrame" : true},
 {"Profile" : "GEORGIA" , "ProfileMargin" : 10 , "Frame" : true, "GlassFrame" : false},
 {"Profile" : "HAWAII" , "ProfileMargin" : 0 , "Frame" : false, "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 22 , "MaxEdge" : 0 , "IsFixedSpacing" : false , "FixedSideMargin" : 13 } },
