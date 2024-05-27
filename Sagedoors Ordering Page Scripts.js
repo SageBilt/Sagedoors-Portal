@@ -49,7 +49,7 @@ var HDFDoorSpecData = [
 {"Profile" : "CAROLINA" , "ProfileMargin" : 18 , "Frame" : true, "GlassFrame" : false},
 {"Profile" : "CHICAGO" , "ProfileMargin" : 0 , "Frame" : false, "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 13 ,"GrooveWidth" : 6.4 ,"GrooveDepth" : 1.5,"MinGrooveWidth" : 6.4,"MaxGrooveDepth" : 15, "UserSpacing" : true, "ToggleStartFinishOnLow" : true} },
 {"Profile" : "COLORADO" , "ProfileMargin" : 0 , "Frame" : false, "GlassFrame" : false},
-{"Profile" : "DAKOTA" , "ProfileMargin" : 60 , "Frame" : true , "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 71 , "MaxEdge" : 75 , "IsFixedSpacing" : true , "ExtendThroughFrame" : true} },
+{"Profile" : "DAKOTA" , "ProfileMargin" : 60 , "Frame" : true , "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 71 , "MaxEdge" : 75 , "IsFixedSpacing" : true , "ExtendThroughFrame" : true, "UserSpacing" : true} },
 {"Profile" : "DELAWARE" , "ProfileMargin" : 0 , "Frame" : false, "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 40 , "MaxEdge" : 0 , "IsFixedSpacing" : false , "FixedSideMargin" : 0.01 } },
 {"Profile" : "DETRIOT" , "ProfileMargin" : 63 , "Frame" : true, "GlassFrame" : true},
 {"Profile" : "FLORIDA" , "ProfileMargin" : 60 , "Frame" : true, "GlassFrame" : true},
