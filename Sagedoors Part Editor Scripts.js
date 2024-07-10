@@ -193,7 +193,7 @@ var CanvasObject = document.getElementById("CanvasBorder");
 														{
 														PartJSON.Operations[SelectedObjects.Items[i]].X = (NewXPos).toString();
 														PartJSON.Operations[SelectedObjects.Items[i]].Y = (NewYPos).toString();
-														delete PartJSON.PNCOperations;
+														//delete PartJSON.PNCOperations;
 														}
 														else {popup("Invalid position! Operation too close to Edgebanding!",120,350,1);}
 													}
@@ -203,7 +203,7 @@ var CanvasObject = document.getElementById("CanvasBorder");
 														var	NewYPos = parseFloat(CalcOutputValue(PartJSON.Operations[SelectedObjects.Items[i]].Y))-round(MoveObject.Y-ActiveMouseY,3);
 														PartJSON.Operations[SelectedObjects.Items[i]].X = (NewXPos).toString();
 														PartJSON.Operations[SelectedObjects.Items[i]].Y = (NewYPos).toString();
-														delete PartJSON.PNCOperations;
+														//delete PartJSON.PNCOperations;
 													}
 														
 												}
@@ -224,7 +224,7 @@ var CanvasObject = document.getElementById("CanvasBorder");
 													PartJSON.Vectors[SelectedObjects.Items[i]].CX = (parseFloat(CalcOutputValue(PartJSON.Vectors[SelectedObjects.Items[i]].CX))-round(MoveObject.X-ActiveMouseX,3)).toString();
 													PartJSON.Vectors[SelectedObjects.Items[i]].CY = (parseFloat(CalcOutputValue(PartJSON.Vectors[SelectedObjects.Items[i]].CY))-round(MoveObject.Y-ActiveMouseY,3)).toString();													
 													}
-												delete PartJSON.PNCOperations;	
+												//delete PartJSON.PNCOperations;	
 												}
 						
 											}
@@ -993,6 +993,7 @@ var currentLength = PartJSON.Operations.length;
 		{
 		var ObjString = JSON.parse(JSON.stringify(PartJSON.Operations[SelectedObjects.Items[i]]));	
 		PartJSON.Operations.push(ObjString);
+		delete PartJSON.PNCOperations;
 		//PartJSON.Operations.copyWithin(PartJSON.Operations.length-1,SelectedObjects.Items[i]);
 		//document.getElementById("TestP").innerHTML = JSON.stringify(PartJSON.Operations[SelectedObjects.Items[i]]);	
 		}
@@ -1405,6 +1406,7 @@ var OrigValue = '';
 					case 'QtyInput': PartJSON.Operations[SelectedObjects.Items[0]].Qty = CalcValue; break;
 					case 'SpacingInput': PartJSON.Operations[SelectedObjects.Items[0]].Spacing = CalcValue; break;
 					}
+					delete PartJSON.PNCOperations;
 				}
 				
 				if (InputElem.id == 'VisibleInput') {PartJSON.Operations[SelectedObjects.Items[0]].VisibleCond = CalcValue;}
@@ -1486,6 +1488,8 @@ var OrigValue = '';
 							break;					
 					}
 				}
+
+				delete PartJSON.PNCVectors;
 				
 				/*if (InputElem.value == "Tangential")
 				{

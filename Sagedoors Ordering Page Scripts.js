@@ -40,7 +40,7 @@ var PanelTypes = [
 var LibImages = [];
 
 var HDFDoorSpecData = [
-{"Profile" : "ALASKA" , "ProfileMargin" : 0 , "Frame" : false , "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 42 , "MaxEdge" : 0 , "IsFixedSpacing" : false, "UserSpacing" : true, "HalfSpacingSideMargin" : true, "Width" : 26} },
+{"Profile" : "ALASKA" , "ProfileMargin" : 0 , "Frame" : false , "GlassFrame" : false , "VGrooves" : {"MaxSpacing" : 42 , "MaxEdge" : 0 , "IsFixedSpacing" : false, "UserSpacing" : true, "HalfSpacingSideMargin" : true, "MaxScallopWidth" : 26, "MaxMaxScallopWidth" : 26, "ScallopToolRad" : 17.083} },
 {"Profile" : "ANNAPOLIS" , "ProfileMargin" : 18 , "Frame" : true, "GlassFrame" : false},
 {"Profile" : "ARIZONA" , "ProfileMargin" : 60 , "Frame" : true, "GlassFrame" : true},
 {"Profile" : "ASPEN" , "ProfileMargin" : 0 , "Frame" : false , "GlassFrame" : false , "VGrooves" : {"MaxScallopWidth" : 32, "MaxMaxScallopWidth" : 32 , "IsFixedSpacing" : false, "FlatWidth" : 3, "MinFlatWidth" : 3, "ScallopToolRad" : 35} },
@@ -2670,6 +2670,8 @@ var PNCPartID = document.getElementById("PNCPartID"+LineNumber).value;
 			{
 				document.getElementById("MaxScallopWidthDiv").style.display = "inherit";
 				SetExtraParInputValue('MaxScallopW',LineDivID,VGrooves.MaxScallopWidth);
+				if (VGrooves.FlatWidth) {document.getElementById("MaxScallopWidthCaption").innerHTML = "Max Scallop Width:";} 
+				else {document.getElementById("MaxScallopWidthCaption").innerHTML = "Scallop Width:";}
 			}			
 			if (VGrooves.FlatWidth > 0) 
 			{
@@ -4252,6 +4254,7 @@ function DrawPreview(canvasId,canvas2Id,LineDivID)
 								{
 								VGrooveQty = 1+Math.floor((PocketWidth-0.01 - FlatWidth)/(MaxScallopWidth+FlatWidth));	
 								VGrooveSpacing = (PocketWidth-FlatWidth)/VGrooveQty;
+								console.log(PocketWidth);
 								}
 								DrawWidth = VGrooveSpacing-FlatWidth;
 							}
@@ -4273,6 +4276,7 @@ function DrawPreview(canvasId,canvas2Id,LineDivID)
 							{	
 							VGrooveSpacing = MaxSpacing;	
 							VGrooveQty = Math.floor(2+(((PocketWidth-MaxEdge*2)/VGrooveSpacing)));
+							console.log(VGrooveQty);
 							//VGrooveSideMargin:= ((PocketWidth - (VGrooveSpcng*(VGrooveQty-1)))/2) + (ProfMargin+LeftExtraLength);
 							}
 							else
