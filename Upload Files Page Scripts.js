@@ -17,7 +17,7 @@ var HelpDocLink = document.getElementById("HelpDocLink");
 	switch (DivID)
 	{
 	  case "PNCFileOption" : 
-	  						UploadFileInput.accept = ".pnc";
+	  						UploadFileInput.accept = ".pnc,.pnx";
 							DropZoneText.innerHTML = "Drag your PNC file to this <i>drop zone</i> or click to browse files";
 							document.getElementById("PNCHelpDocLink").style.display = "initial";				
 							break;

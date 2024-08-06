@@ -616,7 +616,7 @@ function LoadExistLinesData()
 
 		if (GrainMatchGroup > 0) {document.getElementById("AddInfo"+LineNo).placeholder = "Group " + GrainMatchGroup;}
 
-		console.log(document.getElementById("ExtraPar"+LineNo).value);
+		//console.log(document.getElementById("ExtraPar"+LineNo).value);
 		
 		if (parseInt(ExistLinesData.PanelLines[i].PNCPartID) > 0) 
 		{
@@ -4254,7 +4254,7 @@ function DrawPreview(canvasId,canvas2Id,LineDivID)
 								{
 								VGrooveQty = 1+Math.floor((PocketWidth-0.01 - FlatWidth)/(MaxScallopWidth+FlatWidth));	
 								VGrooveSpacing = (PocketWidth-FlatWidth)/VGrooveQty;
-								console.log(PocketWidth);
+								//console.log(PocketWidth);
 								}
 								DrawWidth = VGrooveSpacing-FlatWidth;
 							}
@@ -4276,7 +4276,7 @@ function DrawPreview(canvasId,canvas2Id,LineDivID)
 							{	
 							VGrooveSpacing = MaxSpacing;	
 							VGrooveQty = Math.floor(2+(((PocketWidth-MaxEdge*2)/VGrooveSpacing)));
-							console.log(VGrooveQty);
+							//console.log(VGrooveQty);
 							//VGrooveSideMargin:= ((PocketWidth - (VGrooveSpcng*(VGrooveQty-1)))/2) + (ProfMargin+LeftExtraLength);
 							}
 							else
