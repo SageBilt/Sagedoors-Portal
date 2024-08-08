@@ -224,15 +224,23 @@ var RowWasInserted = false;
 
 				switch (DataArray[i].Type)
 				{
-				case '.pnc' : var ImageClass = "TRows CVFileImage FileImageSmall"; var OrderType = "PNC"; break; 
+				case '.pnc' :
+				case '.pnx' : 	 
+					var ImageClass = "TRows CVFileImage FileImageSmall"; var OrderType = "PNC"; 
+					break; 
 				case '.sdf' : var ImageClass = "TRows MicroFileImage FileImageSmall"; var OrderType = "SDF"; break;
-				case '.opt' : var ImageClass = "TRows MozFileImage FileImageSmall"; var OrderType = "Moziak"; break;
-				case '.db' : var ImageClass = "TRows MozFileImage FileImageSmall"; var OrderType = "Moziak"; break;
-				case '.xml' : var ImageClass = "TRows MozFileImage FileImageSmall"; var OrderType = "Moziak"; break; 
-				case '.xls' : var ImageClass = "TRows ExcelCSVFileImage FileImageSmall"; var OrderType = "Excel"; break; 
-				case '.xlsx' : var ImageClass = "TRows ExcelCSVFileImage FileImageSmall"; var OrderType = "Excel"; break;
+				case '.opt' :
+				case '.db' :
+				case '.xml' :
+					var ImageClass = "TRows MozFileImage FileImageSmall"; var OrderType = "Moziak"; 
+					break; 
+				case '.xls' : 
+				case '.xlsx' :
+				case '.ods' : 
+					var ImageClass = "TRows ExcelCSVFileImage FileImageSmall"; var OrderType = "Excel";
+					break;
 				case '.csv' : var ImageClass = "TRows ExcelCSVFileImage FileImageSmall"; var OrderType = "CSV"; break;
-				case '.ods' : var ImageClass = "TRows ExcelCSVFileImage FileImageSmall"; var OrderType = "Excel"; break;
+
 
 				default : var ImageClass = "TRows"; var OrderType = "Manual"; break; 
 				}	

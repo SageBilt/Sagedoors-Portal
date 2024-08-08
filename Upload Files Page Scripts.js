@@ -18,7 +18,7 @@ var HelpDocLink = document.getElementById("HelpDocLink");
 	{
 	  case "PNCFileOption" : 
 	  						UploadFileInput.accept = ".pnc,.pnx";
-							DropZoneText.innerHTML = "Drag your PNC file to this <i>drop zone</i> or click to browse files";
+							DropZoneText.innerHTML = "Drag your PNC or PNX file to this <i>drop zone</i> or click to browse files";
 							document.getElementById("PNCHelpDocLink").style.display = "initial";				
 							break;
 	  case "SDFFileOption" : 	
@@ -95,11 +95,17 @@ var FileNameDiv = document.getElementById("FileNameDiv");
   
   switch (FileExt)
   {
-	case "pnc" : document.getElementById("fileTypeImage").setAttribute("class", "UploadFileImage CVFileImage"); break;
+	case "pnc" :
+	case "pnx" :	 
+		document.getElementById("fileTypeImage").setAttribute("class", "UploadFileImage CVFileImage");
+		break;
 	case "sdf" : document.getElementById("fileTypeImage").setAttribute("class", "UploadFileImage MicroFileImage"); break;
-	case "xls" : document.getElementById("fileTypeImage").setAttribute("class", "UploadFileImage ExcelCSVFileImage"); break;
-	case "xlsx" : document.getElementById("fileTypeImage").setAttribute("class", "UploadFileImage ExcelCSVFileImage"); break;
-	case "csv" : document.getElementById("fileTypeImage").setAttribute("class", "UploadFileImage ExcelCSVFileImage"); break;
+	case "xls" :
+	case "xlsx" : 
+	case "csv" :
+	case "ods" :
+		document.getElementById("fileTypeImage").setAttribute("class", "UploadFileImage ExcelCSVFileImage");
+		break;
 	default: document.getElementById("fileTypeImage").setAttribute("class", "UploadFileImage MozFileImage");
   }
 
