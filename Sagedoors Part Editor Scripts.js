@@ -2804,10 +2804,10 @@ function OperationToBandEdgeCheck(LeftEdge,RightEdge,TopEdge,BotEdge,OpRec,Throu
 			}
 		}
 		
-		console.log("X=" + OpRec.X);
-		console.log("Y=" + OpRec.Y);
-		console.log("Height=" + OpRec.Height);
-		console.log("Width=" + OpRec.Width);
+		//console.log("X=" + OpRec.X);
+		//console.log("Y=" + OpRec.Y);
+		//console.log("Height=" + OpRec.Height);
+		//console.log("Width=" + OpRec.Width);
 		return Result;
 }
 
@@ -3025,7 +3025,7 @@ var BottomedgeTickNode = document.getElementById("BottomedgeTick"+LineNumber);
 		}
 }
 
-function SetEdgingOnVectors(LineDivID,CheckBoxID,CheckBoxClass)
+function SetEdgingOnVectors(LineDivID,CheckBoxID,TickEdgeType)
 {
 var LineDiv = document.getElementById(LineDivID);
 var LineNumber = LineDiv.getAttribute("data-LineNumber");
@@ -3035,30 +3035,32 @@ var LineNumber = LineDiv.getAttribute("data-LineNumber");
 	{
 	PartJSON = JSON.parse(LineJSON);
 
-
-	switch(CheckBoxClass)
+	switch(TickEdgeType)
 	{
-	case "checkboxBlank": 
-	var EdgeValue = "E";
-	break;
-	case "checkboxTick":
+	case "None": 
 	var EdgeValue = "N";
+	break;
+	default:
+	var EdgeValue = "E";
 	break;
 	}
 	if ( CheckBoxID.match('Left') != null ) { var WhichEdge = 'Left';}
-	if ( CheckBoxID.match('Right') != null ) { var WhichEdge = 'Rigth';}
+	if ( CheckBoxID.match('Right') != null ) { var WhichEdge = 'Right';}
 	if ( CheckBoxID.match('Top') != null ) { var WhichEdge = 'Top';}
 	if ( CheckBoxID.match('Bottom') != null ) { var WhichEdge = 'Bottom';}
+
 	
-	//alert(EdgeValue);
+	//console.log(TickEdgeType,EdgeValue);
 	for (var i = 0; i<PartJSON.Vectors.length; i++)
 	{
+		//console.log(i,PartJSON.Vectors[i].Type,CalcOutputValue(PartJSON.Vectors[i].SX),CalcOutputValue(PartJSON.Vectors[i].EX),PartWidth,PartJSON.Vectors.length);
 		if (PartJSON.Vectors[i].Type == 'Line')
 		{
-			if (CalcOutputValue(PartJSON.Vectors[i].SX) == 0 & CalcOutputValue(PartJSON.Vectors[i].EX) == 0 & WhichEdge == 'Left') {PartJSON.Vectors[i].Edge = EdgeValue; break;}
-			if (CalcOutputValue(PartJSON.Vectors[i].SX) == PartWidth & CalcOutputValue(PartJSON.Vectors[i].EX) == PartWidth & WhichEdge == 'Rigth') {PartJSON.Vectors[i].Edge = EdgeValue; break;}
-			if (CalcOutputValue(PartJSON.Vectors[i].SY) == PartLength & CalcOutputValue(PartJSON.Vectors[i].EY) == PartLength & WhichEdge == 'Top') {PartJSON.Vectors[i].Edge = EdgeValue; break;} 	
-			if (CalcOutputValue(PartJSON.Vectors[i].SY) == 0 & CalcOutputValue(PartJSON.Vectors[i].EY) == 0 & WhichEdge == 'Bottom') {PartJSON.Vectors[i].Edge = EdgeValue; break;}
+			
+			if (CalcOutputValue(PartJSON.Vectors[i].SX) == 0 & CalcOutputValue(PartJSON.Vectors[i].EX) == 0 & WhichEdge == 'Left') {PartJSON.Vectors[i].Edge = EdgeValue;}
+			if (CalcOutputValue(PartJSON.Vectors[i].SX) == PartWidth & CalcOutputValue(PartJSON.Vectors[i].EX) == PartWidth & WhichEdge == 'Right') {PartJSON.Vectors[i].Edge = EdgeValue;}
+			if (CalcOutputValue(PartJSON.Vectors[i].SY) == PartLength & CalcOutputValue(PartJSON.Vectors[i].EY) == PartLength & WhichEdge == 'Top') {PartJSON.Vectors[i].Edge = EdgeValue;} 	
+			if (CalcOutputValue(PartJSON.Vectors[i].SY) == 0 & CalcOutputValue(PartJSON.Vectors[i].EY) == 0 & WhichEdge == 'Bottom') {PartJSON.Vectors[i].Edge = EdgeValue;}
 		}		
 	}
 	

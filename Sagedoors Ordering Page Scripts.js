@@ -914,6 +914,7 @@ var itemMaterial = document.getElementById("Material"+LineNumber).value;
 var CheckBoxClass = document.getElementById(CheckBoxId).className;
 var PNCPartID = parseInt(document.getElementById("PNCPartID"+LineNumber).value);
 var WasChanged = false;
+
 		//alert(LineJSON);
 
 	//else {PartJSON = {"Operations" :[] , "Vectors" :[]}}
@@ -925,11 +926,9 @@ var WasChanged = false;
 
 	if (document.getElementById(CheckBoxId).getAttribute("disabled") != 'disabled')
 	{	
-		SetEdgingOnVectors(LineDiv.id,CheckBoxId,CheckBoxClass);
 		
 		var LineJSON = document.getElementById("LineJSON"+LineNumber).value;
 		if (LineJSON != '') {PartJSON = JSON.parse(LineJSON);}
-
 
 		var TickEdgeType = GetStdEdgeType(LineDiv.id,"");
 
@@ -939,36 +938,44 @@ var WasChanged = false;
 			if (IsHDFMaterial & TickEdgeType != 'Tick') {TickEdgeType = GetNextHDFEdgeProfileType(CheckBoxClass);}
 			if (!IsHDFMaterial & CheckBoxClass != 'checkboxSpecial') {TickEdgeType = 'SpecialEdge';}
 		}
-		
+
 		switch(CheckBoxClass)
 		{
-			case "checkboxBlank": WasChanged = ChangeCheckBoxValue(CheckBoxId,TickEdgeType);
+			case "checkboxBlank": TickEdgeType = TickEdgeType;
 				break;
 			case "checkboxTick":
-				if (e.ctrlKey) {WasChanged = ChangeCheckBoxValue(CheckBoxId,TickEdgeType);}
-				else if(PanelType == 'Angle Edge' | ToggleAngleEdges) {WasChanged = ChangeCheckBoxValue(CheckBoxId,'AngleEdge');}
-				else if (PanelType == 'Profile Handle') {WasChanged = ChangeCheckBoxValue(CheckBoxId,'45Profile');}
-				else {WasChanged = ChangeCheckBoxValue(CheckBoxId,'None');}	
+				if (e.ctrlKey) {TickEdgeType = TickEdgeType;}
+				else if(PanelType == 'Angle Edge' || ToggleAngleEdges) {TickEdgeType = 'AngleEdge';}
+				else if (PanelType == 'Profile Handle') {TickEdgeType = '45Profile';}
+				else {TickEdgeType = 'None';}	
 				break;
-			case "checkboxSpecial": 
-				if (e.ctrlKey) {WasChanged = ChangeCheckBoxValue(CheckBoxId,TickEdgeType);}
-				else {WasChanged = ChangeCheckBoxValue(CheckBoxId,'None');}
+			case "checkboxSpecial":
+				if (e.ctrlKey) {TickEdgeType = TickEdgeType;}
+				else {TickEdgeType = 'None';}
 				break;
-			case "checkbox45Profile": WasChanged = ChangeCheckBoxValue(CheckBoxId,'None');	
+			case "checkbox45Profile":
+				TickEdgeType = 'None';	
 				break;
 			case "checkboxAngleEdge": 
 					//if (ToggleAngleEdges) {ChangeCheckBoxValue(CheckBoxId,'AngleEdge');}
-					if (PanelType == 'Profile Handle') {WasChanged = ChangeCheckBoxValue(CheckBoxId,'45Profile');}
-					else {WasChanged = ChangeCheckBoxValue(CheckBoxId,'None');}	
+					if (PanelType == 'Profile Handle') {TickEdgeType = '45Profile';}
+					else {TickEdgeType = 'None';}	
 					break;
-			default : 	
-				if(PanelType == 'Angle Edge' | ToggleAngleEdges) {WasChanged = ChangeCheckBoxValue(CheckBoxId,'AngleEdge');}
-				else if (PanelType == 'Profile Handle') {WasChanged = ChangeCheckBoxValue(CheckBoxId,'45Profile');}
-				else if (e.ctrlKey) {WasChanged = ChangeCheckBoxValue(CheckBoxId,TickEdgeType);}
-				else {WasChanged = ChangeCheckBoxValue(CheckBoxId,'None');}		
+			default :	
+				if(PanelType == 'Angle Edge' || ToggleAngleEdges) {TickEdgeType = 'AngleEdge';}
+				else if (PanelType == 'Profile Handle') {TickEdgeType = '45Profile';}
+				else if (e.ctrlKey) {TickEdgeType = TickEdgeType;}
+				else {TickEdgeType = 'None';}		
 		}
+		console.log(CheckBoxClass,TickEdgeType);
+
+		WasChanged = ChangeCheckBoxValue(CheckBoxId,TickEdgeType);
 		
 		if (PanelType == 'Angle Edge' | ToggleAngleEdges) {SetSpecialTypeInputs(LineDiv.id);};
+
+		if (WasChanged) {
+			SetEdgingOnVectors(LineDiv.id,CheckBoxId,TickEdgeType);
+		}
 
 		if (PNCPartID > 0 & PartJSON.hasOwnProperty("Vectors") & WasChanged) 
 		{
