@@ -1964,7 +1964,7 @@ function SetConstraintsValues(Index,VectStart)
 
 					PartJSON.Vectors[OthConnVectIndex][OthConnVectXField] = IntPointX2.toString();
 					PartJSON.Vectors[OthConnVectIndex][OthConnVectYField] = IntPointY2.toString(); */
-					
+					debugger;  
 
 				}
 				else
@@ -5321,7 +5321,7 @@ var LoggedOnToken = document.getElementById("Token").value;
 		
 			for (var x=0; x<OrderLines.childElementCount;x++) 
 			{
-			ChangeDesc(OrderLines.children[x].id,OnlyChangeIcon,DontUpdateJSON);
+			ChangeDesc(OrderLines.children[x].id,OnlyChangeIcon,DontUpdateJSON,true);
 			}
 	
     }

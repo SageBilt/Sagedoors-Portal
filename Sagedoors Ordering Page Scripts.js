@@ -1372,7 +1372,7 @@ var LineDiv = document.getElementById(LineDivID);
 
 }
 
-function ChangeDesc(LineDivID,OnlyChangeIcon,DontUpdateJSON)
+function ChangeDesc(LineDivID,OnlyChangeIcon,DontUpdateJSON,DontUpdateBanding)
 {
 var LineDiv = document.getElementById(LineDivID);
 var LineNumber = LineDiv.getAttribute("data-LineNumber");
@@ -1463,7 +1463,11 @@ var LitPartListArr;
 	}
 	else {DescNode.className = "Inputlines";DescNode.style.backgroundImage = "";}
 	
-	if (OnlyChangeIcon == null | OnlyChangeIcon == false) {SetBandingFromJSON(LineDiv,ArrIndex,PartListArr,LitPartListArr);}
+	if (OnlyChangeIcon == null || OnlyChangeIcon == false) {
+		if (DontUpdateBanding == null || DontUpdateBanding == false) {
+			SetBandingFromJSON(LineDiv,ArrIndex,PartListArr,LitPartListArr);
+		}
+	}
 
 }
 
